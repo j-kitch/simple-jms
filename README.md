@@ -1,2 +1,2 @@
 # simple-jms
-JMS 2.0 Implementation
+JMS 2.0 Provider
