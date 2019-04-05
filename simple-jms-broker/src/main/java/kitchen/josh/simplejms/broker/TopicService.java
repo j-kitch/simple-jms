@@ -4,28 +4,28 @@ import java.util.*;
 
 class TopicService {
 
-    private final Map<UUID, Queue<String>> consumerMap;
+    private final Map<UUID, Queue<String>> consumerQueues;
 
     TopicService() {
-        consumerMap = new HashMap<>();
+        consumerQueues = new HashMap<>();
     }
 
     UUID createConsumer() {
         UUID consumerId = UUID.randomUUID();
-        consumerMap.put(consumerId, new LinkedList<>());
+        consumerQueues.put(consumerId, new LinkedList<>());
         return consumerId;
     }
 
     void addMessage(String message) {
-        consumerMap.values().forEach(queue -> queue.add(message));
+        consumerQueues.values().forEach(queue -> queue.add(message));
     }
 
     Optional<String> readMessage(UUID consumerId) {
-        return Optional.ofNullable(consumerMap.get(consumerId))
+        return Optional.ofNullable(consumerQueues.get(consumerId))
                 .map(Queue::poll);
     }
 
-    Map<UUID, Queue<String>> getConsumerMap() {
-        return consumerMap;
+    Map<UUID, Queue<String>> getConsumerQueues() {
+        return consumerQueues;
     }
 }

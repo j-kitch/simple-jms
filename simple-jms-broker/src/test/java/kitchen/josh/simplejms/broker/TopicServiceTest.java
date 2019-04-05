@@ -29,8 +29,8 @@ public class TopicServiceTest {
         UUID consumerId = topicService.createConsumer();
 
         assertThat(consumerId).isNotNull();
-        assertThat(topicService.getConsumerMap()).containsOnlyKeys(consumerId);
-        Queue<String> consumerQueue = topicService.getConsumerMap().get(consumerId);
+        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerId);
+        Queue<String> consumerQueue = topicService.getConsumerQueues().get(consumerId);
         assertThat(consumerQueue).isEmpty();
     }
 
@@ -41,15 +41,15 @@ public class TopicServiceTest {
                 .collect(Collectors.toSet());
 
         assertThat(consumerIds).hasSize(10);
-        assertThat(topicService.getConsumerMap()).containsOnlyKeys(consumerIds);
-        assertThat(topicService.getConsumerMap().values()).allMatch(Collection::isEmpty);
+        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerIds);
+        assertThat(topicService.getConsumerQueues().values()).allMatch(Collection::isEmpty);
     }
 
     @Test
     public void addMessage_noConsumers_doesNothing() {
         topicService.addMessage(MESSAGE_1);
 
-        assertThat(topicService.getConsumerMap()).isEmpty();
+        assertThat(topicService.getConsumerQueues()).isEmpty();
     }
 
     @Test
@@ -60,8 +60,8 @@ public class TopicServiceTest {
         topicService.addMessage(MESSAGE_1);
         topicService.addMessage(MESSAGE_2);
 
-        assertThat(topicService.getConsumerMap()).hasSize(2);
-        topicService.getConsumerMap().values().forEach(queue -> {
+        assertThat(topicService.getConsumerQueues()).hasSize(2);
+        topicService.getConsumerQueues().values().forEach(queue -> {
             assertThat(queue.poll()).isEqualTo(MESSAGE_1);
             assertThat(queue.poll()).isEqualTo(MESSAGE_2);
         });
@@ -89,7 +89,7 @@ public class TopicServiceTest {
         Optional<String> message = topicService.readMessage(consumerId);
 
         assertThat(message).contains(MESSAGE_1);
-        assertThat(topicService.getConsumerMap().get(consumerId)).containsOnly(MESSAGE_2);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsOnly(MESSAGE_2);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class TopicServiceTest {
 
         Optional<String> message = topicService.readMessage(consumerId);
         assertThat(message).contains(MESSAGE_1);
-        assertThat(topicService.getConsumerMap().get(consumerId)).containsOnly(MESSAGE_2);
-        assertThat(topicService.getConsumerMap().get(otherId)).containsOnly(MESSAGE_1, MESSAGE_2);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsOnly(MESSAGE_2);
+        assertThat(topicService.getConsumerQueues().get(otherId)).containsOnly(MESSAGE_1, MESSAGE_2);
     }
 }
