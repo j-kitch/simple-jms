@@ -41,7 +41,7 @@ public class TopicServiceTest {
                 .collect(Collectors.toSet());
 
         assertThat(consumerIds).hasSize(10);
-        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerIds);
+        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(new ArrayList<>(consumerIds).toArray(new UUID[]{}));
         assertThat(topicService.getConsumerQueues().values()).allMatch(Collection::isEmpty);
     }
 
