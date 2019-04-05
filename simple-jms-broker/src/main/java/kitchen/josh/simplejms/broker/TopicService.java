@@ -16,6 +16,10 @@ class TopicService {
         return consumerId;
     }
 
+    void addMessage(String message) {
+        consumerMap.values().forEach(queue -> queue.add(message));
+    }
+
     Map<UUID, Queue<String>> getConsumerMap() {
         return consumerMap;
     }
