@@ -4,6 +4,7 @@ This initial version should function as a very rough implementation of basic fun
 Queues, Connection Factories, Transactions, Redelivery ect for now and focus on simply being able to send messages via
 topics.
 
+## High Level Overview
 This version should provide an API with the following classes
 +   Broker
 +   Session
@@ -11,30 +12,46 @@ This version should provide an API with the following classes
 +   Producer
 +   Message
     
-## Broker
+### Broker
 The broker class should
 +   exposes itself over a port, with the URI acting as the broker URI.
 +   provide a non-persistent topic for the lifetime of the broker instance.
 +   listens for HTTP messages sent from producers and adds them to the topic in any order.
 +   sends HTTP topic messages to all active consumers.
     
-## Session
+### Session
 The session implementation should
 +   accept a URI to locate a Broker
 +   create Consumer and Producer instances for the Broker's single topic.
 +   registers Consumers with the Broker instance upon Consumer creation.
 
-## Consumer
+### Consumer
 The consumer implementation should be
 +   a topic subscription consumer, it consumes messages from a Broker instance's topic.
 
-## Producer
+### Producer
 The producer implementation should be
 +   a topic producer, it can only send messages to a Broker instance's topic.
 
-## Message
+### Message
 A message should be
 +   A plain text message.
 
 Note that this version does not allow the deletion of consumers.  Failed HTTP messages should be logged and ignored.
 The Broker only implements a single non-persistent topic, uniquely identified with the broker.
+
+## Details
+
+### Broker
+The broker should provide a Rest API for producers and consumers.
+The API should expose the following endpoints
++   `POST /producer`
+
+    This endpoint is used by producers to send plain text messages to the broker.
++   `POST /consumer`
+
+    This endpoint should create a consumer, and return the ID of the consumer.
+    
++   `POST /consumer/{id}`
+
+    This endpoint should return the next message for the consumer with the given ID.
