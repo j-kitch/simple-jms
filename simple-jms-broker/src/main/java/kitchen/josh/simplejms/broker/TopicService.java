@@ -20,6 +20,11 @@ class TopicService {
         consumerMap.values().forEach(queue -> queue.add(message));
     }
 
+    Optional<String> readMessage(UUID consumerId) {
+        return Optional.ofNullable(consumerMap.get(consumerId))
+                .map(Queue::poll);
+    }
+
     Map<UUID, Queue<String>> getConsumerMap() {
         return consumerMap;
     }

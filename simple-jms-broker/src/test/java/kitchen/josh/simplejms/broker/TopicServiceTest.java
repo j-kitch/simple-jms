@@ -5,10 +5,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.Collection;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,5 +65,44 @@ public class TopicServiceTest {
             assertThat(queue.poll()).isEqualTo(MESSAGE_1);
             assertThat(queue.poll()).isEqualTo(MESSAGE_2);
         });
+    }
+
+    @Test
+    public void readMessage_consumerDoesNotExist_returnsEmpty() {
+        Optional<String> message = topicService.readMessage(UUID.randomUUID());
+        assertThat(message).isEmpty();
+    }
+
+    @Test
+    public void readMessage_consumerExists_emptyQueue_returnsEmpty() {
+        UUID consumerId = topicService.createConsumer();
+        Optional<String> message = topicService.readMessage(consumerId);
+        assertThat(message).isEmpty();
+    }
+
+    @Test
+    public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
+        UUID consumerId = topicService.createConsumer();
+        topicService.addMessage(MESSAGE_1);
+        topicService.addMessage(MESSAGE_2);
+
+        Optional<String> message = topicService.readMessage(consumerId);
+
+        assertThat(message).contains(MESSAGE_1);
+        assertThat(topicService.getConsumerMap().get(consumerId)).containsOnly(MESSAGE_2);
+    }
+
+    @Test
+    public void readMessage_multipleConsumers_onlyRemovesThisConsumersMessage() {
+        UUID consumerId = topicService.createConsumer();
+        UUID otherId = topicService.createConsumer();
+
+        topicService.addMessage(MESSAGE_1);
+        topicService.addMessage(MESSAGE_2);
+
+        Optional<String> message = topicService.readMessage(consumerId);
+        assertThat(message).contains(MESSAGE_1);
+        assertThat(topicService.getConsumerMap().get(consumerId)).containsOnly(MESSAGE_2);
+        assertThat(topicService.getConsumerMap().get(otherId)).containsOnly(MESSAGE_1, MESSAGE_2);
     }
 }
