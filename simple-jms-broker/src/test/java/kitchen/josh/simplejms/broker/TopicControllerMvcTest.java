@@ -5,6 +5,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,6 +20,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @WebMvcTest(TopicController.class)
 public class TopicControllerMvcTest {
+
+    private static final String MESSAGE = "hello world";
+    private static final String MESSAGE_JSON = "{\"message\": \"" + MESSAGE + "\"}";
 
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final String CONSUMER_ID_JSON = "{\"id\": \"" + CONSUMER_ID + "\"}";
@@ -35,6 +39,7 @@ public class TopicControllerMvcTest {
 
         mockMvc.perform(post("/consumer"))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(CONSUMER_ID_JSON));
         verify(topicService).createConsumer();
         verifyNoMoreInteractions(topicService);
@@ -46,8 +51,19 @@ public class TopicControllerMvcTest {
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{}"));
         verify(topicService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(topicService);
+    }
+
+    @Test
+    public void sendMessage_addsMessageToTopic() throws Exception {
+        mockMvc.perform(post("/producer")
+                .content(MESSAGE_JSON)
+                .contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+        verify(topicService).addMessage(MESSAGE);
     }
 }
