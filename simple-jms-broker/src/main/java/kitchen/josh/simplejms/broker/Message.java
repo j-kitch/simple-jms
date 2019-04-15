@@ -3,17 +3,17 @@ package kitchen.josh.simplejms.broker;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-class Message {
+public class Message {
 
     @JsonProperty
     private final String message;
 
     @JsonCreator
-    Message(String message) {
+    public Message(String message) {
         this.message = message;
     }
 
-    String getMessage() {
+    public String getMessage() {
         return message;
     }
 }

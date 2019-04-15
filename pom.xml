@@ -13,5 +13,6 @@
     <version>0.1.0-SNAPSHOT</version>
     <modules>
         <module>simple-jms-broker</module>
+        <module>simple-jms-client</module>
     </modules>
 </project>
