@@ -58,6 +58,18 @@ public class TopicControllerMvcTest {
     }
 
     @Test
+    public void readMessage_message_returnsMessage() throws Exception {
+        when(topicService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json(MESSAGE_JSON));
+        verify(topicService).readMessage(CONSUMER_ID);
+        verifyNoMoreInteractions(topicService);
+    }
+
+    @Test
     public void sendMessage_addsMessageToTopic() throws Exception {
         mockMvc.perform(post("/producer")
                 .content(MESSAGE_JSON)
