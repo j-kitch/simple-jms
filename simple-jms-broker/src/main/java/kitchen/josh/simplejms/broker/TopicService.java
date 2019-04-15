@@ -1,7 +1,10 @@
 package kitchen.josh.simplejms.broker;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
+@Component
 class TopicService {
 
     private final Map<UUID, Queue<String>> consumerQueues;
