@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.mockito.Mockito.*;
@@ -36,6 +37,17 @@ public class TopicControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(CONSUMER_ID_JSON));
         verify(topicService).createConsumer();
+        verifyNoMoreInteractions(topicService);
+    }
+
+    @Test
+    public void readMessage_noMessage_returnsEmptyMessage() throws Exception {
+        when(topicService.readMessage(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID))
+                .andExpect(status().isOk())
+                .andExpect(content().json("{}"));
+        verify(topicService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(topicService);
     }
 }
