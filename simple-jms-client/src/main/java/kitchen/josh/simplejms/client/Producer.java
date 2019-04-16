@@ -8,8 +8,8 @@ public class Producer {
     private final String url;
     private final RestTemplate restTemplate;
 
-    public Producer(String host, RestTemplate restTemplate) {
-        this.url = host + "/producer";
+    public Producer(String url, RestTemplate restTemplate) {
+        this.url = url;
         this.restTemplate = restTemplate;
     }
 

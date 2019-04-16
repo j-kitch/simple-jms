@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.UUID;
 
-class ConsumerId {
+public class ConsumerId {
 
     @JsonProperty
     private final UUID id;
 
     @JsonCreator
-    ConsumerId(UUID id) {
+    public ConsumerId(UUID id) {
         this.id = id;
     }
 
-    UUID getId() {
+    public UUID getId() {
         return id;
     }
 }

@@ -5,15 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class Consumer {
 
     private final String url;
     private final RestTemplate restTemplate;
 
-    public Consumer(String host, UUID consumerId, RestTemplate restTemplate) {
-        this.url = host + "/consumer/" + consumerId;
+    public Consumer(String url, RestTemplate restTemplate) {
+        this.url = url;
         this.restTemplate = restTemplate;
     }
 

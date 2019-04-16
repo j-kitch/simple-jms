@@ -20,8 +20,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ProducerTest {
 
-    private static final String HOST = "localhost:8080";
-    private static final String URL = HOST + "/producer";
+    private static final String URL = "localhost:8080/producer";
     private static final String MESSAGE = "hello world";
 
     @Mock
@@ -34,7 +33,7 @@ public class ProducerTest {
 
     @Before
     public void setUp() {
-        producer = new Producer(HOST, restTemplate);
+        producer = new Producer(URL, restTemplate);
     }
 
     @Test

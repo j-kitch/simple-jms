@@ -22,9 +22,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsumerTest {
 
-    private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String HOST = "localhost:8080";
-    private static final String URL = HOST + "/consumer/" + CONSUMER_ID;
+    private static final String URL = "localhost:8080/consumer/" + UUID.randomUUID();
     private static final String MESSAGE = "hello world";
 
     @Mock
@@ -34,7 +32,7 @@ public class ConsumerTest {
 
     @Before
     public void setUp() {
-        consumer = new Consumer(HOST, CONSUMER_ID, restTemplate);
+        consumer = new Consumer(URL, restTemplate);
     }
 
     @Test
