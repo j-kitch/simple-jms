@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Message;
+import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ public class ProducerTest {
     private RestTemplate restTemplate;
 
     @Captor
-    private ArgumentCaptor<Message> messageCaptor;
+    private ArgumentCaptor<MessageModel> messageCaptor;
 
     private Producer producer;
 
@@ -43,7 +43,7 @@ public class ProducerTest {
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> producer.sendMessage(MESSAGE));
         verify(restTemplate).postForEntity(eq(URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new Message(MESSAGE));
+        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -52,7 +52,7 @@ public class ProducerTest {
         producer.sendMessage(MESSAGE);
 
         verify(restTemplate).postForEntity(eq(URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new Message(MESSAGE));
+        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }
 }

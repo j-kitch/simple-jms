@@ -1,14 +1,14 @@
 package kitchen.josh.simplejms.broker;
 
-public class Message {
+public class MessageModel {
 
     private String message;
 
-    public Message() {
+    public MessageModel() {
 
     }
 
-    public Message(String message) {
+    public MessageModel(String message) {
         this.message = message;
     }
 

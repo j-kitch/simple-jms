@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Message;
+import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
 public class Producer {
@@ -14,6 +14,6 @@ public class Producer {
     }
 
     public void sendMessage(String message) {
-        restTemplate.postForEntity(url, new Message(message), Void.class);
+        restTemplate.postForEntity(url, new MessageModel(message), Void.class);
     }
 }

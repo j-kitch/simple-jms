@@ -22,14 +22,14 @@ class TopicController {
     }
 
     @PostMapping(path = "/consumer/{consumerId}")
-    Message readMessage(@PathVariable UUID consumerId) {
+    MessageModel readMessage(@PathVariable UUID consumerId) {
         return topicService.readMessage(consumerId)
-                .map(Message::new)
-                .orElse(new Message(null));
+                .map(MessageModel::new)
+                .orElse(new MessageModel(null));
     }
 
     @PostMapping(path = "/producer")
-    void sendMessage(@RequestBody Message message) {
-        topicService.addMessage(message.getMessage());
+    void sendMessage(@RequestBody MessageModel messageModel) {
+        topicService.addMessage(messageModel.getMessage());
     }
 }

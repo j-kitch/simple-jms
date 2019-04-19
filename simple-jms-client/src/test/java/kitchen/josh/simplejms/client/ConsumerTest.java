@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Message;
+import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,29 +41,29 @@ public class ConsumerTest {
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> consumer.receiveMessage());
-        verify(restTemplate).postForEntity(URL, null, Message.class);
+        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
     public void receiveMessage_noMessage_returnsEmpty() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new Message(null)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(null)));
 
         Optional<String> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
-        verify(restTemplate).postForEntity(URL, null, Message.class);
+        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
     public void receiveMessage_messageExists_returnsMessage() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new Message(MESSAGE)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(MESSAGE)));
 
         Optional<String> message = consumer.receiveMessage();
 
         assertThat(message).contains(MESSAGE);
-        verify(restTemplate).postForEntity(URL, null, Message.class);
+        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 }
