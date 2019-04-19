@@ -37,7 +37,7 @@ public class TopicControllerMvcTest {
     public void createConsumer_returnsConsumerIdAsJson() throws Exception {
         when(topicService.createConsumer()).thenReturn(CONSUMER_ID);
 
-        mockMvc.perform(post("/consumer"))
+        mockMvc.perform(post("/topic/consumer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(CONSUMER_ID_JSON));
@@ -49,7 +49,7 @@ public class TopicControllerMvcTest {
     public void readMessage_noMessage_returnsEmptyMessage() throws Exception {
         when(topicService.readMessage(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/consumer/" + CONSUMER_ID))
+        mockMvc.perform(post("/topic/receive/" + CONSUMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{}"));
@@ -61,7 +61,7 @@ public class TopicControllerMvcTest {
     public void readMessage_message_returnsMessage() throws Exception {
         when(topicService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
-        mockMvc.perform(post("/consumer/" + CONSUMER_ID))
+        mockMvc.perform(post("/topic/receive/" + CONSUMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json(MESSAGE_JSON));
@@ -71,7 +71,7 @@ public class TopicControllerMvcTest {
 
     @Test
     public void sendMessage_addsMessageToTopic() throws Exception {
-        mockMvc.perform(post("/producer")
+        mockMvc.perform(post("/topic/send")
                 .content(MESSAGE_JSON)
                 .contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(status().isOk())

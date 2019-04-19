@@ -20,7 +20,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ProducerTest {
 
-    private static final String URL = "localhost:8080/producer";
+    private static final String URL = "localhost:8080/topic/send";
     private static final String MESSAGE = "hello world";
 
     @Mock

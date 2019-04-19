@@ -16,19 +16,19 @@ class TopicController {
         this.topicService = topicService;
     }
 
-    @PostMapping(path = "/consumer")
+    @PostMapping(path = "/topic/consumer")
     ConsumerId createConsumer() {
         return new ConsumerId(topicService.createConsumer());
     }
 
-    @PostMapping(path = "/consumer/{consumerId}")
+    @PostMapping(path = "/topic/receive/{consumerId}")
     MessageModel readMessage(@PathVariable UUID consumerId) {
         return topicService.readMessage(consumerId)
                 .map(MessageModel::new)
                 .orElse(new MessageModel(null));
     }
 
-    @PostMapping(path = "/producer")
+    @PostMapping(path = "/topic/send")
     void sendMessage(@RequestBody MessageModel messageModel) {
         topicService.addMessage(messageModel.getMessage());
     }

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsumerTest {
 
-    private static final String URL = "localhost:8080/consumer/" + UUID.randomUUID();
+    private static final String URL = "localhost:8080/topic/receive/" + UUID.randomUUID();
     private static final String MESSAGE = "hello world";
 
     @Mock

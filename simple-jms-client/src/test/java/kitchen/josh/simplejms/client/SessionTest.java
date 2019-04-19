@@ -22,10 +22,10 @@ import static org.mockito.Mockito.*;
 public class SessionTest {
 
     private static final String HOST = "localhost:8080";
-    private static final String PRODUCER_URL = HOST + "/producer";
-    private static final String CREATE_CONSUMER_URL = HOST + "/consumer";
+    private static final String PRODUCER_URL = HOST + "/topic/send";
+    private static final String CREATE_CONSUMER_URL = HOST + "/topic/consumer";
     private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String CONSUMER_URL = HOST + "/consumer/" + CONSUMER_ID;
+    private static final String CONSUMER_URL = HOST + "/topic/receive/" + CONSUMER_ID;
 
     @Mock
     private RestTemplate restTemplate;

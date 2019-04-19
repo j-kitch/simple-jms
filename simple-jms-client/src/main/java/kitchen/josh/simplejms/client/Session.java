@@ -14,13 +14,13 @@ public class Session {
     }
 
     public Producer createProducer() {
-        return new Producer(host + "/producer", restTemplate);
+        return new Producer(host + "/topic/send", restTemplate);
     }
 
     public Consumer createConsumer() {
-        String createConsumerUrl = host + "/consumer";
+        String createConsumerUrl = host + "/topic/consumer";
         ConsumerId consumerId = restTemplate.postForEntity(createConsumerUrl, null, ConsumerId.class).getBody();
-        String consumerUrl = host + "/consumer/" + consumerId.getId();
+        String consumerUrl = host + "/topic/receive/" + consumerId.getId();
         return new Consumer(consumerUrl, restTemplate);
     }
 }
