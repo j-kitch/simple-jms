@@ -106,7 +106,6 @@ A consumer class for receiving messages from a broker.  The consumer class expos
 
     If a new message exists, this will return the message as a String, or if
     no further messages exist currently, will return `Optional.empty()`.
-The consumer implementation should be
 
 ## Producer
 A producer class for sending messages to a broker, it exposes the following methods
