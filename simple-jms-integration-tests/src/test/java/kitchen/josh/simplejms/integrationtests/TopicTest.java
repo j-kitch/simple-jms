@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.integrationtests;
 
-import kitchen.josh.simplejms.broker.BrokerApplication;
+import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = BrokerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class TopicTest {
 
