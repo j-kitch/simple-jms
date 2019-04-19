@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.client;
 
+import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +51,7 @@ public class ConsumerTest {
     public void receiveMessage_noMessage_returnsEmpty() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(null)));
 
-        Optional<String> message = consumer.receiveMessage();
+        Optional<Message> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         verify(restTemplate).postForEntity(URL, null, MessageModel.class);
@@ -60,9 +62,9 @@ public class ConsumerTest {
     public void receiveMessage_messageExists_returnsMessage() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(MESSAGE)));
 
-        Optional<String> message = consumer.receiveMessage();
+        Optional<Message> message = consumer.receiveMessage();
 
-        assertThat(message).contains(MESSAGE);
+        assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(Destination.TOPIC, MESSAGE));
         verify(restTemplate).postForEntity(URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }

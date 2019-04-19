@@ -1,6 +1,8 @@
 package kitchen.josh.simplejms.integrationtests;
 
 import kitchen.josh.simplejms.broker.Broker;
+import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
@@ -53,9 +55,9 @@ public class TopicTest {
         producer.sendMessage(MESSAGES[1]);
         producer.sendMessage(MESSAGES[2]);
 
-        assertThat(consumer.receiveMessage()).contains(MESSAGES[0]);
-        assertThat(consumer.receiveMessage()).contains(MESSAGES[1]);
-        assertThat(consumer.receiveMessage()).contains(MESSAGES[2]);
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[0]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[1]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[2]));
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -77,16 +79,16 @@ public class TopicTest {
         producer.sendMessage(MESSAGES[1]);
         producer.sendMessage(MESSAGES[2]);
 
-        assertThat(consumer1.receiveMessage()).contains(MESSAGES[0]);
-        assertThat(consumer1.receiveMessage()).contains(MESSAGES[1]);
-        assertThat(consumer1.receiveMessage()).contains(MESSAGES[2]);
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[0]));
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[1]));
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[2]));
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
 
-        assertThat(consumer2.receiveMessage()).contains(MESSAGES[0]);
-        assertThat(consumer2.receiveMessage()).contains(MESSAGES[1]);
-        assertThat(consumer2.receiveMessage()).contains(MESSAGES[2]);
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[0]));
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[1]));
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[2]));
         assertThat(consumer2.receiveMessage()).isEmpty();
         assertThat(consumer2.receiveMessage()).isEmpty();
         assertThat(consumer2.receiveMessage()).isEmpty();
@@ -111,8 +113,8 @@ public class TopicTest {
         producer.sendMessage(MESSAGES[2]);
         producer.sendMessage(MESSAGES[3]);
 
-        assertThat(consumer.receiveMessage()).contains(MESSAGES[2]);
-        assertThat(consumer.receiveMessage()).contains(MESSAGES[3]);
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[2]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(Destination.TOPIC, MESSAGES[3]));
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();

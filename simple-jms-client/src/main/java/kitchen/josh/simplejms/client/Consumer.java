@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.client;
 
+import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -16,9 +18,10 @@ public class Consumer {
         this.restTemplate = restTemplate;
     }
 
-    public Optional<String> receiveMessage() {
+    public Optional<Message> receiveMessage() {
         return Optional.ofNullable(restTemplate.postForEntity(url, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
-                .map(MessageModel::getMessage);
+                .map(MessageModel::getMessage)
+                .map(message -> new Message(Destination.TOPIC, message));
     }
 }

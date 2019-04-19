@@ -138,7 +138,7 @@ It will expose the following methods
 ## Consumer
 A consumer class for receiving messages from a destination.  The consumer class exposes the following methods
 
-+   `Optional<String> receiveMessage()`
++   `Optional<Message> receiveMessage()`
 
     If a new message exists, this will return the message as a String, or if
     no further messages exist currently, will return `Optional.empty()`.
