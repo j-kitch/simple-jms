@@ -21,6 +21,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(QueueController.class)
 public class QueueControllerMvcTest {
 
+    private static final UUID CONSUMER_ID = UUID.randomUUID();
+    private static final String CONSUMER_ID_JSON = "{\"id\": \"" + CONSUMER_ID + "\"}";
+
+    private static final String MESSAGE = "hello world";
+    private static final String MESSAGE_JSON = "{\"message\": \"" + MESSAGE + "\"}";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -29,57 +35,48 @@ public class QueueControllerMvcTest {
 
     @Test
     public void createConsumer_returnsConsumerIdAsJson() throws Exception {
-        UUID consumerId = UUID.randomUUID();
-
-        when(queueService.createConsumer()).thenReturn(consumerId);
+        when(queueService.createConsumer()).thenReturn(CONSUMER_ID);
 
         mockMvc.perform(post("/queue/consumer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + consumerId + "\"}"));
+                .andExpect(content().json(CONSUMER_ID_JSON));
         verify(queueService).createConsumer();
         verifyNoMoreInteractions(queueService);
     }
 
     @Test
     public void readMessage_noMessage_returnsEmptyMessage() throws Exception {
-        UUID consumerId = UUID.randomUUID();
-
         when(queueService.readMessage(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/queue/receive/" + consumerId))
+        mockMvc.perform(post("/queue/receive/" + CONSUMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{}"));
-        verify(queueService).readMessage(consumerId);
+        verify(queueService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(queueService);
     }
 
     @Test
     public void readMessage_message_returnsMessage() throws Exception {
-        UUID consumerId = UUID.randomUUID();
-        String message = "hello world";
+        when(queueService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
-        when(queueService.readMessage(any())).thenReturn(Optional.of(message));
-
-        mockMvc.perform(post("/queue/receive/" + consumerId))
+        mockMvc.perform(post("/queue/receive/" + CONSUMER_ID))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + message + "\"}"));
-        verify(queueService).readMessage(consumerId);
+                .andExpect(content().json(MESSAGE_JSON));
+        verify(queueService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(queueService);
     }
 
     @Test
     public void sendMessage_addsMessageToQueue() throws Exception {
-        String message = "hello world";
-
         mockMvc.perform(post("/queue/send")
-            .contentType(MediaType.APPLICATION_JSON_UTF8)
-            .content("{\"message\": \"" + message + "\"}"))
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content(MESSAGE_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
-        verify(queueService).addMessage(message);
+        verify(queueService).addMessage(MESSAGE);
         verifyNoMoreInteractions(queueService);
     }
 }
