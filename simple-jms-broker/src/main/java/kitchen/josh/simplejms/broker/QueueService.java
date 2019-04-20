@@ -1,8 +1,11 @@
 package kitchen.josh.simplejms.broker;
 
+import org.springframework.stereotype.Component;
+
 import java.util.*;
 
-public class QueueService {
+@Component
+class QueueService {
 
     private final Set<UUID> consumers;
     private final Queue<String> messages;
