@@ -50,6 +50,9 @@ public class BrokerTopicApiIntegrationTest {
         }
     }
 
+    /**
+     * Unknown consumer IDs receive empty messages.
+     */
     @Test
     public void receiveMessage_unknownConsumerId_returnsOkAndEmptyMessage() {
         ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + UUID.randomUUID(), null, MessageModel.class);
@@ -57,6 +60,9 @@ public class BrokerTopicApiIntegrationTest {
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
 
+    /**
+     * When no messages exist to receive, a consumer receives an empty message.
+     */
     @Test
     public void receiveMessage_noMessages_returnsOkAndEmptyMessage() {
         ConsumerId consumerId = restTemplate.postForEntity("/topic/consumer", null, ConsumerId.class).getBody();
@@ -66,6 +72,9 @@ public class BrokerTopicApiIntegrationTest {
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
 
+    /**
+     * When a message is sent before a consumer is created, the consumer does not receive the message.
+     */
     @Test
     public void receiveMessage_messageSentBeforeConsumer_returnsOkAndEmptyMessage() {
         restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
@@ -76,6 +85,9 @@ public class BrokerTopicApiIntegrationTest {
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
 
+    /**
+     * When a message is sent after a consumer is created, the consumer receives the message.
+     */
     @Test
     public void receiveMessage_messageSentAfterConsumer_returnsOkAndMessage() {
         ConsumerId consumerId = restTemplate.postForEntity("/topic/consumer", null, ConsumerId.class).getBody();
@@ -86,6 +98,9 @@ public class BrokerTopicApiIntegrationTest {
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
     }
 
+    /**
+     * A message is only received once by a consumer.
+     */
     @Test
     public void receiveMessage_receivesMessageOnce() {
         ConsumerId consumerId = restTemplate.postForEntity("/topic/consumer", null, ConsumerId.class).getBody();
@@ -100,5 +115,36 @@ public class BrokerTopicApiIntegrationTest {
         ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response2.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
+    }
+
+    /**
+     * Every consumer receives the same message.
+     */
+    @Test
+    public void receiveMessage_multipleConsumers_allReceiveMessages() {
+        ConsumerId consumerId1 = restTemplate.postForEntity("/topic/consumer", null, ConsumerId.class).getBody();
+        ConsumerId consumerId2 = restTemplate.postForEntity("/topic/consumer", null, ConsumerId.class).getBody();
+
+        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+
+        // Consumer 1 receives message.
+        ResponseEntity<MessageModel> response1 = restTemplate.postForEntity("/topic/receive/" + consumerId1.getId(), null, MessageModel.class);
+        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response1.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
+
+        // Consumer2 receives message.
+        ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/receive/" + consumerId2.getId(), null, MessageModel.class);
+        assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response2.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
+    }
+
+    /**
+     * Sending a message returns OK and an empty body.
+     */
+    @Test
+    public void sendMessage_returnsOkAndEmptyBody() {
+        ResponseEntity<Void> response = restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNull();
     }
 }
