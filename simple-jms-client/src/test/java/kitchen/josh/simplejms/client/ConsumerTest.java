@@ -65,7 +65,7 @@ public class ConsumerTest {
 
         Optional<Message> message = consumer.receiveMessage();
 
-        assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(Destination.TOPIC, MESSAGE));
+        assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(DESTINATION, MESSAGE));
         verify(restTemplate).postForEntity(URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }

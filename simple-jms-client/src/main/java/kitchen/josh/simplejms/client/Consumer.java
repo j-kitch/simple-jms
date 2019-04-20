@@ -28,6 +28,6 @@ public class Consumer {
         return Optional.ofNullable(restTemplate.postForEntity(url, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
                 .map(MessageModel::getMessage)
-                .map(message -> new Message(Destination.TOPIC, message));
+                .map(message -> new Message(destination, message));
     }
 }
