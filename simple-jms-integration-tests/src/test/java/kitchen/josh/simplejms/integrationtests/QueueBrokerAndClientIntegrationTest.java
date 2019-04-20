@@ -18,10 +18,13 @@ import org.springframework.web.client.RestTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
+/**
+ * Broker and Client API queue functionality.
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class QueueTest {
+public class QueueBrokerAndClientIntegrationTest {
 
     private static final String[] MESSAGES = {"a", "b", "c", "d"};
 
