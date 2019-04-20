@@ -10,12 +10,18 @@ import java.util.Optional;
 
 public class Consumer {
 
+    private final Destination destination;
     private final String url;
     private final RestTemplate restTemplate;
 
-    public Consumer(String url, RestTemplate restTemplate) {
+    public Consumer(Destination destination, String url, RestTemplate restTemplate) {
+        this.destination = destination;
         this.url = url;
         this.restTemplate = restTemplate;
+    }
+
+    public Destination getDestination() {
+        return destination;
     }
 
     public Optional<Message> receiveMessage() {

@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.ConsumerId;
+import kitchen.josh.simplejms.broker.Destination;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ public class SessionTest {
     public void createProducer_createsProducerWithCorrectUrl() {
         Producer producer = session.createProducer();
 
-        assertThat(producer).isEqualToComparingFieldByField(new Producer(PRODUCER_URL, restTemplate));
+        assertThat(producer).isEqualToComparingFieldByField(new Producer(Destination.TOPIC, PRODUCER_URL, restTemplate));
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -60,7 +61,7 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer();
 
-        assertThat(consumer).isEqualToComparingFieldByField(new Consumer(CONSUMER_URL, restTemplate));
+        assertThat(consumer).isEqualToComparingFieldByField(new Consumer(Destination.TOPIC, CONSUMER_URL, restTemplate));
         verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, ConsumerId.class);
         verifyNoMoreInteractions(restTemplate);
     }

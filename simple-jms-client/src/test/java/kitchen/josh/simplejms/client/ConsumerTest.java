@@ -24,6 +24,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsumerTest {
 
+    private static final Destination DESTINATION = Destination.TOPIC;
     private static final String URL = "localhost:8080/topic/receive/" + UUID.randomUUID();
     private static final String MESSAGE = "hello world";
 
@@ -34,7 +35,7 @@ public class ConsumerTest {
 
     @Before
     public void setUp() {
-        consumer = new Consumer(URL, restTemplate);
+        consumer = new Consumer(DESTINATION, URL, restTemplate);
     }
 
     @Test

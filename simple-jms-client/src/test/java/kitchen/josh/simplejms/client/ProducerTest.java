@@ -1,5 +1,6 @@
 package kitchen.josh.simplejms.client;
 
+import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,6 +21,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ProducerTest {
 
+    private static final Destination DESTINATION = Destination.TOPIC;
     private static final String URL = "localhost:8080/topic/send";
     private static final String MESSAGE = "hello world";
 
@@ -33,7 +35,7 @@ public class ProducerTest {
 
     @Before
     public void setUp() {
-        producer = new Producer(URL, restTemplate);
+        producer = new Producer(DESTINATION, URL, restTemplate);
     }
 
     @Test
