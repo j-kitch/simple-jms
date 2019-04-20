@@ -22,11 +22,13 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class SessionTest {
 
+    private static final Destination DESTINATION = Destination.QUEUE;
+
     private static final String HOST = "localhost:8080";
-    private static final String PRODUCER_URL = HOST + "/topic/send";
-    private static final String CREATE_CONSUMER_URL = HOST + "/topic/consumer";
+    private static final String PRODUCER_URL = HOST + "/" + DESTINATION.name().toLowerCase() + "/send";
+    private static final String CREATE_CONSUMER_URL = HOST + "/" +  DESTINATION.name().toLowerCase() + "/consumer";
     private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String CONSUMER_URL = HOST + "/topic/receive/" + CONSUMER_ID;
+    private static final String CONSUMER_URL = HOST + "/" + DESTINATION.name().toLowerCase() + "/receive/" + CONSUMER_ID;
 
     @Mock
     private RestTemplate restTemplate;
@@ -40,9 +42,9 @@ public class SessionTest {
 
     @Test
     public void createProducer_createsProducerWithCorrectUrl() {
-        Producer producer = session.createProducer();
+        Producer producer = session.createProducer(DESTINATION);
 
-        assertThat(producer).isEqualToComparingFieldByField(new Producer(Destination.TOPIC, PRODUCER_URL, restTemplate));
+        assertThat(producer).isEqualToComparingFieldByField(new Producer(DESTINATION, PRODUCER_URL, restTemplate));
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -51,7 +53,7 @@ public class SessionTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
 
         assertThatExceptionOfType(RestClientException.class)
-                .isThrownBy(() -> session.createConsumer());
+                .isThrownBy(() -> session.createConsumer(DESTINATION));
         verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, ConsumerId.class);
     }
 
@@ -59,9 +61,9 @@ public class SessionTest {
     public void createConsumer_restTemplateReturnsId_returnsConsumerUsingId() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(CONSUMER_ID)));
 
-        Consumer consumer = session.createConsumer();
+        Consumer consumer = session.createConsumer(DESTINATION);
 
-        assertThat(consumer).isEqualToComparingFieldByField(new Consumer(Destination.TOPIC, CONSUMER_URL, restTemplate));
+        assertThat(consumer).isEqualToComparingFieldByField(new Consumer(DESTINATION, CONSUMER_URL, restTemplate));
         verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, ConsumerId.class);
         verifyNoMoreInteractions(restTemplate);
     }

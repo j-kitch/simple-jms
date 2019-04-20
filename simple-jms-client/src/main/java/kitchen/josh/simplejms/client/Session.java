@@ -14,14 +14,28 @@ public class Session {
         this.restTemplate = restTemplate;
     }
 
-    public Producer createProducer() {
-        return new Producer(Destination.TOPIC, host + "/topic/send", restTemplate);
+    public Producer createProducer(Destination destination) {
+        return new Producer(destination, sendUrl(destination), restTemplate);
     }
 
-    public Consumer createConsumer() {
-        String createConsumerUrl = host + "/topic/consumer";
-        ConsumerId consumerId = restTemplate.postForEntity(createConsumerUrl, null, ConsumerId.class).getBody();
-        String consumerUrl = host + "/topic/receive/" + consumerId.getId();
-        return new Consumer(Destination.TOPIC, consumerUrl, restTemplate);
+    public Consumer createConsumer(Destination destination) {
+        ConsumerId consumerId = restTemplate.postForEntity(createConsumerUrl(destination), null, ConsumerId.class).getBody();
+        return new Consumer(destination, receiveUrl(destination, consumerId), restTemplate);
+    }
+
+    private String sendUrl(Destination destination) {
+        return host + "/" + destinationUrl(destination) + "/send";
+    }
+
+    private String receiveUrl(Destination destination, ConsumerId consumerId) {
+        return host + "/" + destinationUrl(destination) + "/receive/" + consumerId.getId();
+    }
+
+    private String createConsumerUrl(Destination destination) {
+        return host + "/" + destinationUrl(destination) + "/consumer";
+    }
+
+    private static String destinationUrl(Destination destination) {
+        return destination.name().toLowerCase();
     }
 }

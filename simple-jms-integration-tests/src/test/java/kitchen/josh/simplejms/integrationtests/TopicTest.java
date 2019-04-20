@@ -48,8 +48,8 @@ public class TopicTest {
      */
     @Test
     public void singleConsumerSingleProducer_sentMessages_receivedMessagesInOrder() {
-        Consumer consumer = session.createConsumer();
-        Producer producer = session.createProducer();
+        Consumer consumer = session.createConsumer(Destination.TOPIC);
+        Producer producer = session.createProducer(Destination.TOPIC);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
@@ -71,9 +71,9 @@ public class TopicTest {
      */
     @Test
     public void multipleConsumersSingleProducer_sentMessages_allConsumersReceiveMessagesInOrder() {
-        Producer producer = session.createProducer();
-        Consumer consumer1 = session.createConsumer();
-        Consumer consumer2 = session.createConsumer();
+        Producer producer = session.createProducer(Destination.TOPIC);
+        Consumer consumer1 = session.createConsumer(Destination.TOPIC);
+        Consumer consumer2 = session.createConsumer(Destination.TOPIC);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
@@ -103,12 +103,12 @@ public class TopicTest {
      */
     @Test
     public void consumerOnlyReceivesMessagesAfterConstruction() {
-        Producer producer = session.createProducer();
+        Producer producer = session.createProducer(Destination.TOPIC);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
 
-        Consumer consumer = session.createConsumer();
+        Consumer consumer = session.createConsumer(Destination.TOPIC);
 
         producer.sendMessage(MESSAGES[2]);
         producer.sendMessage(MESSAGES[3]);
@@ -127,7 +127,7 @@ public class TopicTest {
      */
     @Test
     public void onlyConsumerReceivesNoMessages() {
-        Consumer consumer = session.createConsumer();
+        Consumer consumer = session.createConsumer(Destination.TOPIC);
 
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -141,8 +141,8 @@ public class TopicTest {
      */
     @Test
     public void singleConsumerSingleProducer_noMessagesSent_noMessagesReceived() {
-        Consumer consumer = session.createConsumer();
-        session.createProducer();
+        Consumer consumer = session.createConsumer(Destination.TOPIC);
+        session.createProducer(Destination.TOPIC);
 
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
