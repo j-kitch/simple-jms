@@ -61,25 +61,52 @@ public class SingleTopicServiceTest {
     }
 
     @Test
-    public void addMessage_noConsumers_doesNothing() {
-        topicService.addMessage(MESSAGE_1);
+    public void addMessage_invalidProducer_doesNothing() {
+        topicService.addMessage(UUID.randomUUID(), MESSAGE_1);
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
+        assertThat(topicService.getProducers()).isEmpty();
+    }
+
+    @Test
+    public void addMessage_noConsumers_doesNothing() {
+        UUID producerId = topicService.createProducer();
+        topicService.addMessage(producerId, MESSAGE_1);
+
+        assertThat(topicService.getConsumerQueues()).isEmpty();
+        assertThat(topicService.getProducers()).containsOnly(producerId);
+    }
+
+    @Test
+    public void addMessage_invalidProducer_consumersExist_doesNothing() {
+        topicService.createConsumer();
+        topicService.createConsumer();
+
+        topicService.addMessage(UUID.randomUUID(), MESSAGE_1);
+        topicService.addMessage(UUID.randomUUID(), MESSAGE_2);
+
+        assertThat(topicService.getConsumerQueues()).hasSize(2);
+        topicService.getConsumerQueues().values().forEach(queue -> {
+            assertThat(queue).isEmpty();
+        });
+        assertThat(topicService.getProducers()).isEmpty();
     }
 
     @Test
     public void addMessage_consumersExist_appendsMessageToQueues() {
+        UUID producerId = topicService.createProducer();
         topicService.createConsumer();
         topicService.createConsumer();
 
-        topicService.addMessage(MESSAGE_1);
-        topicService.addMessage(MESSAGE_2);
+        topicService.addMessage(producerId, MESSAGE_1);
+        topicService.addMessage(producerId, MESSAGE_2);
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
             assertThat(queue.poll()).isEqualTo(MESSAGE_1);
             assertThat(queue.poll()).isEqualTo(MESSAGE_2);
         });
+        assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 
     @Test
@@ -97,27 +124,31 @@ public class SingleTopicServiceTest {
 
     @Test
     public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
+        UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(MESSAGE_1);
-        topicService.addMessage(MESSAGE_2);
+        topicService.addMessage(producerId, MESSAGE_1);
+        topicService.addMessage(producerId, MESSAGE_2);
 
         Optional<String> message = topicService.readMessage(consumerId);
 
         assertThat(message).contains(MESSAGE_1);
         assertThat(topicService.getConsumerQueues().get(consumerId)).containsOnly(MESSAGE_2);
+        assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 
     @Test
     public void readMessage_multipleConsumers_onlyRemovesThisConsumersMessage() {
+        UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
         UUID otherId = topicService.createConsumer();
 
-        topicService.addMessage(MESSAGE_1);
-        topicService.addMessage(MESSAGE_2);
+        topicService.addMessage(producerId, MESSAGE_1);
+        topicService.addMessage(producerId, MESSAGE_2);
 
         Optional<String> message = topicService.readMessage(consumerId);
         assertThat(message).contains(MESSAGE_1);
         assertThat(topicService.getConsumerQueues().get(consumerId)).containsOnly(MESSAGE_2);
         assertThat(topicService.getConsumerQueues().get(otherId)).containsOnly(MESSAGE_1, MESSAGE_2);
+        assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 }

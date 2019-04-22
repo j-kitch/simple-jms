@@ -24,8 +24,10 @@ public class SingleTopicService {
         return producerId;
     }
 
-    void addMessage(String message) {
-        consumerQueues.values().forEach(queue -> queue.add(message));
+    void addMessage(UUID producer, String message) {
+        if (producers.contains(producer)) {
+            consumerQueues.values().forEach(queue -> queue.add(message));
+        }
     }
 
     Optional<String> readMessage(UUID consumerId) {
