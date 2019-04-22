@@ -10,7 +10,7 @@
     <groupId>kitchen.josh</groupId>
     <artifactId>simple-jms</artifactId>
     <packaging>pom</packaging>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <modules>
         <module>simple-jms-broker</module>
         <module>simple-jms-client</module>
