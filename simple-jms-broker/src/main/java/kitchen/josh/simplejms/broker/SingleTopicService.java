@@ -2,7 +2,7 @@ package kitchen.josh.simplejms.broker;
 
 import java.util.*;
 
-public class SingleTopicService {
+public class SingleTopicService implements SingleDestinationService {
 
     private final Map<UUID, Queue<String>> consumerQueues;
     private final Set<UUID> producers;
@@ -12,33 +12,39 @@ public class SingleTopicService {
         producers = new HashSet<>();
     }
 
-    UUID createConsumer() {
+    @Override
+    public UUID createConsumer() {
         UUID consumerId = UUID.randomUUID();
         consumerQueues.put(consumerId, new LinkedList<>());
         return consumerId;
     }
 
-    UUID createProducer() {
+    @Override
+    public UUID createProducer() {
         UUID producerId = UUID.randomUUID();
         producers.add(producerId);
         return producerId;
     }
 
-    void removeConsumer(UUID consumerId) {
+    @Override
+    public void removeConsumer(UUID consumerId) {
         consumerQueues.remove(consumerId);
     }
 
-    void removeProducer(UUID producerId) {
+    @Override
+    public void removeProducer(UUID producerId) {
         producers.remove(producerId);
     }
 
-    void addMessage(UUID producer, String message) {
+    @Override
+    public void addMessage(UUID producer, String message) {
         if (producers.contains(producer)) {
             consumerQueues.values().forEach(queue -> queue.add(message));
         }
     }
 
-    Optional<String> readMessage(UUID consumerId) {
+    @Override
+    public Optional<String> readMessage(UUID consumerId) {
         return Optional.ofNullable(consumerQueues.get(consumerId))
                 .map(Queue::poll);
     }
