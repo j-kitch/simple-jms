@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.integrationtests.client;
 
 import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.DestinationType;
 import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.client.Consumer;
 import org.junit.Before;
@@ -25,8 +25,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class ConsumerTest {
 
-    private static final Destination2 QUEUE = new Destination2(Destination.QUEUE, null);
-    private static final Destination2 TOPIC = new Destination2(Destination.TOPIC, null);
+    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, null);
+    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, null);
     private static final String HOST = "http://localhost:8080";
 
     private RestTemplate restTemplate;

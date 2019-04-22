@@ -15,13 +15,13 @@ public class DestinationController {
 
     @PostMapping(path = "/{destinationType}")
     public ConsumerId createDestination(@PathVariable String destinationType) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         return new ConsumerId(destinationService.createDestination(destination));
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
     public ConsumerId createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         UUID consumerId = destinationService.findDestination(destination, destinationId)
                 .map(SingleDestinationService::createConsumer)
                 .orElse(null);
@@ -30,7 +30,7 @@ public class DestinationController {
 
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
     public ConsumerId createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         UUID consumerId = destinationService.findDestination(destination, destinationId)
                 .map(SingleDestinationService::createProducer)
                 .orElse(null);
@@ -40,7 +40,7 @@ public class DestinationController {
     @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID consumerId) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         destinationService.findDestination(destination, destinationId)
                 .ifPresent(service -> service.removeConsumer(consumerId));
     }
@@ -48,7 +48,7 @@ public class DestinationController {
     @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
     public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID producerId) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         destinationService.findDestination(destination, destinationId)
                 .ifPresent(service -> service.removeProducer(producerId));
     }
@@ -56,7 +56,7 @@ public class DestinationController {
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
     public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                             @PathVariable UUID producerId, @RequestBody MessageModel message) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         destinationService.findDestination(destination, destinationId)
                 .ifPresent(service -> service.addMessage(producerId, message.getMessage()));
     }
@@ -64,7 +64,7 @@ public class DestinationController {
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
-        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         String message = destinationService.findDestination(destination, destinationId)
                 .flatMap(service -> service.readMessage(consumerId))
                 .orElse(null);

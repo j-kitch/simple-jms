@@ -43,7 +43,7 @@ public class DestinationControllerMvcTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + id + "\"}"));
 
-        verify(destinationService).createDestination(Destination.TOPIC);
+        verify(destinationService).createDestination(DestinationType.TOPIC);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
@@ -57,7 +57,7 @@ public class DestinationControllerMvcTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + id + "\"}"));
 
-        verify(destinationService).createDestination(Destination.QUEUE);
+        verify(destinationService).createDestination(DestinationType.QUEUE);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
@@ -73,7 +73,7 @@ public class DestinationControllerMvcTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + consumerId + "\"}"));
 
-        verify(destinationService).findDestination(Destination.QUEUE, destinationId);
+        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
         verify(singleDestinationService).createConsumer();
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -90,7 +90,7 @@ public class DestinationControllerMvcTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + producerId + "\"}"));
 
-        verify(destinationService).findDestination(Destination.TOPIC, destinationId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
         verify(singleDestinationService).createProducer();
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -104,7 +104,7 @@ public class DestinationControllerMvcTest {
         mockMvc.perform(delete("/topic/" + destinationId + "/consumer/" + consumerId))
                 .andExpect(status().isOk());
 
-        verify(destinationService).findDestination(Destination.TOPIC, destinationId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
         verify(singleDestinationService).removeConsumer(consumerId);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -118,7 +118,7 @@ public class DestinationControllerMvcTest {
         mockMvc.perform(delete("/queue/" + destinationId + "/producer/" + producerId))
                 .andExpect(status().isOk());
 
-        verify(destinationService).findDestination(Destination.QUEUE, destinationId);
+        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
         verify(singleDestinationService).removeProducer(producerId);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -135,7 +135,7 @@ public class DestinationControllerMvcTest {
                 .content("{\"message\": \"" + message + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
-        verify(destinationService).findDestination(Destination.QUEUE, destinationId);
+        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
         verify(singleDestinationService).addMessage(producerId, message);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -150,7 +150,7 @@ public class DestinationControllerMvcTest {
         mockMvc.perform(post("/topic/" + destinationId + "/consumer/" + consumerId + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"message\": null}"));
-        verify(destinationService).findDestination(Destination.TOPIC, destinationId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
         verify(singleDestinationService).readMessage(consumerId);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
@@ -166,7 +166,7 @@ public class DestinationControllerMvcTest {
         mockMvc.perform(post("/topic/" + destinationId + "/consumer/" + consumerId + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"message\": \"" + message + "\"}"));
-        verify(destinationService).findDestination(Destination.TOPIC, destinationId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
         verify(singleDestinationService).readMessage(consumerId);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }

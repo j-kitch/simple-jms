@@ -1,7 +1,22 @@
 package kitchen.josh.simplejms.broker;
 
-public enum Destination {
+import java.util.UUID;
 
-    TOPIC,
-    QUEUE;
+public class Destination {
+
+    private final DestinationType type;
+    private final UUID id;
+
+    public Destination(DestinationType type, UUID id) {
+        this.type = type;
+        this.id = id;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public DestinationType getType() {
+        return type;
+    }
 }

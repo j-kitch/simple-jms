@@ -2,7 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.ConsumerId;
 import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.DestinationType;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,7 +23,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class SessionTest {
 
-    private static final Destination2 DESTINATION = new Destination2(Destination.QUEUE, null);
+    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, null);
 
     private static final String HOST = "localhost:8080";
     private static final String PRODUCER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/send";

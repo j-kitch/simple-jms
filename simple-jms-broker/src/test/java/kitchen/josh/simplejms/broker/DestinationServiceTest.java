@@ -19,7 +19,7 @@ public class DestinationServiceTest {
 
     @Test
     public void createDestination_QUEUE_createsQueue() {
-        UUID queueId = destinationService.createDestination(Destination.QUEUE);
+        UUID queueId = destinationService.createDestination(DestinationType.QUEUE);
 
         assertThat(queueId).isNotNull();
         assertThat(destinationService.getQueues()).containsOnlyKeys(queueId);
@@ -29,7 +29,7 @@ public class DestinationServiceTest {
 
     @Test
     public void createDestination_TOPIC_createsTopic() {
-        UUID topicId = destinationService.createDestination(Destination.TOPIC);
+        UUID topicId = destinationService.createDestination(DestinationType.TOPIC);
 
         assertThat(topicId).isNotNull();
         assertThat(destinationService.getTopics()).containsOnlyKeys(topicId);
@@ -39,31 +39,31 @@ public class DestinationServiceTest {
 
     @Test
     public void findDestination_noDestination_returnsEmpty() {
-        assertThat(destinationService.findDestination(Destination.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(Destination.QUEUE, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.QUEUE, UUID.randomUUID())).isEmpty();
     }
 
     @Test
     public void findDestination_queue_returnsForQueue() {
-        UUID queueId = destinationService.createDestination(Destination.QUEUE);
+        UUID queueId = destinationService.createDestination(DestinationType.QUEUE);
 
-        Optional<SingleDestinationService> service = destinationService.findDestination(Destination.QUEUE, queueId);
+        Optional<SingleDestinationService> service = destinationService.findDestination(DestinationType.QUEUE, queueId);
         assertThat(service).contains(destinationService.getQueues().get(queueId));
 
-        assertThat(destinationService.findDestination(Destination.QUEUE, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(Destination.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(Destination.TOPIC, queueId)).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.QUEUE, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.TOPIC, queueId)).isEmpty();
     }
 
     @Test
     public void findDestination_topic_returnsForTopic() {
-        UUID topicId = destinationService.createDestination(Destination.TOPIC);
+        UUID topicId = destinationService.createDestination(DestinationType.TOPIC);
 
-        Optional<SingleDestinationService> service = destinationService.findDestination(Destination.TOPIC, topicId);
+        Optional<SingleDestinationService> service = destinationService.findDestination(DestinationType.TOPIC, topicId);
         assertThat(service).contains(destinationService.getTopics().get(topicId));
 
-        assertThat(destinationService.findDestination(Destination.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(Destination.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(Destination.QUEUE, topicId)).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(DestinationType.QUEUE, topicId)).isEmpty();
     }
 }

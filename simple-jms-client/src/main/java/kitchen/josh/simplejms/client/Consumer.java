@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.http.ResponseEntity;
@@ -10,17 +10,17 @@ import java.util.Optional;
 
 public class Consumer {
 
-    private final Destination2 destination;
+    private final Destination destination;
     private final String url;
     private final RestTemplate restTemplate;
 
-    public Consumer(Destination2 destination, String url, RestTemplate restTemplate) {
+    public Consumer(Destination destination, String url, RestTemplate restTemplate) {
         this.destination = destination;
         this.url = url;
         this.restTemplate = restTemplate;
     }
 
-    public Destination2 getDestination() {
+    public Destination getDestination() {
         return destination;
     }
 

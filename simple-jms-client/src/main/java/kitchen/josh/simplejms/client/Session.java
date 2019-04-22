@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.ConsumerId;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.Destination;
 import org.springframework.web.client.RestTemplate;
 
 public class Session {
@@ -14,28 +14,28 @@ public class Session {
         this.restTemplate = restTemplate;
     }
 
-    public Producer createProducer(Destination2 destination) {
+    public Producer createProducer(Destination destination) {
         return new Producer(destination, sendUrl(destination), restTemplate);
     }
 
-    public Consumer createConsumer(Destination2 destination) {
+    public Consumer createConsumer(Destination destination) {
         ConsumerId consumerId = restTemplate.postForEntity(createConsumerUrl(destination), null, ConsumerId.class).getBody();
         return new Consumer(destination, receiveUrl(destination, consumerId), restTemplate);
     }
 
-    private String sendUrl(Destination2 destination) {
+    private String sendUrl(Destination destination) {
         return host + "/" + destinationUrl(destination) + "/send";
     }
 
-    private String receiveUrl(Destination2 destination, ConsumerId consumerId) {
+    private String receiveUrl(Destination destination, ConsumerId consumerId) {
         return host + "/" + destinationUrl(destination) + "/receive/" + consumerId.getId();
     }
 
-    private String createConsumerUrl(Destination2 destination) {
+    private String createConsumerUrl(Destination destination) {
         return host + "/" + destinationUrl(destination) + "/consumer";
     }
 
-    private static String destinationUrl(Destination2 destination) {
+    private static String destinationUrl(Destination destination) {
         return destination.getType().name().toLowerCase();
     }
 }

@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.DestinationType;
 import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsumerTest {
 
-    private static final Destination2 DESTINATION = new Destination2(Destination.TOPIC, null);
+    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, null);
     private static final String URL = "localhost:8080/topic/receive/" + UUID.randomUUID();
     private static final String MESSAGE = "hello world";
 

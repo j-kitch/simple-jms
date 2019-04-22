@@ -18,20 +18,20 @@ public class DestinationService {
         topics = new HashMap<>();
     }
 
-    UUID createDestination(Destination destination) {
+    UUID createDestination(DestinationType destinationType) {
         UUID id = UUID.randomUUID();
-        if (destination == Destination.QUEUE) {
+        if (destinationType == DestinationType.QUEUE) {
             queues.put(id, new SingleQueueService());
-        } else if (destination == Destination.TOPIC) {
+        } else if (destinationType == DestinationType.TOPIC) {
             topics.put(id, new SingleTopicService());
         }
         return id;
     }
 
-    Optional<SingleDestinationService> findDestination(Destination type, UUID id) {
-        if (type == Destination.QUEUE) {
+    Optional<SingleDestinationService> findDestination(DestinationType type, UUID id) {
+        if (type == DestinationType.QUEUE) {
             return Optional.ofNullable(queues.get(id));
-        } else if (type == Destination.TOPIC) {
+        } else if (type == DestinationType.TOPIC) {
             return Optional.ofNullable(topics.get(id));
         } else {
             return Optional.empty();

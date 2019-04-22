@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.integrationtests.client;
 
 import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.DestinationType;
 import kitchen.josh.simplejms.client.Producer;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +33,7 @@ public class ProducerTest {
     @Test
     public void sendMessageToQueue() {
         String message = "hello world";
-        Producer producer = new Producer(new Destination2(Destination.QUEUE, null), HOST + "/queue/send", restTemplate);
+        Producer producer = new Producer(new Destination(DestinationType.QUEUE, null), HOST + "/queue/send", restTemplate);
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/send"))
                 .andExpect(method(HttpMethod.POST))
@@ -49,7 +49,7 @@ public class ProducerTest {
     @Test
     public void sendMessageToTopic() {
         String message = "hello world";
-        Producer producer = new Producer(new Destination2(Destination.TOPIC, null), HOST + "/topic/send", restTemplate);
+        Producer producer = new Producer(new Destination(DestinationType.TOPIC, null), HOST + "/topic/send", restTemplate);
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/send"))
                 .andExpect(method(HttpMethod.POST))

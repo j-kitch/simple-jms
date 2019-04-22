@@ -2,10 +2,10 @@ package kitchen.josh.simplejms.broker;
 
 public class Message {
 
-    private final Destination2 destination;
+    private final Destination destination;
     private final String message;
 
-    public Message(Destination2 destination, String message) {
+    public Message(Destination destination, String message) {
         this.destination = destination;
         this.message = message;
     }
@@ -14,7 +14,7 @@ public class Message {
         return message;
     }
 
-    public Destination2 getDestination() {
+    public Destination getDestination() {
         return destination;
     }
 }

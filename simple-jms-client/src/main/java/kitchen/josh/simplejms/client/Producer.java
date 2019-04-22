@@ -1,16 +1,16 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
 public class Producer {
 
-    private final Destination2 destination;
+    private final Destination destination;
     private final String url;
     private final RestTemplate restTemplate;
 
-    public Producer(Destination2 destination, String url, RestTemplate restTemplate) {
+    public Producer(Destination destination, String url, RestTemplate restTemplate) {
         this.destination = destination;
         this.url = url;
         this.restTemplate = restTemplate;
@@ -20,7 +20,7 @@ public class Producer {
         restTemplate.postForEntity(url, new MessageModel(message), Void.class);
     }
 
-    public Destination2 getDestination() {
+    public Destination getDestination() {
         return destination;
     }
 }

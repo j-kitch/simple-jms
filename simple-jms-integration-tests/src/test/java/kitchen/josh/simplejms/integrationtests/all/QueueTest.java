@@ -2,7 +2,7 @@ package kitchen.josh.simplejms.integrationtests.all;
 
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.Destination2;
+import kitchen.josh.simplejms.broker.DestinationType;
 import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
@@ -27,8 +27,8 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
 public class QueueTest {
 
-    private static final Destination2 QUEUE = new Destination2(Destination.QUEUE, null);
-    private static final Destination2 TOPIC = new Destination2(Destination.TOPIC, null);
+    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, null);
+    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, null);
     private static final String[] MESSAGES = {"a", "b", "c", "d"};
 
     @LocalServerPort
