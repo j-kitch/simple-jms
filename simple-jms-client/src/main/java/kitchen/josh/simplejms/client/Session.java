@@ -2,6 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.ConsumerId;
 import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.DestinationType;
 import org.springframework.web.client.RestTemplate;
 
 public class Session {
@@ -12,6 +13,11 @@ public class Session {
     public Session(String host, RestTemplate restTemplate) {
         this.host = host;
         this.restTemplate = restTemplate;
+    }
+
+    public Destination createDestination(DestinationType type) {
+        ConsumerId destinationId = restTemplate.postForEntity(host + "/" + destinationUrl(new Destination(type, null)), null, ConsumerId.class).getBody();
+        return new Destination(type, destinationId.getId());
     }
 
     public Producer createProducer(Destination destination) {

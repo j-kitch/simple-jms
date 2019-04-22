@@ -42,6 +42,30 @@ public class SessionTest {
     }
 
     @Test
+    public void createDestination_queue_createsQueueWithId() {
+        UUID destinationId = UUID.randomUUID();
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(destinationId)));
+
+        Destination destination = session.createDestination(DestinationType.QUEUE);
+
+        assertThat(destination).isEqualToComparingFieldByField(new Destination(DestinationType.QUEUE, destinationId));
+        verify(restTemplate).postForEntity(HOST + "/queue", null, ConsumerId.class);
+        verifyNoMoreInteractions(restTemplate);
+    }
+
+    @Test
+    public void createDestination_topic_createsTopicWithId() {
+        UUID destinationId = UUID.randomUUID();
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(destinationId)));
+
+        Destination destination = session.createDestination(DestinationType.TOPIC);
+
+        assertThat(destination).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, destinationId));
+        verify(restTemplate).postForEntity(HOST + "/topic", null, ConsumerId.class);
+        verifyNoMoreInteractions(restTemplate);
+    }
+
+    @Test
     public void createProducer_createsProducerWithCorrectUrl() {
         Producer producer = session.createProducer(DESTINATION);
 
