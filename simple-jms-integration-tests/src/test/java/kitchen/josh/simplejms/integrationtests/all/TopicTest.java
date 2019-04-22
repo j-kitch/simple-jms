@@ -56,16 +56,17 @@ public class TopicTest {
      */
     @Test
     public void singleConsumerSingleProducer_sentMessages_receivedMessagesInOrder() {
-        Consumer consumer = session.createConsumer(TOPIC);
-        Producer producer = session.createProducer(TOPIC);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Consumer consumer = session.createConsumer(topic);
+        Producer producer = session.createProducer(topic);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
         producer.sendMessage(MESSAGES[2]);
 
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[0]));
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[1]));
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[2]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[0]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[1]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[2]));
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -79,24 +80,25 @@ public class TopicTest {
      */
     @Test
     public void multipleConsumersSingleProducer_sentMessages_allConsumersReceiveMessagesInOrder() {
-        Producer producer = session.createProducer(TOPIC);
-        Consumer consumer1 = session.createConsumer(TOPIC);
-        Consumer consumer2 = session.createConsumer(TOPIC);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Producer producer = session.createProducer(topic);
+        Consumer consumer1 = session.createConsumer(topic);
+        Consumer consumer2 = session.createConsumer(topic);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
         producer.sendMessage(MESSAGES[2]);
 
-        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[0]));
-        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[1]));
-        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[2]));
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[0]));
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[1]));
+        assertThat(consumer1.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[2]));
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
 
-        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[0]));
-        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[1]));
-        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[2]));
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[0]));
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[1]));
+        assertThat(consumer2.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[2]));
         assertThat(consumer2.receiveMessage()).isEmpty();
         assertThat(consumer2.receiveMessage()).isEmpty();
         assertThat(consumer2.receiveMessage()).isEmpty();
@@ -111,18 +113,19 @@ public class TopicTest {
      */
     @Test
     public void consumerOnlyReceivesMessagesAfterConstruction() {
-        Producer producer = session.createProducer(TOPIC);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Producer producer = session.createProducer(topic);
 
         producer.sendMessage(MESSAGES[0]);
         producer.sendMessage(MESSAGES[1]);
 
-        Consumer consumer = session.createConsumer(TOPIC);
+        Consumer consumer = session.createConsumer(topic);
 
         producer.sendMessage(MESSAGES[2]);
         producer.sendMessage(MESSAGES[3]);
 
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[2]));
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[3]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[2]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[3]));
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -135,7 +138,8 @@ public class TopicTest {
      */
     @Test
     public void onlyConsumerReceivesNoMessages() {
-        Consumer consumer = session.createConsumer(TOPIC);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Consumer consumer = session.createConsumer(topic);
 
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -149,8 +153,9 @@ public class TopicTest {
      */
     @Test
     public void singleConsumerSingleProducer_noMessagesSent_noMessagesReceived() {
-        Consumer consumer = session.createConsumer(TOPIC);
-        session.createProducer(TOPIC);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Consumer consumer = session.createConsumer(topic);
+        session.createProducer(topic);
 
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
@@ -164,8 +169,10 @@ public class TopicTest {
      */
     @Test
     public void consumerAndQueueProducer_queueMessageSent_noTopicMessageReceived() {
-        Consumer consumer = session.createConsumer(TOPIC);
-        Producer producer = session.createProducer(QUEUE);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Destination queue = session.createDestination(DestinationType.QUEUE);
+        Consumer consumer = session.createConsumer(topic);
+        Producer producer = session.createProducer(queue);
 
         producer.sendMessage(MESSAGES[0]);
 
@@ -179,17 +186,19 @@ public class TopicTest {
      */
     @Test
     public void consumerAndAllDestinationProducers_allDestinationMessagesSent_onlyTopicMessagesReceived() {
-        Consumer consumer = session.createConsumer(TOPIC);
-        Producer topicProducer = session.createProducer(TOPIC);
-        Producer queueProducer = session.createProducer(QUEUE);
+        Destination topic = session.createDestination(DestinationType.TOPIC);
+        Destination queue = session.createDestination(DestinationType.QUEUE);
+        Consumer consumer = session.createConsumer(topic);
+        Producer topicProducer = session.createProducer(topic);
+        Producer queueProducer = session.createProducer(queue);
 
         queueProducer.sendMessage(MESSAGES[0]);
         queueProducer.sendMessage(MESSAGES[1]);
         topicProducer.sendMessage(MESSAGES[2]);
         topicProducer.sendMessage(MESSAGES[3]);
 
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[2]));
-        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGES[3]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[2]));
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic, MESSAGES[3]));
         assertThat(consumer.receiveMessage()).isEmpty();
         assertThat(consumer.receiveMessage()).isEmpty();
     }

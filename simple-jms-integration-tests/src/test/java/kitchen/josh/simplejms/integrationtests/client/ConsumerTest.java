@@ -4,6 +4,7 @@ import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.DestinationType;
 import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.client.Consumer;
+import kitchen.josh.simplejms.client.ConsumerId;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -25,8 +26,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class ConsumerTest {
 
-    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, null);
-    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, null);
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, DESTINATION_ID);
+    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, DESTINATION_ID);
     private static final String HOST = "http://localhost:8080";
 
     private RestTemplate restTemplate;
@@ -41,10 +43,10 @@ public class ConsumerTest {
     @Test
     public void receiveMessageFromQueue_noMessage_returnsEmpty() {
         UUID consumerId = UUID.randomUUID();
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/receive/" + consumerId))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + consumerId + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"message\": null}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(QUEUE, HOST + "/queue/receive/" + consumerId, restTemplate);
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, consumerId));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -56,10 +58,10 @@ public class ConsumerTest {
     public void receiveMessageFromQueue_message_returnsMessage() {
         UUID consumerId = UUID.randomUUID();
         String message = "hello world";
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/receive/" + consumerId))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + consumerId + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"message\": \"" + message + "\"}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(QUEUE, HOST + "/queue/receive/" + consumerId, restTemplate);
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, consumerId));
 
         Optional<Message> received = consumer.receiveMessage();
 
@@ -70,10 +72,10 @@ public class ConsumerTest {
     @Test
     public void receiveMessageFromTopic_noMessage_returnsEmpty() {
         UUID consumerId = UUID.randomUUID();
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/receive/" + consumerId))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + consumerId + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"message\": null}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(TOPIC, HOST + "/topic/receive/" + consumerId, restTemplate);
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, consumerId));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -85,10 +87,10 @@ public class ConsumerTest {
     public void receiveMessageFromTopic_message_returnsMessage() {
         UUID consumerId = UUID.randomUUID();
         String message = "hello world";
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/receive/" + consumerId))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + consumerId + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"message\": \"" + message + "\"}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(TOPIC, HOST + "/topic/receive/" + consumerId, restTemplate);
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, consumerId));
 
         Optional<Message> received = consumer.receiveMessage();
 

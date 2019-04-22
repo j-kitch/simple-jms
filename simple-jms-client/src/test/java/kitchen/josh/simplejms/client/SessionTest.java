@@ -27,10 +27,7 @@ public class SessionTest {
     private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, DESTINATION_ID);
 
     private static final String HOST = "localhost:8080";
-    private static final String PRODUCER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/send";
-    private static final String CREATE_CONSUMER_URL = HOST + "/" +  DESTINATION.getType().name().toLowerCase() + "/consumer";
     private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String CONSUMER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/receive/" + CONSUMER_ID;
 
     @Mock
     private RestTemplate restTemplate;
@@ -84,7 +81,7 @@ public class SessionTest {
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> session.createConsumer(DESTINATION));
-        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, IdModel.class);
+        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
     }
 
     @Test
@@ -93,8 +90,8 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer(DESTINATION);
 
-        assertThat(consumer).isEqualToComparingFieldByField(new Consumer(DESTINATION, CONSUMER_URL, restTemplate));
-        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, IdModel.class);
+        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID)));
+        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 }

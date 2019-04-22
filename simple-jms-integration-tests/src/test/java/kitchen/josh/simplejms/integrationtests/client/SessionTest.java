@@ -2,9 +2,7 @@ package kitchen.josh.simplejms.integrationtests.client;
 
 import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.DestinationType;
-import kitchen.josh.simplejms.client.Consumer;
-import kitchen.josh.simplejms.client.Producer;
-import kitchen.josh.simplejms.client.Session;
+import kitchen.josh.simplejms.client.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -25,8 +23,9 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class SessionTest {
 
-    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, null);
-    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, null);
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, DESTINATION_ID);
+    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, DESTINATION_ID);
     private static final String HOST = "http://localhost:8080";
 
     private RestTemplate restTemplate;
@@ -46,7 +45,7 @@ public class SessionTest {
     @Test
     public void createQueueConsumer_callsBrokerAndUsesId() {
         UUID consumerId = UUID.randomUUID();
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/consumer"))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"id\": \"" + consumerId + "\"}", MediaType.APPLICATION_JSON_UTF8));
 
@@ -54,8 +53,8 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer(QUEUE);
 
-        assertThat(consumer).isEqualToComparingFieldByField(
-                new Consumer(QUEUE, HOST + "/queue/receive/" + consumerId, restTemplate));
+        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(
+                new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, consumerId)));
         mockRestServiceServer.verify();
     }
 
@@ -67,7 +66,7 @@ public class SessionTest {
     @Test
     public void createTopicConsumer_callsBrokerAndUsesId() {
         UUID consumerId = UUID.randomUUID();
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/consumer"))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"id\": \"" + consumerId + "\"}", MediaType.APPLICATION_JSON_UTF8));
 
@@ -75,28 +74,38 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer(TOPIC);
 
-        assertThat(consumer).isEqualToComparingFieldByField(
-                new Consumer(TOPIC, HOST + "/topic/receive/" + consumerId, restTemplate));
+        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(
+                new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, consumerId)));
         mockRestServiceServer.verify();
     }
 
     @Test
     public void createTopicProducer() {
+        UUID producerId = UUID.randomUUID();
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{\"id\": \"" + producerId + "\"}", MediaType.APPLICATION_JSON_UTF8));
         Session session = new Session(HOST, restTemplate);
 
         Producer producer = session.createProducer(TOPIC);
 
-        assertThat(producer).isEqualToComparingFieldByField(
-                new Producer(TOPIC, HOST + "/topic/send", restTemplate));
+        assertThat(producer).isEqualToComparingFieldByFieldRecursively(
+                new Producer(HOST, restTemplate, new ProducerId(TOPIC, producerId)));
+        mockRestServiceServer.verify();
     }
 
     @Test
     public void createQueueProducer() {
+        UUID producerId = UUID.randomUUID();
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withSuccess("{\"id\": \"" + producerId + "\"}", MediaType.APPLICATION_JSON_UTF8));
         Session session = new Session(HOST, restTemplate);
 
         Producer producer = session.createProducer(QUEUE);
 
-        assertThat(producer).isEqualToComparingFieldByField(
-                new Producer(QUEUE, HOST + "/queue/send", restTemplate));
+        assertThat(producer).isEqualToComparingFieldByFieldRecursively(
+                new Producer(HOST, restTemplate, new ProducerId(QUEUE, producerId)));
+        mockRestServiceServer.verify();
     }
 }

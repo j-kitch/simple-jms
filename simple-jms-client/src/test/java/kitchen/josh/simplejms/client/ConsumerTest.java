@@ -25,8 +25,14 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ConsumerTest {
 
-    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, null);
-    private static final String URL = "localhost:8080/topic/receive/" + UUID.randomUUID();
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, DESTINATION_ID);
+    private static final String BROKER_URL = "http://localhost:8080";
+
+    private static final UUID CONSUMER_ID = UUID.randomUUID();
+
+    private static final String RECEIVE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
+
     private static final String MESSAGE = "hello world";
 
     @Mock
@@ -36,7 +42,7 @@ public class ConsumerTest {
 
     @Before
     public void setUp() {
-        consumer = new Consumer(DESTINATION, URL, restTemplate);
+        consumer = new Consumer(BROKER_URL, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID));
     }
 
     @Test
@@ -45,7 +51,7 @@ public class ConsumerTest {
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> consumer.receiveMessage());
-        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
+        verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -56,7 +62,7 @@ public class ConsumerTest {
         Optional<Message> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
-        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
+        verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -67,7 +73,7 @@ public class ConsumerTest {
         Optional<Message> message = consumer.receiveMessage();
 
         assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(DESTINATION, MESSAGE));
-        verify(restTemplate).postForEntity(URL, null, MessageModel.class);
+        verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 }

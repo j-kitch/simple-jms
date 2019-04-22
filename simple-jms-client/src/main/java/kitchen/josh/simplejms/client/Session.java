@@ -27,34 +27,18 @@ public class Session {
 
     public Consumer createConsumer(Destination destination) {
         IdModel consumerId = restTemplate.postForEntity(createConsumerUrl(destination), null, IdModel.class).getBody();
-        return new Consumer(destination, receiveUrl(destination, consumerId), restTemplate);
-    }
-
-    private String sendUrl(Destination destination) {
-        return host + "/" + destinationUrl(destination) + "/send";
-    }
-
-    private String receiveUrl(Destination destination, IdModel consumerId) {
-        return host + "/" + destinationUrl(destination) + "/receive/" + consumerId.getId();
+        return new Consumer(host, restTemplate, new ConsumerId(destination, consumerId.getId()));
     }
 
     private String createConsumerUrl(Destination destination) {
-        return host + "/" + destinationUrl(destination) + "/consumer";
-    }
-
-    private String createDestinationUrl(DestinationType type) {
-        return host + "/" + destinationUrl(type);
+        return host + "/" + destination.getType().name().toLowerCase() + "/" + destination.getId() + "/consumer";
     }
 
     private String createProducerUrl(Destination destination) {
-        return host + "/" + destinationUrl(destination.getType()) + "/" + destination.getId() + "/producer";
+        return host + "/" + destination.getType().name().toLowerCase() + "/" + destination.getId() + "/producer";
     }
 
-    private static String destinationUrl(Destination destination) {
-        return destinationUrl(destination.getType());
-    }
-
-    private static String destinationUrl(DestinationType type) {
-        return type.name().toLowerCase();
+    private String createDestinationUrl(DestinationType type) {
+        return host + "/" + type.name().toLowerCase();
     }
 }
