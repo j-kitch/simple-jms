@@ -1,4 +1,4 @@
-# Issues 0.1.0
+# Issues 0.2.0
 
 ## Broker REST API
 +   Poor documentation
@@ -11,7 +11,7 @@
 +   No documentation
 +   No code-based control of startup/shutdown.
 
-## TopicController
+## TopicController/QueueController
 +   No documentation.
 +   No multi-threading handling.
 +   No error handling.
@@ -24,10 +24,18 @@
 +   No documentation.
 +   Infinite-lifetime consumers.
 +   Duplicating messages per consumer.
-+   Relying on Java's `UUID.randomUUID()` for id uniquiness.
++   Relying on Java's `UUID.randomUUID()` for id uniqueness.
 +   No multi-threading handling.
 +   Linked-Lists are BAD.
 +   Only handles a single topic.
+
+## QueueService
++   No documentation
++   Infinite-lifetime consumers.
++   Relying on Java's `UUID.randomUUID()` for id uniqueness.
++   No multi-threading handling.
++   Linked-Lists are BAD.
++   Only handles a single queue.
 
 ## Session
 +   No documentation.
