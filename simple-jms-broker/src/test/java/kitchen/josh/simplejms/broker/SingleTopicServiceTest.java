@@ -61,6 +61,27 @@ public class SingleTopicServiceTest {
     }
 
     @Test
+    public void removeConsumer_removesConsumerAndQueue() {
+        UUID producerId = topicService.createProducer();
+        UUID consumerId = topicService.createConsumer();
+        topicService.addMessage(producerId, MESSAGE_1);
+        topicService.addMessage(producerId, MESSAGE_2);
+
+        topicService.removeConsumer(consumerId);
+
+        assertThat(topicService.getConsumerQueues()).isEmpty();
+    }
+
+    @Test
+    public void removeProducer_removesProducer() {
+        UUID producerId = topicService.createProducer();
+
+        topicService.removeProducer(producerId);
+
+        assertThat(topicService.getProducers()).isEmpty();
+    }
+
+    @Test
     public void addMessage_invalidProducer_doesNothing() {
         topicService.addMessage(UUID.randomUUID(), MESSAGE_1);
 

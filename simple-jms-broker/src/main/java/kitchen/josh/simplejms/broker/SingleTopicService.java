@@ -24,6 +24,14 @@ public class SingleTopicService {
         return producerId;
     }
 
+    void removeConsumer(UUID consumerId) {
+        consumerQueues.remove(consumerId);
+    }
+
+    void removeProducer(UUID producerId) {
+        producers.remove(producerId);
+    }
+
     void addMessage(UUID producer, String message) {
         if (producers.contains(producer)) {
             consumerQueues.values().forEach(queue -> queue.add(message));
