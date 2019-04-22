@@ -16,6 +16,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
+/**
+ * Integration tests for the Broker's independence of queue and topic functionality.
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)

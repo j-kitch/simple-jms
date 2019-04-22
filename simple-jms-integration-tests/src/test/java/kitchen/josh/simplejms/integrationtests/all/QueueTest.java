@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 /**
- * Broker and Client API queue functionality.
+ * Integration tests for the interaction between the Broker and Client API for queue functionality.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

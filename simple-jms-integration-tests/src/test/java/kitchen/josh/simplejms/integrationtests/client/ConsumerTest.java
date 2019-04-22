@@ -19,6 +19,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+/**
+ * Integration tests for the Client's Consumer class.
+ */
 public class ConsumerTest {
 
     private static final String HOST = "http://localhost:8080";

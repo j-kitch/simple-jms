@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
 /**
- * Broker and Client API topic functionality.
+ * Integration tests for the interaction between the Broker and Client API for topic functionality.
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)

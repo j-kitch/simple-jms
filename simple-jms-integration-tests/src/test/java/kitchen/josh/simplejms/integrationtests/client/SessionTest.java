@@ -19,6 +19,9 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
+/**
+ * Integration tests for the Client's Session class.
+ */
 public class SessionTest {
 
     private static final String HOST = "http://localhost:8080";
@@ -32,6 +35,11 @@ public class SessionTest {
         mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
     }
 
+    /**
+     * Given a broker that responds with a new consumer ID,
+     * When a Session creates a queue consumer,
+     * Then it constructs a new queue consumer with that ID.
+     */
     @Test
     public void createQueueConsumer_callsBrokerAndUsesId() {
         UUID consumerId = UUID.randomUUID();
@@ -48,6 +56,11 @@ public class SessionTest {
         mockRestServiceServer.verify();
     }
 
+    /**
+     * Given a broker that responds with a new consumer ID,
+     * When a Session creates a topic consumer,
+     * Then it constructs a new topic consumer with that ID.
+     */
     @Test
     public void createTopicConsumer_callsBrokerAndUsesId() {
         UUID consumerId = UUID.randomUUID();
