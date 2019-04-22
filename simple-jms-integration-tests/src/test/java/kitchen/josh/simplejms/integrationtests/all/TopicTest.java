@@ -1,4 +1,4 @@
-package kitchen.josh.simplejms.integrationtests;
+package kitchen.josh.simplejms.integrationtests.all;
 
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.broker.Destination;
@@ -24,7 +24,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class TopicBrokerAndClientIntegrationTest {
+public class TopicTest {
 
     private static final String[] MESSAGES = {
             "hello world",

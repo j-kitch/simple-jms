@@ -1,4 +1,4 @@
-package kitchen.josh.simplejms.integrationtests;
+package kitchen.josh.simplejms.integrationtests.broker;
 
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.broker.ConsumerId;
@@ -19,7 +19,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class BrokerDestinationApiIndependenceIntegraionTest {
+public class QueueAndTopicTest {
 
     @Autowired
     private TestRestTemplate restTemplate;

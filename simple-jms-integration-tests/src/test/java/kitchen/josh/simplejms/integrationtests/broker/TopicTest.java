@@ -1,9 +1,8 @@
-package kitchen.josh.simplejms.integrationtests;
+package kitchen.josh.simplejms.integrationtests.broker;
 
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.broker.ConsumerId;
 import kitchen.josh.simplejms.broker.MessageModel;
-import kitchen.josh.simplejms.client.Consumer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @DirtiesContext(classMode = AFTER_EACH_TEST_METHOD)
-public class BrokerTopicApiIntegrationTest {
+public class TopicTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
