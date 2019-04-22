@@ -3,7 +3,7 @@ package kitchen.josh.simplejms.client;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
-public class Producer {
+public class Producer implements AutoCloseable {
 
     private final String brokerUrl;
     private final RestTemplate restTemplate;
@@ -23,5 +23,13 @@ public class Producer {
 
     public ProducerId getId() {
         return id;
+    }
+
+    @Override
+    public void close() {
+        String deleteUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
+                + "/producer/" + id.getId();
+
+        restTemplate.delete(deleteUrl);
     }
 }

@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
-public class Consumer {
+public class Consumer implements AutoCloseable {
 
     private final String brokerUrl;
     private final RestTemplate restTemplate;
@@ -27,5 +27,13 @@ public class Consumer {
                 .map(ResponseEntity::getBody)
                 .map(MessageModel::getMessage)
                 .map(message -> new Message(id.getDestination(), message));
+    }
+
+    @Override
+    public void close() {
+        String deleteUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"
+                + id.getId();
+
+        restTemplate.delete(deleteUrl);
     }
 }

@@ -97,4 +97,17 @@ public class ConsumerTest {
         assertThat(received).usingFieldByFieldValueComparator().contains(new Message(TOPIC, message));
         mockRestServiceServer.verify();
     }
+
+    @Test
+    public void close_notifiesBroker() {
+        UUID consumerId = UUID.randomUUID();
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, consumerId));
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + consumerId))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withSuccess());
+
+        consumer.close();
+
+        mockRestServiceServer.verify();
+    }
 }

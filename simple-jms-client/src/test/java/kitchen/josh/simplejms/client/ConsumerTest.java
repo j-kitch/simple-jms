@@ -32,6 +32,7 @@ public class ConsumerTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
     private static final String RECEIVE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
+    private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
 
     private static final String MESSAGE = "hello world";
 
@@ -75,5 +76,12 @@ public class ConsumerTest {
         assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(DESTINATION, MESSAGE));
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
+    }
+
+    @Test
+    public void close_notifiesBroker() {
+        consumer.close();
+
+        verify(restTemplate).delete(DELETE_URL);
     }
 }

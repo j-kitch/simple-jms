@@ -66,4 +66,16 @@ public class ProducerTest {
 
         mockRestServiceServer.verify();
     }
+
+    @Test
+    public void close_notifiesBroker() {
+        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID));
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withSuccess());
+
+        producer.close();
+
+        mockRestServiceServer.verify();
+    }
 }
