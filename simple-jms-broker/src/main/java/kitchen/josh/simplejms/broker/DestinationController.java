@@ -1,0 +1,73 @@
+package kitchen.josh.simplejms.broker;
+
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+public class DestinationController {
+
+    private final DestinationService destinationService;
+
+    public DestinationController(DestinationService destinationService) {
+        this.destinationService = destinationService;
+    }
+
+    @PostMapping(path = "/{destinationType}")
+    public ConsumerId createDestination(@PathVariable String destinationType) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        return new ConsumerId(destinationService.createDestination(destination));
+    }
+
+    @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
+    public ConsumerId createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        UUID consumerId = destinationService.findDestination(destination, destinationId)
+                .map(SingleDestinationService::createConsumer)
+                .orElse(null);
+        return new ConsumerId(consumerId);
+    }
+
+    @PostMapping(path = "/{destinationType}/{destinationId}/producer")
+    public ConsumerId createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        UUID consumerId = destinationService.findDestination(destination, destinationId)
+                .map(SingleDestinationService::createProducer)
+                .orElse(null);
+        return new ConsumerId(consumerId);
+    }
+
+    @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
+    public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
+                               @PathVariable UUID consumerId) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        destinationService.findDestination(destination, destinationId)
+                .ifPresent(service -> service.removeConsumer(consumerId));
+    }
+
+    @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
+    public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
+                               @PathVariable UUID producerId) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        destinationService.findDestination(destination, destinationId)
+                .ifPresent(service -> service.removeProducer(producerId));
+    }
+
+    @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
+    public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
+                            @PathVariable UUID producerId, @RequestBody MessageModel message) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        destinationService.findDestination(destination, destinationId)
+                .ifPresent(service -> service.addMessage(producerId, message.getMessage()));
+    }
+
+    @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
+    public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
+                                       @PathVariable UUID consumerId) {
+        Destination destination = Destination.valueOf(destinationType.toUpperCase());
+        String message = destinationService.findDestination(destination, destinationId)
+                .flatMap(service -> service.readMessage(consumerId))
+                .orElse(null);
+        return new MessageModel(message);
+    }
+}

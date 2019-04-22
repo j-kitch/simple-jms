@@ -1,10 +1,13 @@
 package kitchen.josh.simplejms.broker;
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class DestinationService {
 
     private final Map<UUID, SingleDestinationService> queues;
