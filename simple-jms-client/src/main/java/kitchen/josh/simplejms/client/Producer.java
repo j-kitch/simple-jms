@@ -1,26 +1,27 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
 public class Producer {
 
-    private final Destination destination;
-    private final String url;
+    private final String brokerUrl;
     private final RestTemplate restTemplate;
+    private final ProducerId id;
 
-    public Producer(Destination destination, String url, RestTemplate restTemplate) {
-        this.destination = destination;
-        this.url = url;
+    public Producer(String brokerUrl, RestTemplate restTemplate, ProducerId id) {
+        this.brokerUrl = brokerUrl;
         this.restTemplate = restTemplate;
+        this.id = id;
     }
 
     public void sendMessage(String message) {
-        restTemplate.postForEntity(url, new MessageModel(message), Void.class);
+        String sendUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
+                + "/producer/" + id.getId() + "/send";
+        restTemplate.postForEntity(sendUrl, new MessageModel(message), Void.class);
     }
 
-    public Destination getDestination() {
-        return destination;
+    public ProducerId getId() {
+        return id;
     }
 }

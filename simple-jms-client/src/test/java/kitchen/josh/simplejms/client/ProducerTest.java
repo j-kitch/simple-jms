@@ -13,6 +13,8 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -22,8 +24,12 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ProducerTest {
 
-    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, null);
-    private static final String URL = "localhost:8080/topic/send";
+    private static final UUID PRODUCER_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, UUID.randomUUID());
+    private static final String BROKER_URL = "http://localhost:9999";
+
+    private static final String SEND_URL = BROKER_URL + "/topic/" + DESTINATION.getId() + "/producer/" + PRODUCER_ID + "/send";
+
     private static final String MESSAGE = "hello world";
 
     @Mock
@@ -36,7 +42,7 @@ public class ProducerTest {
 
     @Before
     public void setUp() {
-        producer = new Producer(DESTINATION, URL, restTemplate);
+        producer = new Producer(BROKER_URL, restTemplate, new ProducerId(DESTINATION, PRODUCER_ID));
     }
 
     @Test
@@ -45,7 +51,7 @@ public class ProducerTest {
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> producer.sendMessage(MESSAGE));
-        verify(restTemplate).postForEntity(eq(URL), messageCaptor.capture(), eq(Void.class));
+        verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
         assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }
@@ -54,7 +60,7 @@ public class ProducerTest {
     public void sendMessage_restTemplateReturns_returns() {
         producer.sendMessage(MESSAGE);
 
-        verify(restTemplate).postForEntity(eq(URL), messageCaptor.capture(), eq(Void.class));
+        verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
         assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }

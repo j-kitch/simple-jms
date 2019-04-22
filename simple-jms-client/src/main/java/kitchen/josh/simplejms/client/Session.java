@@ -21,7 +21,8 @@ public class Session {
     }
 
     public Producer createProducer(Destination destination) {
-        return new Producer(destination, sendUrl(destination), restTemplate);
+        IdModel producerId = restTemplate.postForEntity(createProducerUrl(destination), null, IdModel.class).getBody();
+        return new Producer(host, restTemplate, new ProducerId(destination, producerId.getId()));
     }
 
     public Consumer createConsumer(Destination destination) {
@@ -43,6 +44,10 @@ public class Session {
 
     private String createDestinationUrl(DestinationType type) {
         return host + "/" + destinationUrl(type);
+    }
+
+    private String createProducerUrl(Destination destination) {
+        return host + "/" + destinationUrl(destination.getType()) + "/" + destination.getId() + "/producer";
     }
 
     private static String destinationUrl(Destination destination) {

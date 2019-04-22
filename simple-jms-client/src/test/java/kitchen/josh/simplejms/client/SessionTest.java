@@ -23,7 +23,8 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class SessionTest {
 
-    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, null);
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, DESTINATION_ID);
 
     private static final String HOST = "localhost:8080";
     private static final String PRODUCER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/send";
@@ -67,9 +68,13 @@ public class SessionTest {
 
     @Test
     public void createProducer_createsProducerWithCorrectUrl() {
+        UUID producerId = UUID.randomUUID();
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new IdModel(producerId)));
+
         Producer producer = session.createProducer(DESTINATION);
 
-        assertThat(producer).isEqualToComparingFieldByField(new Producer(DESTINATION, PRODUCER_URL, restTemplate));
+        assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, new ProducerId(DESTINATION, producerId)));
+        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/producer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
