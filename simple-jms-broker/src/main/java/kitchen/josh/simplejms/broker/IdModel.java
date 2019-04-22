@@ -2,15 +2,15 @@ package kitchen.josh.simplejms.broker;
 
 import java.util.UUID;
 
-public class ConsumerId {
+public class IdModel {
 
     private UUID id;
 
-    public ConsumerId() {
+    public IdModel() {
 
     }
 
-    public ConsumerId(UUID id) {
+    public IdModel(UUID id) {
         this.id = id;
     }
 

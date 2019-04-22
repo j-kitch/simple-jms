@@ -1,8 +1,8 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.ConsumerId;
 import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.DestinationType;
+import kitchen.josh.simplejms.broker.IdModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,24 +44,24 @@ public class SessionTest {
     @Test
     public void createDestination_queue_createsQueueWithId() {
         UUID destinationId = UUID.randomUUID();
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(destinationId)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new IdModel(destinationId)));
 
         Destination destination = session.createDestination(DestinationType.QUEUE);
 
         assertThat(destination).isEqualToComparingFieldByField(new Destination(DestinationType.QUEUE, destinationId));
-        verify(restTemplate).postForEntity(HOST + "/queue", null, ConsumerId.class);
+        verify(restTemplate).postForEntity(HOST + "/queue", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
     @Test
     public void createDestination_topic_createsTopicWithId() {
         UUID destinationId = UUID.randomUUID();
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(destinationId)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new IdModel(destinationId)));
 
         Destination destination = session.createDestination(DestinationType.TOPIC);
 
         assertThat(destination).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, destinationId));
-        verify(restTemplate).postForEntity(HOST + "/topic", null, ConsumerId.class);
+        verify(restTemplate).postForEntity(HOST + "/topic", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -79,17 +79,17 @@ public class SessionTest {
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> session.createConsumer(DESTINATION));
-        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, ConsumerId.class);
+        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, IdModel.class);
     }
 
     @Test
     public void createConsumer_restTemplateReturnsId_returnsConsumerUsingId() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new ConsumerId(CONSUMER_ID)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new IdModel(CONSUMER_ID)));
 
         Consumer consumer = session.createConsumer(DESTINATION);
 
         assertThat(consumer).isEqualToComparingFieldByField(new Consumer(DESTINATION, CONSUMER_URL, restTemplate));
-        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, ConsumerId.class);
+        verify(restTemplate).postForEntity(CREATE_CONSUMER_URL, null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 }

@@ -17,8 +17,8 @@ class QueueController {
     }
 
     @PostMapping(path = "/queue/consumer")
-    ConsumerId createConsumer() {
-        return new ConsumerId(queueService.createConsumer());
+    IdModel createConsumer() {
+        return new IdModel(queueService.createConsumer());
     }
 
     @PostMapping(path = "/queue/receive/{id}")

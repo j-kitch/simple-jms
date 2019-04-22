@@ -14,27 +14,27 @@ public class DestinationController {
     }
 
     @PostMapping(path = "/{destinationType}")
-    public ConsumerId createDestination(@PathVariable String destinationType) {
+    public IdModel createDestination(@PathVariable String destinationType) {
         DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        return new ConsumerId(destinationService.createDestination(destination));
+        return new IdModel(destinationService.createDestination(destination));
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
-    public ConsumerId createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
+    public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         UUID consumerId = destinationService.findDestination(destination, destinationId)
                 .map(SingleDestinationService::createConsumer)
                 .orElse(null);
-        return new ConsumerId(consumerId);
+        return new IdModel(consumerId);
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
-    public ConsumerId createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
+    public IdModel createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
         UUID consumerId = destinationService.findDestination(destination, destinationId)
                 .map(SingleDestinationService::createProducer)
                 .orElse(null);
-        return new ConsumerId(consumerId);
+        return new IdModel(consumerId);
     }
 
     @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")

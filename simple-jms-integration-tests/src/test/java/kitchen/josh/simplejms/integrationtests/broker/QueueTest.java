@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.integrationtests.broker;
 
 import kitchen.josh.simplejms.broker.Broker;
-import kitchen.josh.simplejms.broker.ConsumerId;
+import kitchen.josh.simplejms.broker.IdModel;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,11 +39,11 @@ public class QueueTest {
         Set<UUID> consumerIds = new HashSet<>();
 
         for (int i = 0; i < 10; i++) {
-            ResponseEntity<ConsumerId> response = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class);
+            ResponseEntity<IdModel> response = restTemplate.postForEntity("/queue/consumer", null, IdModel.class);
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
 
-            ConsumerId consumerId = response.getBody();
+            IdModel consumerId = response.getBody();
             assertThat(consumerIds).doesNotContain(consumerId.getId());
             consumerIds.add(consumerId.getId());
         }
@@ -64,7 +64,7 @@ public class QueueTest {
      */
     @Test
     public void receiveMessage_noMessages_returnsOkAndEmptyMessage() {
-        ConsumerId consumerId = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
+        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
 
         ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/receive/" + consumerId.getId(), null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -77,7 +77,7 @@ public class QueueTest {
     @Test
     public void receiveMessage_messageSentBeforeConsumer_returnsOkAndMessage() {
         restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
-        ConsumerId consumerId = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
+        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
 
         ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/receive/" + consumerId.getId(), null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -89,7 +89,7 @@ public class QueueTest {
      */
     @Test
     public void receiveMessage_messageSentAfterConsumer_returnsOkAndMessage() {
-        ConsumerId consumerId = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
+        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
         restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
 
         ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/receive/" + consumerId.getId(), null, MessageModel.class);
@@ -102,7 +102,7 @@ public class QueueTest {
      */
     @Test
     public void receiveMessage_receivesMessageOnce() {
-        ConsumerId consumerId = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
+        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
         restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
 
         // Receives message on first call.
@@ -121,8 +121,8 @@ public class QueueTest {
      */
     @Test
     public void receiveMessage_multipleConsumers_onlyOneReceivesMessage() {
-        ConsumerId consumerId1 = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
-        ConsumerId consumerId2 = restTemplate.postForEntity("/queue/consumer", null, ConsumerId.class).getBody();
+        IdModel consumerId1 = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
+        IdModel consumerId2 = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
 
         restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
 

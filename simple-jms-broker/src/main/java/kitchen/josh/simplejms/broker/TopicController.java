@@ -17,8 +17,8 @@ class TopicController {
     }
 
     @PostMapping(path = "/topic/consumer")
-    ConsumerId createConsumer() {
-        return new ConsumerId(topicService.createConsumer());
+    IdModel createConsumer() {
+        return new IdModel(topicService.createConsumer());
     }
 
     @PostMapping(path = "/topic/receive/{consumerId}")
