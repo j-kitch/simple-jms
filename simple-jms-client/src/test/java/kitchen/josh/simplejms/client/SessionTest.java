@@ -2,6 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.ConsumerId;
 import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Destination2;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -22,13 +23,13 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class SessionTest {
 
-    private static final Destination DESTINATION = Destination.QUEUE;
+    private static final Destination2 DESTINATION = new Destination2(Destination.QUEUE, null);
 
     private static final String HOST = "localhost:8080";
-    private static final String PRODUCER_URL = HOST + "/" + DESTINATION.name().toLowerCase() + "/send";
-    private static final String CREATE_CONSUMER_URL = HOST + "/" +  DESTINATION.name().toLowerCase() + "/consumer";
+    private static final String PRODUCER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/send";
+    private static final String CREATE_CONSUMER_URL = HOST + "/" +  DESTINATION.getType().name().toLowerCase() + "/consumer";
     private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String CONSUMER_URL = HOST + "/" + DESTINATION.name().toLowerCase() + "/receive/" + CONSUMER_ID;
+    private static final String CONSUMER_URL = HOST + "/" + DESTINATION.getType().name().toLowerCase() + "/receive/" + CONSUMER_ID;
 
     @Mock
     private RestTemplate restTemplate;

@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Destination2;
 import kitchen.josh.simplejms.broker.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +22,7 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class ProducerTest {
 
-    private static final Destination DESTINATION = Destination.TOPIC;
+    private static final Destination2 DESTINATION = new Destination2(Destination.TOPIC, null);
     private static final String URL = "localhost:8080/topic/send";
     private static final String MESSAGE = "hello world";
 

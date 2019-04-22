@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.integrationtests.client;
 
 import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.broker.Destination2;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
  */
 public class SessionTest {
 
+    private static final Destination2 QUEUE = new Destination2(Destination.QUEUE, null);
+    private static final Destination2 TOPIC = new Destination2(Destination.TOPIC, null);
     private static final String HOST = "http://localhost:8080";
 
     private RestTemplate restTemplate;
@@ -49,10 +52,10 @@ public class SessionTest {
 
         Session session = new Session(HOST, restTemplate);
 
-        Consumer consumer = session.createConsumer(Destination.QUEUE);
+        Consumer consumer = session.createConsumer(QUEUE);
 
         assertThat(consumer).isEqualToComparingFieldByField(
-                new Consumer(Destination.QUEUE, HOST + "/queue/receive/" + consumerId, restTemplate));
+                new Consumer(QUEUE, HOST + "/queue/receive/" + consumerId, restTemplate));
         mockRestServiceServer.verify();
     }
 
@@ -70,10 +73,10 @@ public class SessionTest {
 
         Session session = new Session(HOST, restTemplate);
 
-        Consumer consumer = session.createConsumer(Destination.TOPIC);
+        Consumer consumer = session.createConsumer(TOPIC);
 
         assertThat(consumer).isEqualToComparingFieldByField(
-                new Consumer(Destination.TOPIC, HOST + "/topic/receive/" + consumerId, restTemplate));
+                new Consumer(TOPIC, HOST + "/topic/receive/" + consumerId, restTemplate));
         mockRestServiceServer.verify();
     }
 
@@ -81,19 +84,19 @@ public class SessionTest {
     public void createTopicProducer() {
         Session session = new Session(HOST, restTemplate);
 
-        Producer producer = session.createProducer(Destination.TOPIC);
+        Producer producer = session.createProducer(TOPIC);
 
         assertThat(producer).isEqualToComparingFieldByField(
-                new Producer(Destination.TOPIC, HOST + "/topic/send", restTemplate));
+                new Producer(TOPIC, HOST + "/topic/send", restTemplate));
     }
 
     @Test
     public void createQueueProducer() {
         Session session = new Session(HOST, restTemplate);
 
-        Producer producer = session.createProducer(Destination.QUEUE);
+        Producer producer = session.createProducer(QUEUE);
 
         assertThat(producer).isEqualToComparingFieldByField(
-                new Producer(Destination.QUEUE, HOST + "/queue/send", restTemplate));
+                new Producer(QUEUE, HOST + "/queue/send", restTemplate));
     }
 }
