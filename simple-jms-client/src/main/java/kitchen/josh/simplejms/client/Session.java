@@ -16,7 +16,7 @@ public class Session {
     }
 
     public Destination createDestination(DestinationType type) {
-        ConsumerId destinationId = restTemplate.postForEntity(host + "/" + destinationUrl(new Destination(type, null)), null, ConsumerId.class).getBody();
+        ConsumerId destinationId = restTemplate.postForEntity(createDestinationUrl(type), null, ConsumerId.class).getBody();
         return new Destination(type, destinationId.getId());
     }
 
@@ -41,7 +41,15 @@ public class Session {
         return host + "/" + destinationUrl(destination) + "/consumer";
     }
 
+    private String createDestinationUrl(DestinationType type) {
+        return host + "/" + destinationUrl(type);
+    }
+
     private static String destinationUrl(Destination destination) {
-        return destination.getType().name().toLowerCase();
+        return destinationUrl(destination.getType());
+    }
+
+    private static String destinationUrl(DestinationType type) {
+        return type.name().toLowerCase();
     }
 }
