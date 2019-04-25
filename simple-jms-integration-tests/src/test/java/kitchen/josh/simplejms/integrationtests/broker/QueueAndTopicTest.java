@@ -13,6 +13,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD;
 
@@ -32,10 +34,14 @@ public class QueueAndTopicTest {
      */
     @Test
     public void queueConsumersDoNotReceiveTopicMessages() {
-        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID queueId = restTemplate.postForEntity("/queue", null, IdModel.class).getBody().getId();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/queue/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/receive/" + consumerId.getId(), null, MessageModel.class);
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/" + queueId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -45,11 +51,17 @@ public class QueueAndTopicTest {
      */
     @Test
     public void queueConsumersCannotReceiveUsingTopicEndpoint() {
-        IdModel consumerId = restTemplate.postForEntity("/queue/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID queueId = restTemplate.postForEntity("/queue", null, IdModel.class).getBody().getId();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID queueProducerId = restTemplate.postForEntity("/queue/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID topicProducerId = restTemplate.postForEntity("/topic/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        UUID queueConsumerId = restTemplate.postForEntity("/queue/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
+
+        restTemplate.postForEntity("/queue/" + queueId + "/producer/" + queueProducerId + "/send", new MessageModel("hello world"), Void.class);
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + topicProducerId + "/send", new MessageModel("hello world"), Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + queueId + "/consumer/" + queueConsumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -59,10 +71,14 @@ public class QueueAndTopicTest {
      */
     @Test
     public void topicConsumersDoNotReceiveQueueMessages() {
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
+        UUID queueId = restTemplate.postForEntity("/queue", null, IdModel.class).getBody().getId();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/queue/" + queueId + "/producer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        restTemplate.postForEntity("/queue/" + queueId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -72,11 +88,17 @@ public class QueueAndTopicTest {
      */
     @Test
     public void topicConsumersCannotReceiveUsingQueueEndpoint() {
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/queue/send", new MessageModel("hello world"), Void.class);
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID queueId = restTemplate.postForEntity("/queue", null, IdModel.class).getBody().getId();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID queueProducerId = restTemplate.postForEntity("/queue/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID topicProducerId = restTemplate.postForEntity("/topic/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/receive/" + consumerId.getId(), null, MessageModel.class);
+        UUID topicConsumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+
+        restTemplate.postForEntity("/queue/" + queueId + "/producer/" + queueProducerId + "/send", new MessageModel("hello world"), Void.class);
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + topicProducerId + "/send", new MessageModel("hello world"), Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/" + topicId + "/consumer/" + topicConsumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
