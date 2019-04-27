@@ -6,43 +6,51 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+
+import static java.util.stream.Collectors.toMap;
 
 @Component
 public class DestinationService {
 
-    private final Map<UUID, SingleDestinationService> queues;
-    private final Map<UUID, SingleDestinationService> topics;
+    private static final Map<DestinationType, Supplier<SingleDestinationService>> SERVICE_SUPPLIERS = createServiceSupplierMap();
+
+    private final Map<Destination, SingleDestinationService> destinations;
 
     DestinationService() {
-        queues = new HashMap<>();
-        topics = new HashMap<>();
+        destinations = new HashMap<>();
     }
 
     UUID createDestination(DestinationType destinationType) {
-        UUID id = UUID.randomUUID();
-        if (destinationType == DestinationType.QUEUE) {
-            queues.put(id, new QueueService());
-        } else if (destinationType == DestinationType.TOPIC) {
-            topics.put(id, new TopicService());
-        }
-        return id;
+        Destination destination = new Destination(destinationType, UUID.randomUUID());
+        destinations.put(destination, createService(destinationType));
+        return destination.getId();
     }
 
     Optional<SingleDestinationService> findDestination(DestinationType type, UUID id) {
-        if (type == DestinationType.QUEUE) {
-            return Optional.ofNullable(queues.get(id));
-        } else if (type == DestinationType.TOPIC) {
-            return Optional.ofNullable(topics.get(id));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.ofNullable(destinations.get(new Destination(type, id)));
     }
 
     Map<UUID, SingleDestinationService> getQueues() {
-        return queues;
+        return destinations.keySet().stream()
+                .filter(destination -> destination.getType() == DestinationType.QUEUE)
+                .collect(toMap(Destination::getId, destinations::get));
     }
 
     Map<UUID, SingleDestinationService> getTopics() {
-        return topics;
+        return destinations.keySet().stream()
+                .filter(destination -> destination.getType() == DestinationType.TOPIC)
+                .collect(toMap(Destination::getId, destinations::get));
+    }
+
+    private static Map<DestinationType, Supplier<SingleDestinationService>> createServiceSupplierMap() {
+        Map<DestinationType, Supplier<SingleDestinationService>> suppliers = new HashMap<>();
+        suppliers.put(DestinationType.TOPIC, TopicService::new);
+        suppliers.put(DestinationType.QUEUE, QueueService::new);
+        return suppliers;
+    }
+
+    private static SingleDestinationService createService(DestinationType type) {
+        return SERVICE_SUPPLIERS.get(type).get();
     }
 }
