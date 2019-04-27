@@ -163,4 +163,18 @@ public class TopicTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNull();
     }
+
+    @Test
+    public void deleteConsumer_consumerExists_cannotReceiveMessages() {
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer/", null, IdModel.class).getBody().getId();
+
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+        restTemplate.delete("/topic/" + topicId + "/consumer/" + consumerId, null, Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
+    }
 }

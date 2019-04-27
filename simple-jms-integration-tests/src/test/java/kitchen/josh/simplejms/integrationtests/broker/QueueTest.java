@@ -162,4 +162,18 @@ public class QueueTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNull();
     }
+
+    @Test
+    public void deleteConsumer_consumerExists_cannotReceiveMessages() {
+        UUID queueId = restTemplate.postForEntity("/queue", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/queue/" + queueId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/queue/" + queueId + "/producer/", null, IdModel.class).getBody().getId();
+
+        restTemplate.postForEntity("/queue/" + queueId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+        restTemplate.delete("/queue/" + queueId + "/consumer/" + consumerId, null, Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/queue/" + queueId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
+    }
 }
