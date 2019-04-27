@@ -21,9 +21,9 @@ public class DestinationService {
     UUID createDestination(DestinationType destinationType) {
         UUID id = UUID.randomUUID();
         if (destinationType == DestinationType.QUEUE) {
-            queues.put(id, new SingleQueueService());
+            queues.put(id, new QueueService());
         } else if (destinationType == DestinationType.TOPIC) {
-            topics.put(id, new SingleTopicService());
+            topics.put(id, new TopicService());
         }
         return id;
     }

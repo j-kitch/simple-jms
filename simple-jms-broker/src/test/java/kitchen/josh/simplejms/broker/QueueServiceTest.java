@@ -2,17 +2,14 @@ package kitchen.josh.simplejms.broker;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RunWith(MockitoJUnitRunner.class)
 public class QueueServiceTest {
-    
+
     private static final String[] MESSAGES = {"a", "b", "c", "d"};
 
     private QueueService queueService;
@@ -31,16 +28,52 @@ public class QueueServiceTest {
     }
 
     @Test
+    public void createProducer_shouldCreateNewUUIDAndAddToProducers() {
+        UUID producerId = queueService.createProducer();
+
+        assertThat(producerId).isNotNull();
+        assertThat(queueService.getProducers()).containsOnly(producerId);
+    }
+
+    @Test
+    public void removeConsumer_removesConsumer() {
+        UUID consumerId = queueService.createConsumer();
+
+        queueService.removeConsumer(consumerId);
+
+        assertThat(queueService.getConsumers()).isEmpty();
+    }
+
+    @Test
+    public void removeProducer_removesProducer() {
+        UUID producerId = queueService.createProducer();
+
+        queueService.removeProducer(producerId);
+
+        assertThat(queueService.getProducers()).isEmpty();
+    }
+
+    @Test
+    public void addMessage_unknownProducer_doesNothing() {
+        queueService.addMessage(UUID.randomUUID(), MESSAGES[0]);
+        queueService.addMessage(UUID.randomUUID(), MESSAGES[1]);
+
+        assertThat(queueService.getMessages()).isEmpty();
+    }
+
+    @Test
     public void addMessage_appendsMessageToMessages() {
-        queueService.addMessage(MESSAGES[0]);
-        queueService.addMessage(MESSAGES[1]);
+        UUID producerId = queueService.createProducer();
+        queueService.addMessage(producerId, MESSAGES[0]);
+        queueService.addMessage(producerId, MESSAGES[1]);
 
         assertThat(queueService.getMessages()).containsExactly(MESSAGES[0], MESSAGES[1]);
     }
 
     @Test
     public void readMessage_consumerDoesNotExist_returnsEmpty() {
-        queueService.addMessage(MESSAGES[0]);
+        UUID producerId = queueService.createProducer();
+        queueService.addMessage(producerId, MESSAGES[0]);
 
         Optional<String> read = queueService.readMessage(UUID.randomUUID());
 
@@ -62,9 +95,10 @@ public class QueueServiceTest {
 
     @Test
     public void readMessage_consumerExistsWithMessages_popsFirst() {
+        UUID producerId = queueService.createProducer();
         UUID consumerId = queueService.createConsumer();
-        queueService.addMessage(MESSAGES[0]);
-        queueService.addMessage(MESSAGES[1]);
+        queueService.addMessage(producerId, MESSAGES[0]);
+        queueService.addMessage(producerId, MESSAGES[1]);
 
         Optional<String> read = queueService.readMessage(consumerId);
 
@@ -75,10 +109,11 @@ public class QueueServiceTest {
 
     @Test
     public void readMessage_multipleConsumers_popFromSameQueue() {
-        queueService.addMessage(MESSAGES[0]);
-        queueService.addMessage(MESSAGES[1]);
-        queueService.addMessage(MESSAGES[2]);
-        queueService.addMessage(MESSAGES[3]);
+        UUID producerId = queueService.createProducer();
+        queueService.addMessage(producerId, MESSAGES[0]);
+        queueService.addMessage(producerId, MESSAGES[1]);
+        queueService.addMessage(producerId, MESSAGES[2]);
+        queueService.addMessage(producerId, MESSAGES[3]);
         UUID consumerId1 = queueService.createConsumer();
         UUID consumerId2 = queueService.createConsumer();
 

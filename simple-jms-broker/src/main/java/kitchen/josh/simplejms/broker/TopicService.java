@@ -1,34 +1,59 @@
 package kitchen.josh.simplejms.broker;
 
-import org.springframework.stereotype.Component;
-
 import java.util.*;
 
-@Component
-class TopicService {
+public class TopicService implements SingleDestinationService {
 
     private final Map<UUID, Queue<String>> consumerQueues;
+    private final Set<UUID> producers;
 
     TopicService() {
         consumerQueues = new HashMap<>();
+        producers = new HashSet<>();
     }
 
-    UUID createConsumer() {
+    @Override
+    public UUID createConsumer() {
         UUID consumerId = UUID.randomUUID();
         consumerQueues.put(consumerId, new LinkedList<>());
         return consumerId;
     }
 
-    void addMessage(String message) {
-        consumerQueues.values().forEach(queue -> queue.add(message));
+    @Override
+    public UUID createProducer() {
+        UUID producerId = UUID.randomUUID();
+        producers.add(producerId);
+        return producerId;
     }
 
-    Optional<String> readMessage(UUID consumerId) {
+    @Override
+    public void removeConsumer(UUID consumerId) {
+        consumerQueues.remove(consumerId);
+    }
+
+    @Override
+    public void removeProducer(UUID producerId) {
+        producers.remove(producerId);
+    }
+
+    @Override
+    public void addMessage(UUID producer, String message) {
+        if (producers.contains(producer)) {
+            consumerQueues.values().forEach(queue -> queue.add(message));
+        }
+    }
+
+    @Override
+    public Optional<String> readMessage(UUID consumerId) {
         return Optional.ofNullable(consumerQueues.get(consumerId))
                 .map(Queue::poll);
     }
 
     Map<UUID, Queue<String>> getConsumerQueues() {
         return consumerQueues;
+    }
+
+    Set<UUID> getProducers() {
+        return producers;
     }
 }

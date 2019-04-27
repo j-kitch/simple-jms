@@ -23,7 +23,7 @@ public class DestinationServiceTest {
 
         assertThat(queueId).isNotNull();
         assertThat(destinationService.getQueues()).containsOnlyKeys(queueId);
-        assertThat(destinationService.getQueues().get(queueId)).isInstanceOf(SingleQueueService.class);
+        assertThat(destinationService.getQueues().get(queueId)).isInstanceOf(QueueService.class);
         assertThat(destinationService.getTopics()).isEmpty();
     }
 
@@ -33,7 +33,7 @@ public class DestinationServiceTest {
 
         assertThat(topicId).isNotNull();
         assertThat(destinationService.getTopics()).containsOnlyKeys(topicId);
-        assertThat(destinationService.getTopics().get(topicId)).isInstanceOf(SingleTopicService.class);
+        assertThat(destinationService.getTopics().get(topicId)).isInstanceOf(TopicService.class);
         assertThat(destinationService.getQueues()).isEmpty();
     }
 
