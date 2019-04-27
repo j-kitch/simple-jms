@@ -11,10 +11,16 @@
     <artifactId>simple-jms</artifactId>
     <packaging>pom</packaging>
     <version>0.4.0-SNAPSHOT</version>
+
     <modules>
         <module>simple-jms-broker</module>
         <module>simple-jms-client</module>
         <module>simple-jms-integration-tests</module>
         <module>simple-jms-jacoco-aggregate</module>
     </modules>
+
+    <properties>
+        <jacoco.version>0.8.3</jacoco.version>
+        <jacoco.coverage.minimum>0.50</jacoco.coverage.minimum>
+    </properties>
 </project>
