@@ -71,6 +71,24 @@ public class QueueTest {
     }
 
     /**
+     * Given a queue consumer and a different queue producer,
+     * When the producer sends a message,
+     * Then the consumer receives no messages.
+     */
+    @Test
+    public void consumerAndOtherQueueProducer_messageSent_noMessagesReceived() {
+        Destination queue1 = session.createDestination(DestinationType.QUEUE);
+        Destination queue2 = session.createDestination(DestinationType.QUEUE);
+        Consumer consumer = session.createConsumer(queue1);
+        Producer producer = session.createProducer(queue2);
+
+        producer.sendMessage("hello world");
+
+        assertThat(consumer.receiveMessage()).isEmpty();
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
+
+    /**
      * Given a queue consumer and topic producer,
      * When the producer sends messages,
      * The consumer receives no messages.
@@ -90,12 +108,32 @@ public class QueueTest {
     }
 
     /**
+     * Given a queue consumer, and multiple different queue producers,
+     * When the producers send messages,
+     * The consumer only receives messages from it's queue.
+     */
+    @Test
+    public void consumerAndMultipleQueueProducers_messagesSent_onlyThisQueueMessagesReceived() {
+        Destination queue1 = session.createDestination(DestinationType.QUEUE);
+        Destination queue2 = session.createDestination(DestinationType.QUEUE);
+        Producer producer1 = session.createProducer(queue1);
+        Producer producer2 = session.createProducer(queue2);
+        Consumer consumer = session.createConsumer(queue1);
+
+        producer1.sendMessage(MESSAGES[0]);
+        producer2.sendMessage(MESSAGES[1]);
+
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(queue1, MESSAGES[0]));
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
+
+    /**
      * Given a queue consumer and topic/queue producers,
      * When the producers send messages,
      * Then the consumer only receives queue messages.
      */
     @Test
-    public void consumerAndAllDestinationsProducers_messagesSent_onlyQueueMessagesReceived() {
+    public void consumerAndAllDestinationTypeProducers_messagesSent_onlyQueueMessagesReceived() {
         Destination queue = session.createDestination(DestinationType.QUEUE);
         Destination topic = session.createDestination(DestinationType.TOPIC);
         Consumer consumer = session.createConsumer(queue);
