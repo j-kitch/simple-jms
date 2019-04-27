@@ -163,6 +163,23 @@ public class TopicTest {
     }
 
     /**
+     * Given a topic consumer and a different topic producer,
+     * When the producer sends a message,
+     * Then the consumer receives no messages.
+     */
+    @Test
+    public void singleConsumerAndOtherTopicProducer_messageSent_noMessageReceived() {
+        Destination topic1 = session.createDestination(DestinationType.TOPIC);
+        Destination topic2 = session.createDestination(DestinationType.TOPIC);
+        Consumer consumer = session.createConsumer(topic1);
+        Producer producer = session.createProducer(topic2);
+
+        producer.sendMessage(MESSAGES[0]);
+
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
+
+    /**
      * Given a topic consumer and a queue producer,
      * When the queue producer sends a message,
      * Then the topic consumer receives no messages.
@@ -176,6 +193,26 @@ public class TopicTest {
 
         producer.sendMessage(MESSAGES[0]);
 
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
+
+    /**
+     * Given a topic consumer and different topic producers,
+     * When producers send messages,
+     * Then only this topic's messages are received.
+     */
+    @Test
+    public void consumerAndMultipleDifferentTopicProducers_sendMessages_onlyThisTopicMessagesReceived() {
+        Destination topic1 = session.createDestination(DestinationType.TOPIC);
+        Destination topic2 = session.createDestination(DestinationType.TOPIC);
+        Consumer consumer = session.createConsumer(topic1);
+        Producer producer1 = session.createProducer(topic1);
+        Producer producer2 = session.createProducer(topic2);
+
+        producer1.sendMessage(MESSAGES[0]);
+        producer2.sendMessage(MESSAGES[1]);
+
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(topic1, MESSAGES[0]));
         assertThat(consumer.receiveMessage()).isEmpty();
     }
 
