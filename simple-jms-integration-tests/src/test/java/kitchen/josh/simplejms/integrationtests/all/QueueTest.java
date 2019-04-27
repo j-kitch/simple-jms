@@ -219,4 +219,31 @@ public class QueueTest {
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer2.receiveMessage()).isEmpty();
     }
+
+    @Test
+    public void consumerClosed_doesNotReceiveMessages() {
+        Destination queue = session.createDestination(DestinationType.QUEUE);
+        Consumer consumer = session.createConsumer(queue);
+        Producer producer = session.createProducer(queue);
+
+        producer.sendMessage(MESSAGES[0]);
+
+        consumer.close();
+
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
+
+    @Test
+    public void producerClosed_doesNotSendMessages() {
+        Destination queue = session.createDestination(DestinationType.QUEUE);
+        Consumer consumer = session.createConsumer(queue);
+        Producer producer = session.createProducer(queue);
+
+        producer.sendMessage(MESSAGES[0]);
+        producer.close();
+        producer.sendMessage(MESSAGES[1]);
+
+        assertThat(consumer.receiveMessage()).usingFieldByFieldValueComparator().contains(new Message(queue, MESSAGES[0]));
+        assertThat(consumer.receiveMessage()).isEmpty();
+    }
 }
