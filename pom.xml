@@ -15,5 +15,6 @@
         <module>simple-jms-broker</module>
         <module>simple-jms-client</module>
         <module>simple-jms-integration-tests</module>
+        <module>simple-jms-jacoco-aggregate</module>
     </modules>
 </project>
