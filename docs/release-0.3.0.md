@@ -60,10 +60,6 @@ A POJO describing a single message.  This POJO exposes the following methods
 
     The destination that the message has been received from.
     
-+   `ProducerId getProducerId()`
-
-    The producer that the message was sent from.
-    
 ## Session
 A session
 +   `Session(String brokerUrl, RestTemplate restTemplate)`
