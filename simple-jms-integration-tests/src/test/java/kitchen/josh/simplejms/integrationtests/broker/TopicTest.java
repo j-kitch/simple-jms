@@ -36,10 +36,12 @@ public class TopicTest {
      */
     @Test
     public void createTopicConsumer_returnsUniqueIds() {
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+
         Set<UUID> consumerIds = new HashSet<>();
 
         for (int i = 0; i < 10; i++) {
-            ResponseEntity<IdModel> response = restTemplate.postForEntity("/topic/consumer", null, IdModel.class);
+            ResponseEntity<IdModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class);
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
 
@@ -54,7 +56,8 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_unknownConsumerId_returnsOkAndEmptyMessage() {
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + UUID.randomUUID(), null, MessageModel.class);
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + UUID.randomUUID() + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -64,9 +67,10 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_noMessages_returnsOkAndEmptyMessage() {
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -76,10 +80,13 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_messageSentBeforeConsumer_returnsOkAndEmptyMessage() {
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -89,12 +96,14 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_messageSentAfterConsumer_returnsOkAndMessage() {
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
 
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
+
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
     }
 
     /**
@@ -102,16 +111,19 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_receivesMessageOnce() {
-        IdModel consumerId = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
+        UUID consumerId = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
 
         // Receives message on first call.
-        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
 
         // Receives empty on the second call.
-        ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/receive/" + consumerId.getId(), null, MessageModel.class);
+        ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumerId + "/receive", null, MessageModel.class);
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response2.getBody()).isEqualToComparingFieldByField(new MessageModel(null));
     }
@@ -121,18 +133,20 @@ public class TopicTest {
      */
     @Test
     public void receiveMessage_multipleConsumers_allReceiveMessages() {
-        IdModel consumerId1 = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
-        IdModel consumerId2 = restTemplate.postForEntity("/topic/consumer", null, IdModel.class).getBody();
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
+        UUID consumer1Id = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
+        UUID consumer2Id = restTemplate.postForEntity("/topic/" + topicId + "/consumer", null, IdModel.class).getBody().getId();
 
-        restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
 
-        // Consumer 1 receives message.
-        ResponseEntity<MessageModel> response1 = restTemplate.postForEntity("/topic/receive/" + consumerId1.getId(), null, MessageModel.class);
-        assertThat(response1.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response1.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
+        // One consumer receives the message.
+        ResponseEntity<MessageModel> response = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumer1Id + "/receive", null, MessageModel.class);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
 
-        // Consumer2 receives message.
-        ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/receive/" + consumerId2.getId(), null, MessageModel.class);
+        // The other consumer receives the message.
+        ResponseEntity<MessageModel> response2 = restTemplate.postForEntity("/topic/" + topicId + "/consumer/" + consumer2Id + "/receive", null, MessageModel.class);
         assertThat(response2.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response2.getBody()).isEqualToComparingFieldByField(new MessageModel("hello world"));
     }
@@ -142,7 +156,10 @@ public class TopicTest {
      */
     @Test
     public void sendMessage_returnsOkAndEmptyBody() {
-        ResponseEntity<Void> response = restTemplate.postForEntity("/topic/send", new MessageModel("hello world"), Void.class);
+        UUID topicId = restTemplate.postForEntity("/topic", null, IdModel.class).getBody().getId();
+        UUID producerId = restTemplate.postForEntity("/topic/" + topicId + "/producer", null, IdModel.class).getBody().getId();
+
+        ResponseEntity<Void> response = restTemplate.postForEntity("/topic/" + topicId + "/producer/" + producerId + "/send", new MessageModel("hello world"), Void.class);
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNull();
     }
