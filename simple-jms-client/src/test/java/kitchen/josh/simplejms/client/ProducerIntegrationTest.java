@@ -15,14 +15,12 @@ import static org.springframework.test.web.client.ExpectedCount.once;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
-/**
- * Integration tests for the Client's Producer class.
- */
 public class ProducerIntegrationTest {
 
     private static final String HOST = "http://localhost:8080";
     private static final UUID DESTINATION_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
+    private static final String MESSAGE = "hello world";
 
     private RestTemplate restTemplate;
     private MockRestServiceServer mockRestServiceServer;
@@ -34,39 +32,22 @@ public class ProducerIntegrationTest {
     }
 
     @Test
-    public void sendMessageToQueue() {
-        String message = "hello world";
+    public void sendMessage() {
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID));
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + message + "\"}"))
+                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\"}"))
                 .andRespond(withSuccess());
 
-        producer.sendMessage(message);
+        producer.sendMessage(MESSAGE);
 
         mockRestServiceServer.verify();
     }
 
     @Test
-    public void sendMessageToTopic() {
-        String message = "hello world";
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID));
-
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
-                .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + message + "\"}"))
-                .andRespond(withSuccess());
-
-        producer.sendMessage(message);
-
-        mockRestServiceServer.verify();
-    }
-
-    @Test
-    public void close_notifiesBroker() {
+    public void close() {
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID));
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(method(HttpMethod.DELETE))

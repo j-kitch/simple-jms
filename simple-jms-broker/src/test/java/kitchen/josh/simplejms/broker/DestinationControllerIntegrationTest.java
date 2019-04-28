@@ -24,6 +24,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DestinationController.class)
 public class DestinationControllerIntegrationTest {
 
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final UUID CONSUMER_ID = UUID.randomUUID();
+    private static final UUID PRODUCER_ID = UUID.randomUUID();
+    private static final String MESSAGE = "hello world";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -35,13 +40,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void createDestination_topic_returnsOkAndId() throws Exception {
-        UUID id = UUID.randomUUID();
-        when(destinationService.createDestination(any())).thenReturn(id);
+        when(destinationService.createDestination(any())).thenReturn(DESTINATION_ID);
 
         mockMvc.perform(post("/topic"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + id + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}"));
 
         verify(destinationService).createDestination(DestinationType.TOPIC);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -49,13 +53,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void createDestination_queue_returnsOkAndId() throws Exception {
-        UUID id = UUID.randomUUID();
-        when(destinationService.createDestination(any())).thenReturn(id);
+        when(destinationService.createDestination(any())).thenReturn(DESTINATION_ID);
 
         mockMvc.perform(post("/queue"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + id + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}"));
 
         verify(destinationService).createDestination(DestinationType.QUEUE);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -63,111 +66,98 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void createConsumer_returnsOkAndId() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID consumerId = UUID.randomUUID();
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.createConsumer()).thenReturn(consumerId);
+        when(singleDestinationService.createConsumer()).thenReturn(CONSUMER_ID);
 
-        mockMvc.perform(post("/queue/" + destinationId + "/consumer"))
+        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/consumer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + consumerId + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}"));
 
-        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).createConsumer();
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void createProducer_returnsOkAndId() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID producerId = UUID.randomUUID();
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.createProducer()).thenReturn(producerId);
+        when(singleDestinationService.createProducer()).thenReturn(PRODUCER_ID);
 
-        mockMvc.perform(post("/topic/" + destinationId + "/producer"))
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + producerId + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}"));
 
-        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).createProducer();
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void deleteConsumer_returnsOk() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID consumerId = UUID.randomUUID();
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
 
-        mockMvc.perform(delete("/topic/" + destinationId + "/consumer/" + consumerId))
+        mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(status().isOk());
 
-        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
-        verify(singleDestinationService).removeConsumer(consumerId);
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verify(singleDestinationService).removeConsumer(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void deleteProducer_returnsOk() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID producerId = UUID.randomUUID();
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
 
-        mockMvc.perform(delete("/queue/" + destinationId + "/producer/" + producerId))
+        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(status().isOk());
 
-        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
-        verify(singleDestinationService).removeProducer(producerId);
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verify(singleDestinationService).removeProducer(PRODUCER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void sendMessage_returnsOk() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID producerId = UUID.randomUUID();
-        String message = "hello world";
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
 
-        mockMvc.perform(post("/queue/" + destinationId + "/producer/" + producerId + "/send")
+        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + message + "\"}"))
+                .content("{\"message\": \"" + MESSAGE + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
-        verify(destinationService).findDestination(DestinationType.QUEUE, destinationId);
-        verify(singleDestinationService).addMessage(producerId, message);
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void receiveMessage_noMessage_returnsNull() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID consumerId = UUID.randomUUID();
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/topic/" + destinationId + "/consumer/" + consumerId + "/receive"))
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"message\": null}"));
-        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
-        verify(singleDestinationService).readMessage(consumerId);
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verify(singleDestinationService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        UUID destinationId = UUID.randomUUID();
-        UUID consumerId = UUID.randomUUID();
-        String message = "hello world";
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));
+        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
-        mockMvc.perform(post("/topic/" + destinationId + "/consumer/" + consumerId + "/receive"))
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": \"" + message + "\"}"));
-        verify(destinationService).findDestination(DestinationType.TOPIC, destinationId);
-        verify(singleDestinationService).readMessage(consumerId);
+                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verify(singleDestinationService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 }
