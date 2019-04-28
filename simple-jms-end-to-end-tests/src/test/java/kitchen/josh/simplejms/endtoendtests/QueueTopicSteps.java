@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ContextConfiguration
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-public class Steps {
+public class QueueTopicSteps {
 
     private static final String[] MESSAGES = {
             "a", "b", "c", "d"
@@ -52,12 +52,44 @@ public class Steps {
         consumer2 = null;
     }
 
+    @Given("a fake destination with a producer and consumer")
+    public void a_fake_destination_with_a_producer_and_consumer() {
+        destination = new Destination(DestinationType.QUEUE, UUID.randomUUID());
+        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()));
+        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()));
+    }
+
+    @Given("a queue with a producer")
+    public void a_queue_with_a_producer() {
+        destination = session.createDestination(DestinationType.QUEUE);
+        producer = session.createProducer(destination);
+    }
+
     @Given("a queue with a producer and multiple consumers")
     public void a_queue_with_a_producer_and_multiple_consumers() {
         destination = session.createDestination(DestinationType.QUEUE);
         producer = session.createProducer(destination);
         consumer1 = session.createConsumer(destination);
         consumer2 = session.createConsumer(destination);
+    }
+
+    @Given("a topic with a producer")
+    public void a_topic_with_a_producer() {
+        destination = session.createDestination(DestinationType.TOPIC);
+        producer = session.createProducer(destination);
+    }
+
+    @Given("a topic with a producer and multiple consumers")
+    public void a_topic_with_a_producer_and_multiple_consumers() {
+        destination = session.createDestination(DestinationType.TOPIC);
+        producer = session.createProducer(destination);
+        consumer1 = session.createConsumer(destination);
+        consumer2 = session.createConsumer(destination);
+    }
+
+    @When("a consumer is created")
+    public void a_consumer_is_created() {
+        consumer1 = session.createConsumer(destination);
     }
 
     @When("the producer sends messages")
@@ -86,17 +118,6 @@ public class Steps {
         assertThat(consumer2.receiveMessage()).isEmpty();
     }
 
-    @Given("a queue with a producer")
-    public void a_queue_with_a_producer() {
-        destination = session.createDestination(DestinationType.QUEUE);
-        producer = session.createProducer(destination);
-    }
-
-    @When("a consumer is created")
-    public void a_consumer_is_created() {
-        consumer1 = session.createConsumer(destination);
-    }
-
     @Then("the consumer receives messages")
     public void the_consumer_receives_messages() {
         Optional<Message> message1 = consumer1.receiveMessage();
@@ -111,14 +132,6 @@ public class Steps {
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
-    }
-
-    @Given("a topic with a producer and multiple consumers")
-    public void a_topic_with_a_producer_and_multiple_consumers() {
-        destination = session.createDestination(DestinationType.TOPIC);
-        producer = session.createProducer(destination);
-        consumer1 = session.createConsumer(destination);
-        consumer2 = session.createConsumer(destination);
     }
 
     @Then("each message is received by every consumer")
@@ -139,22 +152,9 @@ public class Steps {
         });
     }
 
-    @Given("a topic with a producer")
-    public void a_topic_with_a_producer() {
-        destination = session.createDestination(DestinationType.TOPIC);
-        producer = session.createProducer(destination);
-    }
-
     @Then("the consumer receives no messages")
     public void the_consumer_receives_no_messages() {
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
-    }
-
-    @Given("a fake destination with a producer and consumer")
-    public void a_fake_destination_with_a_producer_and_consumer() {
-        destination = new Destination(DestinationType.QUEUE, UUID.randomUUID());
-        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()));
-        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()));
     }
 }
