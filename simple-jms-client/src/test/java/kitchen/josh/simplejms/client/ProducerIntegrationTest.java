@@ -1,9 +1,7 @@
-package kitchen.josh.simplejms.integrationtests.client;
+package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.broker.Destination;
 import kitchen.josh.simplejms.broker.DestinationType;
-import kitchen.josh.simplejms.client.Producer;
-import kitchen.josh.simplejms.client.ProducerId;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -20,7 +18,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 /**
  * Integration tests for the Client's Producer class.
  */
-public class ProducerTest {
+public class ProducerIntegrationTest {
 
     private static final String HOST = "http://localhost:8080";
     private static final UUID DESTINATION_ID = UUID.randomUUID();

@@ -1,4 +1,4 @@
-package kitchen.josh.simplejms.integrationtests.all;
+package kitchen.josh.simplejms.endtoendtests;
 
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.broker.Destination;
