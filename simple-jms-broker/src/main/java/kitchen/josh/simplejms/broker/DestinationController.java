@@ -22,10 +22,9 @@ public class DestinationController {
 
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
     public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        UUID consumerId = destinationService.findDestination(destination, destinationId)
+        UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
                 .map(SingleDestinationService::createConsumer)
-                .orElse(null);
+                .orElseThrow(() -> new ApiException("Failed to create consumer for " + destinationType + " " + destinationId + ": the topic does not exist."));
         return new IdModel(consumerId);
     }
 
@@ -70,6 +69,12 @@ public class DestinationController {
                 .flatMap(service -> service.readMessage(consumerId))
                 .orElse(null);
         return new MessageModel(message);
+    }
+
+    @ExceptionHandler(ApiException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public MessageModel apiExceptionHandler(ApiException apiException) {
+        return new MessageModel(apiException.getMessage());
     }
 
     private static DestinationType toType(String type) {

@@ -65,7 +65,7 @@ public class DestinationControllerIntegrationTest {
     }
 
     @Test
-    public void createDestination_unknownDestinationType_returnsNormal404() throws Exception {
+    public void createDestination_unknownDestinationType_returnsNotFound() throws Exception {
         mockMvc.perform(post("/ooga-booga"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
@@ -85,6 +85,26 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).createConsumer();
         verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void createConsumer_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/consumer"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void createConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to create consumer for topic " + DESTINATION_ID + ": the topic does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
     }
 
     @Test
