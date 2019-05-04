@@ -65,6 +65,14 @@ public class DestinationControllerIntegrationTest {
     }
 
     @Test
+    public void createDestination_unknownDestinationType_returnsNormal404() throws Exception {
+        mockMvc.perform(post("/ooga-booga"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
     public void createConsumer_returnsOkAndId() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.createConsumer()).thenReturn(CONSUMER_ID);

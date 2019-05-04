@@ -1,6 +1,8 @@
 package kitchen.josh.simplejms.broker;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -15,8 +17,7 @@ public class DestinationController {
 
     @PostMapping(path = "/{destinationType}")
     public IdModel createDestination(@PathVariable String destinationType) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        return new IdModel(destinationService.createDestination(destination));
+        return new IdModel(destinationService.createDestination(toType(destinationType)));
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
@@ -69,5 +70,13 @@ public class DestinationController {
                 .flatMap(service -> service.readMessage(consumerId))
                 .orElse(null);
         return new MessageModel(message);
+    }
+
+    private static DestinationType toType(String type) {
+        try {
+            return DestinationType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException iae) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
     }
 }
