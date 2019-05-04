@@ -9,15 +9,10 @@ Create a new destination to send/receive messages from.
 ### Request
 
 #### Path Parameters
-+   destination-type
 
-    **type**: string
-    
-    **optional**: false
-
-    The type of destination to be created, a choice of either
-    `queue` or `topic`.
-    
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of destination to be created, a choice of either `queue` or `topic`.
 
 ### Response
 
@@ -29,15 +24,10 @@ The destination was successfully created.
 }
 ```
 
-+   destination-id
+Path | Type | Optional | Description
+---|---|---|---
+id | string | false |  The ID of the created destination.  
 
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the created destination.  Together the destination
-    type and destination ID uniquely identify the destination.
-    
 ## Create a Producer
 ```
 POST /{destination-type}/{destination-id}/producer
@@ -47,21 +37,10 @@ Create a producer for a specific destination.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination to create a producer for.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination to create a producer for.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false |The type of the destination to create a producer for.
+destination-id | string | false | The ID of the destination to create a producer for.
 
 ### Response
 
@@ -73,13 +52,9 @@ The Producer was successfully created.
   "id": "{producer-id}"
 }
 ```
-+   producer-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the created producer.
+Path | Type | Optional | Description
+---|---|---|---
+id | string | false | The ID of the created producer.
     
 #### 400: Bad Request
 The broker failed to create the Producer.
@@ -88,14 +63,9 @@ The broker failed to create the Producer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the producer
-    failed to be created.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the producer failed to be created.
 
 ## Create a Consumer
 ```
@@ -106,21 +76,10 @@ Create a Consumer for the specific destination.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination to create a Consumer for.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination to create a Consumer for.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of the destination to create a Consumer for.
+destination-id | string | false | The ID of the destination to create a Consumer for.
 
 ### Response
 
@@ -132,14 +91,10 @@ The Consumer was successfully created.
   "id": "{consumer-id}"
 }
 ```
-+   consumer-id
+Path | Type | Optional | Description
+---|---|---|---
+id | string | false | THe ID of the created Consumer.
 
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the created Consumer.
-    
 #### 400: Bad Request
 The broker failed to create the Consumer.
 ```json
@@ -147,15 +102,9 @@ The broker failed to create the Consumer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the Consumer
-    failed to be created.
-
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the Consumer failed to be created.
 
 ## Delete a Producer
 ```
@@ -166,29 +115,11 @@ Delete a specific producer from the broker.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination of the producer.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination of the Producer.
-    
-+   producer-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the Producer to delete.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of the destination of the producer.
+destination-id | string | false | The ID of the destination of the Producer.
+producer-id | string | false | The ID of the Producer to delete.
 
 ### Response
 
@@ -203,14 +134,9 @@ The broker failed to delete the specified Producer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the Producer
-    could not be deleted.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the Producer could not be deleted.
 
 
 ## Delete a Consumer
@@ -222,29 +148,11 @@ Delete a specific consumer from a broker.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination of the Consumer.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination of the Consumer.
-    
-+   consumer-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the Consumer to delete.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of the destination of the Consumer.
+destination-id | string | false | The ID of the destination of the Consumer.
+consumer-id | string | false | The ID of the Consumer to delete.
 
 ### Response
 
@@ -259,14 +167,9 @@ The broker failed to delete the specified Consumer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the Consumer
-    could not be deleted.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the Consumer could not be deleted.
 
 ## Send a Message
 ```
@@ -277,29 +180,11 @@ Send a message to the broker using the specified Producer.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination of the Producer.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination of the Producer.
-    
-+   producer-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the Producer.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of the destination of the Producer.
+destination-id | string | false | The ID of the destination of the Producer.
+producer-id | string | false | The ID of the Producer.
     
 #### Request Body
 ```json
@@ -307,13 +192,9 @@ Send a message to the broker using the specified Producer.
   "message": "{message}"
 }
 ```
-+   message
-    
-    **type**: string
-    
-    **optional**: false
-    
-    The message to be sent via the producer.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | The message to be sent via the producer.
 
 ### Response
 
@@ -328,14 +209,9 @@ The broker failed to receive the message from the Producer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the Producer
-    could not send the message to the broker.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the Producer could not send the message to the broker.
 
 ## Receive a Message
 ```
@@ -346,29 +222,11 @@ Receive a message for the specific consumer.
 ### Request
 
 #### Path Parameters
-+   destination-type
-
-    **type**: string
-    
-    **optional**: false
-    
-    The type of the destination of the Consumer.
-    
-+   destination-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the destination of the Consumer.
-    
-+   consumer-id
-
-    **type**: string
-    
-    **optional**: false
-    
-    The ID of the Consumer.
+Parameter | Type | Optional | Description
+---|---|---|---
+destination-type | string | false | The type of the destination of the Consumer.
+destination-id | string | false | The ID of the destination of the Consumer.
+consumer-id | string | false | The ID of the Consumer.
 
 ### Response
 
@@ -380,14 +238,9 @@ The Consumer has received it's message from the broker.
   "message": "{message}"
 }
 ```
-+   message
-
-    **type**: string
-    
-    **optional**: true
-    
-    The message the broker has sent to the consumer, or `null` if
-    there isn't a message for the consumer to receive.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | true | The message the broker has sent to the consumer, or `null` if there isn't a message for the consumer to receive.
 
 #### 400: Bad Request
 The broker failed to send the next message to the consumer.
@@ -397,11 +250,6 @@ The broker failed to send the next message to the consumer.
   "message": "{error-message}"
 }
 ```
-+   error-message
-
-    **type**: string
-    
-    **optional**: false
-    
-    A descriptive error message describing the reason why the 
-    next message could not be sent to the Consumer.
+Path | Type | Optional | Description
+---|---|---|---
+message | string | false | A descriptive error message describing the reason why the next message could not be sent to the Consumer.
