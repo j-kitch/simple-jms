@@ -105,6 +105,9 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 
     @Test
@@ -119,6 +122,29 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).createProducer();
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void createProducer_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void createProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to create producer for queue " + DESTINATION_ID + ": the queue does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
 

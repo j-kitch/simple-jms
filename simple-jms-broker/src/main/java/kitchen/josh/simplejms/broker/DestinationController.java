@@ -24,16 +24,15 @@ public class DestinationController {
     public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
                 .map(SingleDestinationService::createConsumer)
-                .orElseThrow(() -> new ApiException("Failed to create consumer for " + destinationType + " " + destinationId + ": the topic does not exist."));
+                .orElseThrow(() -> new ApiException("Failed to create consumer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
         return new IdModel(consumerId);
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
     public IdModel createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        UUID consumerId = destinationService.findDestination(destination, destinationId)
+        UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
                 .map(SingleDestinationService::createProducer)
-                .orElse(null);
+                .orElseThrow(() -> new ApiException("Failed to create producer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
         return new IdModel(consumerId);
     }
 
