@@ -2,7 +2,10 @@ package kitchen.josh.simplejms.broker;
 
 import org.springframework.util.Assert;
 
-public class Message {
+/**
+ * A single message received by a destination.
+ */
+public final class Message {
 
     private final Destination destination;
     private final String message;
@@ -14,11 +17,21 @@ public class Message {
         this.message = message;
     }
 
-    public String getMessage() {
+    /**
+     * Get the plain text message.
+     *
+     * @return the message
+     */
+    public final String getMessage() {
         return message;
     }
 
-    public Destination getDestination() {
+    /**
+     * Get the destination the message was sent to.
+     *
+     * @return the destination the message was sent to
+     */
+    public final Destination getDestination() {
         return destination;
     }
 }

@@ -6,6 +6,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
+/**
+ * The controller for the broker's destinations.  With an API for creating destinations, producers and consumers,
+ * and sending and receiving messages.
+ */
 @RestController
 public class DestinationController {
 
@@ -15,11 +19,24 @@ public class DestinationController {
         this.destinationService = destinationService;
     }
 
+    /**
+     * Create a new destination.
+     *
+     * @param destinationType the type of destination to create
+     * @return the id of the created destination
+     */
     @PostMapping(path = "/{destinationType}")
     public IdModel createDestination(@PathVariable String destinationType) {
         return new IdModel(destinationService.createDestination(toType(destinationType)));
     }
 
+    /**
+     * Create a new consumer for a destination.
+     *
+     * @param destinationType the type of destination to create a consumer for
+     * @param destinationId   the id of the destination to create a consumer for
+     * @return the id of the created consumer
+     */
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
     public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
@@ -28,6 +45,13 @@ public class DestinationController {
         return new IdModel(consumerId);
     }
 
+    /**
+     * Create a new producer for a destination.
+     *
+     * @param destinationType the type of destination to create a producer for
+     * @param destinationId the id of the destination to create a producer for
+     * @return the id of the created consumer
+     */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
     public IdModel createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
@@ -36,6 +60,13 @@ public class DestinationController {
         return new IdModel(consumerId);
     }
 
+    /**
+     * Delete a consumer.
+     *
+     * @param destinationType the type of destination
+     * @param destinationId the id of the destination
+     * @param consumerId the id of the consumer
+     */
     @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID consumerId) {
@@ -48,6 +79,13 @@ public class DestinationController {
         }
     }
 
+    /**
+     * Delete a producer.
+     *
+     * @param destinationType the type of destination
+     * @param destinationId the id of the destination
+     * @param producerId the id of the producer
+     */
     @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
     public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID producerId) {
@@ -60,6 +98,14 @@ public class DestinationController {
         }
     }
 
+    /**
+     * Send a message from a producer to a destination.
+     *
+     * @param destinationType the type of destination
+     * @param destinationId the id of the destination
+     * @param producerId the id of the producer
+     * @param message the message to send to the destination
+     */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
     public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                             @PathVariable UUID producerId, @RequestBody MessageModel message) {
@@ -72,6 +118,14 @@ public class DestinationController {
         }
     }
 
+    /**
+     * Receive a message for a consumer from a destination.
+     *
+     * @param destinationType the type of destination
+     * @param destinationId the id of the destination
+     * @param consumerId the id of the consumer
+     * @return the message received from the destination
+     */
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
@@ -86,6 +140,11 @@ public class DestinationController {
         }
     }
 
+    /**
+     * Handle an {@link ApiException} by returning 400 and the exception's message.
+     * @param apiException the exception to handle
+     * @return the exception's message
+     */
     @ExceptionHandler(ApiException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public MessageModel apiExceptionHandler(ApiException apiException) {

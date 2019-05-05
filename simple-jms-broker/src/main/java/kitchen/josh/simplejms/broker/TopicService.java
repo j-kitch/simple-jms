@@ -2,6 +2,9 @@ package kitchen.josh.simplejms.broker;
 
 import java.util.*;
 
+/**
+ * A class implementing a publish-subscribe model of destination.
+ */
 public class TopicService implements SingleDestinationService {
 
     private final Map<UUID, Queue<String>> consumerQueues;

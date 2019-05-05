@@ -7,6 +7,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
+/**
+ * A consumer for a destination, used for receiving messages.
+ */
 public class Consumer implements AutoCloseable {
 
     private final String brokerUrl;
@@ -19,6 +22,11 @@ public class Consumer implements AutoCloseable {
         this.id = id;
     }
 
+    /**
+     * Receive a message from the consumer's destination.
+     *
+     * @return the next message for the consumer, or <code>Optional.empty()</code> if there isn't a message
+     */
     public Optional<Message> receiveMessage() {
         String receiveUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"
                 + id.getId() + "/receive";
@@ -29,6 +37,9 @@ public class Consumer implements AutoCloseable {
                 .map(message -> new Message(id.getDestination(), message));
     }
 
+    /**
+     * Close the consumer, telling the broker to remove resources allocated for this consumer.
+     */
     @Override
     public void close() {
         String deleteUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"

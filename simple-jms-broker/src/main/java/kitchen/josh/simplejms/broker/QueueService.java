@@ -2,6 +2,9 @@ package kitchen.josh.simplejms.broker;
 
 import java.util.*;
 
+/**
+ * A class implementing a point-to-point destination for the broker.
+ */
 public class QueueService implements SingleDestinationService {
 
     private final Set<UUID> consumers;

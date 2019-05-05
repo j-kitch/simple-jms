@@ -10,6 +10,9 @@ import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.toMap;
 
+/**
+ * A service for creating, looking up and maintaining the lifetimes of destinations in the broker.
+ */
 @Component
 public class DestinationService {
 
@@ -21,13 +24,26 @@ public class DestinationService {
         destinations = new HashMap<>();
     }
 
-    UUID createDestination(DestinationType destinationType) {
+    /**
+     * Create a new destination of the given type.
+     *
+     * @param destinationType the type of destination to create
+     * @return the id of the destination created
+     */
+    public UUID createDestination(DestinationType destinationType) {
         Destination destination = new Destination(destinationType, UUID.randomUUID());
         destinations.put(destination, createService(destinationType));
         return destination.getId();
     }
 
-    Optional<SingleDestinationService> findDestination(DestinationType type, UUID id) {
+    /**
+     * Find a destination in the broker.
+     *
+     * @param type the type of destination
+     * @param id   the id of the destination
+     * @return the destination searched for, or <code>Optional.empty()</code> if it doesn't exist
+     */
+    public Optional<SingleDestinationService> findDestination(DestinationType type, UUID id) {
         return Optional.ofNullable(destinations.get(new Destination(type, id)));
     }
 
