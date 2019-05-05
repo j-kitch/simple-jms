@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>kitchen.josh</groupId>
-            <artifactId>simple-jms-broker</artifactId>
+            <artifactId>simple-jms-common</artifactId>
             <version>0.4.0-SNAPSHOT</version>
         </dependency>
 
