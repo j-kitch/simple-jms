@@ -37,6 +37,7 @@ public class QueueTopicSteps {
     private Producer producer;
     private Consumer consumer1;
     private Consumer consumer2;
+    private Throwable throwable;
 
     @Before
     public void setUp() {
@@ -50,6 +51,7 @@ public class QueueTopicSteps {
         producer = null;
         consumer1 = null;
         consumer2 = null;
+        throwable = null;
     }
 
     @Given("a fake destination with a producer and consumer")
@@ -98,6 +100,24 @@ public class QueueTopicSteps {
         producer.sendMessage(MESSAGES[1]);
         producer.sendMessage(MESSAGES[2]);
         producer.sendMessage(MESSAGES[3]);
+    }
+
+    @When("the producer tries to send a message")
+    public void the_producer_tries_to_send_a_message() {
+        try {
+            producer.sendMessage(MESSAGES[0]);
+        } catch (Throwable t) {
+            throwable = t;
+        }
+    }
+
+    @When("the consumer tries to receive a message")
+    public void the_consumer_tries_to_receive_a_message() {
+        try {
+            consumer1.receiveMessage();
+        } catch (Throwable t) {
+            throwable = t;
+        }
     }
 
     @Then("each message is only received by a single consumer")
@@ -156,5 +176,10 @@ public class QueueTopicSteps {
     public void the_consumer_receives_no_messages() {
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
+    }
+
+    @Then("an exception was thrown")
+    public void an_exception_was_thrown() {
+        assertThat(throwable).isNotNull();
     }
 }
