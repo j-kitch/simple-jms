@@ -161,6 +161,45 @@ public class DestinationControllerIntegrationTest {
     }
 
     @Test
+    public void deleteConsumer_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(delete("/ooga-booga/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void deleteConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to delete consumer " + CONSUMER_ID + " for topic " + DESTINATION_ID + ": the topic does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void deleteConsumer_consumerDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to delete consumer " + CONSUMER_ID + " for queue " + DESTINATION_ID + ": the consumer does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        doThrow(ConsumerDoesNotExistException.class).when(singleDestinationService).removeConsumer(any());
+
+        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verify(singleDestinationService).removeConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
     public void deleteProducer_returnsOk() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
 

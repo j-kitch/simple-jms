@@ -39,9 +39,13 @@ public class DestinationController {
     @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID consumerId) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        destinationService.findDestination(destination, destinationId)
-                .ifPresent(service -> service.removeConsumer(consumerId));
+        try {
+            destinationService.findDestination(toType(destinationType), destinationId)
+                    .orElseThrow(() -> new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .removeConsumer(consumerId);
+        } catch (ConsumerDoesNotExistException cdnee) {
+            throw new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the consumer does not exist.");
+        }
     }
 
     @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
