@@ -43,7 +43,7 @@ public class DestinationController {
             destinationService.findDestination(toType(destinationType), destinationId)
                     .orElseThrow(() -> new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
                     .removeConsumer(consumerId);
-        } catch (ConsumerDoesNotExistException cdnee) {
+        } catch (ConsumerDoesNotExistException e) {
             throw new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the consumer does not exist.");
         }
     }
@@ -51,9 +51,13 @@ public class DestinationController {
     @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
     public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID producerId) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        destinationService.findDestination(destination, destinationId)
-                .ifPresent(service -> service.removeProducer(producerId));
+        try {
+            destinationService.findDestination(toType(destinationType), destinationId)
+                    .orElseThrow(() -> new ApiException("Failed to delete producer " + producerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .removeProducer(producerId);
+        } catch (ProducerDoesNotExistException e) {
+            throw new ApiException("Failed to delete producer " + producerId + " for " + destinationType + " " + destinationId + ": the producer does not exist.");
+        }
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")

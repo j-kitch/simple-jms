@@ -212,6 +212,45 @@ public class DestinationControllerIntegrationTest {
     }
 
     @Test
+    public void deleteProducer_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(delete("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void deleteProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to delete producer " + PRODUCER_ID + " for topic " + DESTINATION_ID + ": the topic does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void deleteProducer_producerDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to delete producer " + PRODUCER_ID + " for queue " + DESTINATION_ID + ": the producer does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).removeProducer(any());
+
+        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verify(singleDestinationService).removeProducer(PRODUCER_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
     public void sendMessage_returnsOk() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
 
