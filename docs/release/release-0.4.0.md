@@ -6,7 +6,7 @@ but should be introduced as soon as possible.
 
 +   Code coverage with Jacoco
 +   Javadoc
-+   Spring REST API docs
++   REST API docs
 +   Public API / Implementation split
 +   Cucumber for integration tests
 +   Component tests

@@ -5,12 +5,12 @@ import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
-import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.DestinationType;
-import kitchen.josh.simplejms.broker.Message;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 

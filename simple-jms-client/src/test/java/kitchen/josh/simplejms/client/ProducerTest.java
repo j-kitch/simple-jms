@@ -1,8 +1,8 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Destination;
-import kitchen.josh.simplejms.broker.DestinationType;
-import kitchen.josh.simplejms.broker.MessageModel;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.Destination;
+import kitchen.josh.simplejms.common.Destination;
 import org.springframework.util.Assert;
 
 import java.util.UUID;

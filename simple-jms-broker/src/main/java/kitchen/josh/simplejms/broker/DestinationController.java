@@ -1,5 +1,8 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.IdModel;
+import kitchen.josh.simplejms.common.MessageModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;

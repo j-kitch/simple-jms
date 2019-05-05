@@ -1,5 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.DestinationType;
 import org.junit.Before;
 import org.junit.Test;
 

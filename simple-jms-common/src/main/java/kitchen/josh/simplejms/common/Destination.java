@@ -1,4 +1,4 @@
-package kitchen.josh.simplejms.broker;
+package kitchen.josh.simplejms.common;
 
 import org.springframework.util.Assert;
 

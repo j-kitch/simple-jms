@@ -17,6 +17,7 @@
         <module>simple-jms-client</module>
         <module>simple-jms-end-to-end-tests</module>
         <module>simple-jms-jacoco-aggregate</module>
+        <module>simple-jms-common</module>
     </modules>
 
     <properties>

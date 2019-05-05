@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.broker.MessageModel;
+import kitchen.josh.simplejms.common.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
 /**

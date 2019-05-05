@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
