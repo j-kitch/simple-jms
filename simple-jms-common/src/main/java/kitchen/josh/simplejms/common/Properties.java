@@ -2,15 +2,14 @@ package kitchen.josh.simplejms.common;
 
 import javax.jms.JMSException;
 import javax.jms.MessageFormatException;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
+import java.util.*;
 
 import static java.util.Collections.enumeration;
 
 public class Properties {
+
+    private static final List<Class<?>> PROPERTY_TYPES = Arrays.asList(
+            Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class);
 
     private final Map<String, Object> properties;
 
@@ -184,8 +183,7 @@ public class Properties {
     }
 
     public void setObjectProperty(String name, Object value) throws MessageFormatException {
-        if (Stream.of(Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, String.class)
-                .noneMatch(clazz -> clazz.equals(value.getClass()))) {
+        if (!PROPERTY_TYPES.contains(value.getClass())) {
             throw new MessageFormatException("");
         }
         properties.put(name, value);
