@@ -75,11 +75,15 @@ public class DestinationController {
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        String message = destinationService.findDestination(destination, destinationId)
-                .flatMap(service -> service.readMessage(consumerId))
-                .orElse(null);
-        return new MessageModel(message);
+        try {
+            String message = destinationService.findDestination(toType(destinationType), destinationId)
+                    .orElseThrow(() -> new ApiException("Failed to receive message: the " + destinationType + " " + destinationId + " does not exist."))
+                    .readMessage(consumerId)
+                    .orElse(null);
+            return new MessageModel(message);
+        } catch (ConsumerDoesNotExistException e) {
+            throw new ApiException("Failed to receive message: the consumer " + consumerId + " does not exist.");
+        }
     }
 
     @ExceptionHandler(ApiException.class)

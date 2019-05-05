@@ -337,4 +337,42 @@ public class DestinationControllerIntegrationTest {
         verify(singleDestinationService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
     }
+
+    @Test
+    public void receiveMessage_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void receiveMessage_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to receive message: the queue " + DESTINATION_ID + " does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void receiveMessage_consumerDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to receive message: the consumer " + CONSUMER_ID + " does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        doThrow(ConsumerDoesNotExistException.class).when(singleDestinationService).readMessage(any());
+
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verify(singleDestinationService).readMessage(CONSUMER_ID);
+    }
 }
