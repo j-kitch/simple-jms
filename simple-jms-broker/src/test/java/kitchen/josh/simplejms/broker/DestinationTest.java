@@ -5,8 +5,23 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class DestinationTest {
+
+    @Test
+    public void newDestination_nullType_throwsIllegalArgument() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> new Destination(null, UUID.randomUUID()))
+                .withMessage("DestinationType is required");
+    }
+
+    @Test
+    public void newDestination_nullUUID_throwsIllegalArgument() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> new Destination(DestinationType.QUEUE, null))
+                .withMessage("UUID is required");
+    }
 
     @Test
     public void equals_null_isFalse() {

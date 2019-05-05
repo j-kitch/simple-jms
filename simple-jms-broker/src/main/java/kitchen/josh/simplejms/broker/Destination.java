@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.broker;
 
+import org.springframework.util.Assert;
+
 import java.util.Objects;
 import java.util.UUID;
 
@@ -9,6 +11,8 @@ public class Destination {
     private final UUID id;
 
     public Destination(DestinationType type, UUID id) {
+        Assert.notNull(type, "DestinationType is required");
+        Assert.notNull(id, "UUID is required");
         this.type = type;
         this.id = id;
     }
