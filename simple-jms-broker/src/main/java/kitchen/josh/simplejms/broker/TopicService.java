@@ -28,25 +28,26 @@ public class TopicService implements SingleDestinationService {
 
     @Override
     public void removeConsumer(UUID consumerId) {
+        verifyConsumerExists(consumerId);
         consumerQueues.remove(consumerId);
     }
 
     @Override
     public void removeProducer(UUID producerId) {
+        verifyProducerExists(producerId);
         producers.remove(producerId);
     }
 
     @Override
     public void addMessage(UUID producer, String message) {
-        if (producers.contains(producer)) {
-            consumerQueues.values().forEach(queue -> queue.add(message));
-        }
+        verifyProducerExists(producer);
+        consumerQueues.values().forEach(queue -> queue.add(message));
     }
 
     @Override
     public Optional<String> readMessage(UUID consumerId) {
-        return Optional.ofNullable(consumerQueues.get(consumerId))
-                .map(Queue::poll);
+        verifyConsumerExists(consumerId);
+        return Optional.ofNullable(consumerQueues.get(consumerId).poll());
     }
 
     Map<UUID, Queue<String>> getConsumerQueues() {
@@ -55,5 +56,17 @@ public class TopicService implements SingleDestinationService {
 
     Set<UUID> getProducers() {
         return producers;
+    }
+
+    private void verifyProducerExists(UUID producerId) {
+        if (!producers.contains(producerId)) {
+            throw new ProducerDoesNotExistException();
+        }
+    }
+
+    private void verifyConsumerExists(UUID consumerId) {
+        if (!consumerQueues.containsKey(consumerId)) {
+            throw new ConsumerDoesNotExistException();
+        }
     }
 }

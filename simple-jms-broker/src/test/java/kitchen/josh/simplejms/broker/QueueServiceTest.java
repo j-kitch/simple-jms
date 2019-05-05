@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class QueueServiceTest {
 
@@ -45,6 +46,16 @@ public class QueueServiceTest {
     }
 
     @Test
+    public void removeConsumer_consumerDoesNotExist_throwsConsumerDoesNotExist() {
+        assertThatExceptionOfType(ConsumerDoesNotExistException.class)
+                .isThrownBy(() -> queueService.removeConsumer(UUID.randomUUID()));
+
+        assertThat(queueService.getMessages()).isEmpty();
+        assertThat(queueService.getConsumers()).isEmpty();
+        assertThat(queueService.getProducers()).isEmpty();
+    }
+
+    @Test
     public void removeProducer_removesProducer() {
         UUID producerId = queueService.createProducer();
 
@@ -54,11 +65,25 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void addMessage_unknownProducer_doesNothing() {
-        queueService.addMessage(UUID.randomUUID(), MESSAGES[0]);
-        queueService.addMessage(UUID.randomUUID(), MESSAGES[1]);
+    public void removeProducer_producerDoesNotExist_throwsProducerDoesNotExist() {
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> queueService.removeProducer(UUID.randomUUID()));
 
         assertThat(queueService.getMessages()).isEmpty();
+        assertThat(queueService.getConsumers()).isEmpty();
+        assertThat(queueService.getProducers()).isEmpty();
+    }
+
+    @Test
+    public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[0]));
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[1]));
+
+        assertThat(queueService.getMessages()).isEmpty();
+        assertThat(queueService.getConsumers()).isEmpty();
+        assertThat(queueService.getProducers()).isEmpty();
     }
 
     @Test
@@ -71,15 +96,16 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void readMessage_consumerDoesNotExist_returnsEmpty() {
+    public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
         UUID producerId = queueService.createProducer();
         queueService.addMessage(producerId, MESSAGES[0]);
 
-        Optional<String> read = queueService.readMessage(UUID.randomUUID());
+        assertThatExceptionOfType(ConsumerDoesNotExistException.class)
+                .isThrownBy(() -> queueService.readMessage(UUID.randomUUID()));
 
-        assertThat(read).isEmpty();
         assertThat(queueService.getConsumers()).isEmpty();
         assertThat(queueService.getMessages()).containsExactly(MESSAGES[0]);
+        assertThat(queueService.getProducers()).containsOnly(producerId);
     }
 
     @Test
@@ -90,6 +116,7 @@ public class QueueServiceTest {
 
         assertThat(read).isEmpty();
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
+        assertThat(queueService.getProducers()).isEmpty();
         assertThat(queueService.getMessages()).isEmpty();
     }
 
@@ -104,6 +131,7 @@ public class QueueServiceTest {
 
         assertThat(read).contains(MESSAGES[0]);
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
+        assertThat(queueService.getProducers()).containsOnly(producerId);
         assertThat(queueService.getMessages()).containsExactly(MESSAGES[1]);
     }
 

@@ -30,26 +30,25 @@ public class QueueService implements SingleDestinationService {
 
     @Override
     public void removeConsumer(UUID consumer) {
+        verifyConsumerExists(consumer);
         consumers.remove(consumer);
     }
 
     @Override
     public void removeProducer(UUID producer) {
+        verifyProducerExists(producer);
         producers.remove(producer);
     }
 
     @Override
     public void addMessage(UUID producer, String message) {
-        if (producers.contains(producer)) {
-            messages.add(message);
-        }
+        verifyProducerExists(producer);
+        messages.add(message);
     }
 
     @Override
     public Optional<String> readMessage(UUID consumerId) {
-        if (!consumers.contains(consumerId)) {
-            return Optional.empty();
-        }
+        verifyConsumerExists(consumerId);
         return Optional.ofNullable(messages.poll());
     }
 
@@ -63,5 +62,17 @@ public class QueueService implements SingleDestinationService {
 
     Queue<String> getMessages() {
         return messages;
+    }
+
+    private void verifyConsumerExists(UUID consumerId) {
+        if (!consumers.contains(consumerId)) {
+            throw new ConsumerDoesNotExistException();
+        }
+    }
+
+    private void verifyProducerExists(UUID producerId) {
+        if (!producers.contains(producerId)) {
+            throw new ProducerDoesNotExistException();
+        }
     }
 }

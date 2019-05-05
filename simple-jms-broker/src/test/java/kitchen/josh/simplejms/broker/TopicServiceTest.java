@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicServiceTest {
 
@@ -73,6 +74,15 @@ public class TopicServiceTest {
     }
 
     @Test
+    public void removeConsumer_consumerDoesNotExist_throwsConsumerDoesNotExistException() {
+        assertThatExceptionOfType(ConsumerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.removeConsumer(UUID.randomUUID()));
+
+        assertThat(topicService.getConsumerQueues()).isEmpty();
+        assertThat(topicService.getProducers()).isEmpty();
+    }
+
+    @Test
     public void removeProducer_removesProducer() {
         UUID producerId = topicService.createProducer();
 
@@ -82,8 +92,18 @@ public class TopicServiceTest {
     }
 
     @Test
-    public void addMessage_invalidProducer_doesNothing() {
-        topicService.addMessage(UUID.randomUUID(), MESSAGE_1);
+    public void removeProducer_producerDoesNotExist_throwsProducerDoesNotExistException() {
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.removeProducer(UUID.randomUUID()));
+
+        assertThat(topicService.getConsumerQueues()).isEmpty();
+        assertThat(topicService.getProducers()).isEmpty();
+    }
+
+    @Test
+    public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGE_1));
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).isEmpty();
@@ -99,12 +119,14 @@ public class TopicServiceTest {
     }
 
     @Test
-    public void addMessage_invalidProducer_consumersExist_doesNothing() {
+    public void addMessage_producerDoesNotExist_consumersExist_throwsProducerDoesNotExist() {
         topicService.createConsumer();
         topicService.createConsumer();
 
-        topicService.addMessage(UUID.randomUUID(), MESSAGE_1);
-        topicService.addMessage(UUID.randomUUID(), MESSAGE_2);
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGE_1));
+        assertThatExceptionOfType(ProducerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGE_2));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
@@ -131,9 +153,12 @@ public class TopicServiceTest {
     }
 
     @Test
-    public void readMessage_consumerDoesNotExist_returnsEmpty() {
-        Optional<String> message = topicService.readMessage(UUID.randomUUID());
-        assertThat(message).isEmpty();
+    public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
+        assertThatExceptionOfType(ConsumerDoesNotExistException.class)
+                .isThrownBy(() -> topicService.readMessage(UUID.randomUUID()));
+
+        assertThat(topicService.getProducers()).isEmpty();
+        assertThat(topicService.getConsumerQueues()).isEmpty();
     }
 
     @Test
