@@ -266,6 +266,51 @@ public class DestinationControllerIntegrationTest {
     }
 
     @Test
+    public void sendMessage_unknownDestinationType_returnsNotFound() throws Exception {
+        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string(""));
+
+        verifyZeroInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void sendMessage_destinationDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to send message to topic " + DESTINATION_ID + ": the topic does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
+    public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
+        String errorMessage = "Failed to send message to queue " + DESTINATION_ID + ": the producer " + PRODUCER_ID + " does not exist.";
+        when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
+
+        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+
+        verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
+        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
+        verifyNoMoreInteractions(destinationService, singleDestinationService);
+    }
+
+    @Test
     public void receiveMessage_noMessage_returnsNull() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.empty());

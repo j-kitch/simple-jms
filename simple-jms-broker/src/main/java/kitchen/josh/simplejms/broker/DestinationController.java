@@ -63,9 +63,13 @@ public class DestinationController {
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
     public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                             @PathVariable UUID producerId, @RequestBody MessageModel message) {
-        DestinationType destination = DestinationType.valueOf(destinationType.toUpperCase());
-        destinationService.findDestination(destination, destinationId)
-                .ifPresent(service -> service.addMessage(producerId, message.getMessage()));
+        try {
+            destinationService.findDestination(toType(destinationType), destinationId)
+                    .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .addMessage(producerId, message.getMessage());
+        } catch (ProducerDoesNotExistException e) {
+            throw new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the producer " + producerId + " does not exist.");
+        }
     }
 
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
