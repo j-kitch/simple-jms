@@ -2,6 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
 import kitchen.josh.simplejms.common.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
@@ -52,7 +53,7 @@ public class ProducerTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
 
         assertThatExceptionOfType(RestClientException.class)
-                .isThrownBy(() -> producer.sendMessage(MESSAGE));
+                .isThrownBy(() -> producer.sendMessage(new Message(DESTINATION, MESSAGE)));
         verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
         assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));
         verifyNoMoreInteractions(restTemplate);
@@ -60,7 +61,7 @@ public class ProducerTest {
 
     @Test
     public void sendMessage_restTemplateReturns_returns() {
-        producer.sendMessage(MESSAGE);
+        producer.sendMessage(new Message(DESTINATION, MESSAGE));
 
         verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
         assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));

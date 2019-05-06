@@ -96,16 +96,16 @@ public class QueueTopicSteps {
 
     @When("the producer sends messages")
     public void the_producer_sends_messages() {
-        producer.sendMessage(MESSAGES[0]);
-        producer.sendMessage(MESSAGES[1]);
-        producer.sendMessage(MESSAGES[2]);
-        producer.sendMessage(MESSAGES[3]);
+        producer.sendMessage(new Message(destination, MESSAGES[0]));
+        producer.sendMessage(new Message(destination, MESSAGES[1]));
+        producer.sendMessage(new Message(destination, MESSAGES[2]));
+        producer.sendMessage(new Message(destination, MESSAGES[3]));
     }
 
     @When("the producer tries to send a message")
     public void the_producer_tries_to_send_a_message() {
         try {
-            producer.sendMessage(MESSAGES[0]);
+            producer.sendMessage(new Message(destination, MESSAGES[0]));
         } catch (Throwable t) {
             throwable = t;
         }

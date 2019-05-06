@@ -2,6 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -41,7 +42,7 @@ public class ProducerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + MESSAGE + "\"}"))
                 .andRespond(withSuccess());
 
-        producer.sendMessage(MESSAGE);
+        producer.sendMessage(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
 
         mockRestServiceServer.verify();
     }

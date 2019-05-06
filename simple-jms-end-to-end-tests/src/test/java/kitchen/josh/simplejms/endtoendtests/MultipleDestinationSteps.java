@@ -66,10 +66,10 @@ public class MultipleDestinationSteps {
     @When("each destination's producers send messages")
     public void each_destination_s_producers_send_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
-            destinationSetup.producer.sendMessage(destinationSetup.messages[0]);
-            destinationSetup.producer.sendMessage(destinationSetup.messages[1]);
-            destinationSetup.producer.sendMessage(destinationSetup.messages[2]);
-            destinationSetup.producer.sendMessage(destinationSetup.messages[3]);
+            destinationSetup.producer.sendMessage(new Message(destinationSetup.destination, destinationSetup.messages[0]));
+            destinationSetup.producer.sendMessage(new Message(destinationSetup.destination, destinationSetup.messages[1]));
+            destinationSetup.producer.sendMessage(new Message(destinationSetup.destination, destinationSetup.messages[2]));
+            destinationSetup.producer.sendMessage(new Message(destinationSetup.destination, destinationSetup.messages[3]));
         });
     }
 
