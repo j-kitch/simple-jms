@@ -15,6 +15,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -53,7 +54,7 @@ public class ProducerTest {
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> producer.sendMessage(MESSAGE));
         verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
+        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }
 
@@ -62,7 +63,7 @@ public class ProducerTest {
         producer.sendMessage(MESSAGE);
 
         verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(MESSAGE));
+        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));
         verifyNoMoreInteractions(restTemplate);
     }
 

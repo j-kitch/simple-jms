@@ -16,6 +16,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,7 +59,7 @@ public class ConsumerTest {
 
     @Test
     public void receiveMessage_noMessage_returnsEmpty() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(null)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(emptyList(), null)));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -69,11 +70,11 @@ public class ConsumerTest {
 
     @Test
     public void receiveMessage_messageExists_returnsMessage() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(MESSAGE)));
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(emptyList(), MESSAGE)));
 
         Optional<Message> message = consumer.receiveMessage();
 
-        assertThat(message).usingFieldByFieldValueComparator().hasValue(new Message(DESTINATION, MESSAGE));
+        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE));
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }

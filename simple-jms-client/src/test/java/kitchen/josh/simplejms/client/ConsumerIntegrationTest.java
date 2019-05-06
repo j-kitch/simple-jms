@@ -60,7 +60,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received).usingFieldByFieldValueComparator().contains(new Message(TOPIC, MESSAGE));
+        assertThat(received).get().isEqualToComparingFieldByFieldRecursively(new Message(TOPIC, MESSAGE));
         mockRestServiceServer.verify();
     }
 

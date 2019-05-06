@@ -127,10 +127,10 @@ public class QueueTopicSteps {
         Optional<Message> message3 = consumer2.receiveMessage();
         Optional<Message> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[0]));
-        assertThat(message2).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[1]));
-        assertThat(message3).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[2]));
-        assertThat(message4).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[3]));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -145,10 +145,10 @@ public class QueueTopicSteps {
         Optional<Message> message3 = consumer1.receiveMessage();
         Optional<Message> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[0]));
-        assertThat(message2).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[1]));
-        assertThat(message3).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[2]));
-        assertThat(message4).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[3]));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -162,10 +162,10 @@ public class QueueTopicSteps {
             Optional<Message> message3 = consumer.receiveMessage();
             Optional<Message> message4 = consumer.receiveMessage();
 
-            assertThat(message1).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[0]));
-            assertThat(message2).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[1]));
-            assertThat(message3).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[2]));
-            assertThat(message4).usingFieldByFieldValueComparator().contains(new Message(destination, MESSAGES[3]));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[0]));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[1]));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[2]));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, MESSAGES[3]));
 
             assertThat(consumer.receiveMessage()).isEmpty();
             assertThat(consumer.receiveMessage()).isEmpty();

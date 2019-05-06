@@ -1,5 +1,8 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,6 +14,8 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class QueueServiceTest {
 
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, DESTINATION_ID);
     private static final String[] MESSAGES = {"a", "b", "c", "d"};
 
     private QueueService queueService;
@@ -77,9 +82,9 @@ public class QueueServiceTest {
     @Test
     public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[0]));
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), new Message(DESTINATION, MESSAGES[0])));
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[1]));
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), new Message(DESTINATION, MESSAGES[1])));
 
         assertThat(queueService.getMessages()).isEmpty();
         assertThat(queueService.getConsumers()).isEmpty();
@@ -89,22 +94,24 @@ public class QueueServiceTest {
     @Test
     public void addMessage_appendsMessageToMessages() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
+        Message message1 = new Message(DESTINATION, MESSAGES[0]);
+        Message message2 = new Message(DESTINATION, MESSAGES[1]);
+        queueService.addMessage(producerId, message1);
+        queueService.addMessage(producerId, message2);
 
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[0], MESSAGES[1]);
+        assertThat(queueService.getMessages()).containsExactly(message1, message2);
     }
 
     @Test
     public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[0]));
 
         assertThatExceptionOfType(ConsumerDoesNotExistException.class)
                 .isThrownBy(() -> queueService.readMessage(UUID.randomUUID()));
 
         assertThat(queueService.getConsumers()).isEmpty();
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[0]);
+        assertThat(queueService.getMessages()).usingRecursiveFieldByFieldElementComparator().containsExactly(new Message(DESTINATION, MESSAGES[0]));
         assertThat(queueService.getProducers()).containsOnly(producerId);
     }
 
@@ -112,7 +119,7 @@ public class QueueServiceTest {
     public void readMessage_consumerExistsNoMessages_returnsEmpty() {
         UUID consumerId = queueService.createConsumer();
 
-        Optional<String> read = queueService.readMessage(consumerId);
+        Optional<Message> read = queueService.readMessage(consumerId);
 
         assertThat(read).isEmpty();
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
@@ -124,38 +131,38 @@ public class QueueServiceTest {
     public void readMessage_consumerExistsWithMessages_popsFirst() {
         UUID producerId = queueService.createProducer();
         UUID consumerId = queueService.createConsumer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[0]));
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[1]));
 
-        Optional<String> read = queueService.readMessage(consumerId);
+        Optional<Message> read = queueService.readMessage(consumerId);
 
-        assertThat(read).contains(MESSAGES[0]);
+        assertThat(read).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGES[0]));
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
         assertThat(queueService.getProducers()).containsOnly(producerId);
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[1]);
+        assertThat(queueService.getMessages()).usingRecursiveFieldByFieldElementComparator().containsExactly(new Message(DESTINATION, MESSAGES[1]));
     }
 
     @Test
     public void readMessage_multipleConsumers_popFromSameQueue() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
-        queueService.addMessage(producerId, MESSAGES[2]);
-        queueService.addMessage(producerId, MESSAGES[3]);
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[0]));
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[1]));
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[2]));
+        queueService.addMessage(producerId, new Message(DESTINATION, MESSAGES[3]));
         UUID consumerId1 = queueService.createConsumer();
         UUID consumerId2 = queueService.createConsumer();
 
-        Optional<String> read1 = queueService.readMessage(consumerId1);
-        Optional<String> read2 = queueService.readMessage(consumerId2);
-        Optional<String> read3 = queueService.readMessage(consumerId1);
-        Optional<String> read4 = queueService.readMessage(consumerId2);
-        Optional<String> read5 = queueService.readMessage(consumerId2);
-        Optional<String> read6 = queueService.readMessage(consumerId1);
+        Optional<Message> read1 = queueService.readMessage(consumerId1);
+        Optional<Message> read2 = queueService.readMessage(consumerId2);
+        Optional<Message> read3 = queueService.readMessage(consumerId1);
+        Optional<Message> read4 = queueService.readMessage(consumerId2);
+        Optional<Message> read5 = queueService.readMessage(consumerId2);
+        Optional<Message> read6 = queueService.readMessage(consumerId1);
 
-        assertThat(read1).contains(MESSAGES[0]);
-        assertThat(read2).contains(MESSAGES[1]);
-        assertThat(read3).contains(MESSAGES[2]);
-        assertThat(read4).contains(MESSAGES[3]);
+        assertThat(read1).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGES[0]));
+        assertThat(read2).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGES[1]));
+        assertThat(read3).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGES[2]));
+        assertThat(read4).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGES[3]));
         assertThat(read5).isEmpty();
         assertThat(read6).isEmpty();
     }

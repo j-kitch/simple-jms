@@ -1,13 +1,13 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.IdModel;
-import kitchen.josh.simplejms.common.MessageModel;
+import kitchen.josh.simplejms.common.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
+
+import static java.util.Collections.emptyList;
 
 /**
  * The controller for the broker's destinations.  With an API for creating destinations, producers and consumers,
@@ -52,7 +52,7 @@ public class DestinationController {
      * Create a new producer for a destination.
      *
      * @param destinationType the type of destination to create a producer for
-     * @param destinationId the id of the destination to create a producer for
+     * @param destinationId   the id of the destination to create a producer for
      * @return the id of the created consumer
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
@@ -67,8 +67,8 @@ public class DestinationController {
      * Delete a consumer.
      *
      * @param destinationType the type of destination
-     * @param destinationId the id of the destination
-     * @param consumerId the id of the consumer
+     * @param destinationId   the id of the destination
+     * @param consumerId      the id of the consumer
      */
     @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
@@ -86,8 +86,8 @@ public class DestinationController {
      * Delete a producer.
      *
      * @param destinationType the type of destination
-     * @param destinationId the id of the destination
-     * @param producerId the id of the producer
+     * @param destinationId   the id of the destination
+     * @param producerId      the id of the producer
      */
     @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
     public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
@@ -105,9 +105,9 @@ public class DestinationController {
      * Send a message from a producer to a destination.
      *
      * @param destinationType the type of destination
-     * @param destinationId the id of the destination
-     * @param producerId the id of the producer
-     * @param message the message to send to the destination
+     * @param destinationId   the id of the destination
+     * @param producerId      the id of the producer
+     * @param message         the message to send to the destination
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
     public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
@@ -115,7 +115,7 @@ public class DestinationController {
         try {
             destinationService.findDestination(toType(destinationType), destinationId)
                     .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
-                    .addMessage(producerId, message.getMessage());
+                    .addMessage(producerId, new Message(new Destination(toType(destinationType), destinationId), message.getMessage()));
         } catch (ProducerDoesNotExistException e) {
             throw new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the producer " + producerId + " does not exist.");
         }
@@ -125,8 +125,8 @@ public class DestinationController {
      * Receive a message for a consumer from a destination.
      *
      * @param destinationType the type of destination
-     * @param destinationId the id of the destination
-     * @param consumerId the id of the consumer
+     * @param destinationId   the id of the destination
+     * @param consumerId      the id of the consumer
      * @return the message received from the destination
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
@@ -136,8 +136,9 @@ public class DestinationController {
             String message = destinationService.findDestination(toType(destinationType), destinationId)
                     .orElseThrow(() -> new ApiException("Failed to receive message: the " + destinationType + " " + destinationId + " does not exist."))
                     .readMessage(consumerId)
+                    .map(Message::getMessage)
                     .orElse(null);
-            return new MessageModel(message);
+            return new MessageModel(emptyList(), message);
         } catch (ConsumerDoesNotExistException e) {
             throw new ApiException("Failed to receive message: the consumer " + consumerId + " does not exist.");
         }
@@ -145,13 +146,14 @@ public class DestinationController {
 
     /**
      * Handle an {@link ApiException} by returning 400 and the exception's message.
+     *
      * @param apiException the exception to handle
      * @return the exception's message
      */
     @ExceptionHandler(ApiException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public MessageModel apiExceptionHandler(ApiException apiException) {
-        return new MessageModel(apiException.getMessage());
+        return new MessageModel(emptyList(), apiException.getMessage());
     }
 
     private static DestinationType toType(String type) {

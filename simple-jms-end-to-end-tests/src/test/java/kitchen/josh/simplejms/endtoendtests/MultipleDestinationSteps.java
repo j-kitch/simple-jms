@@ -81,10 +81,10 @@ public class MultipleDestinationSteps {
             Optional<Message> message3 = destinationSetup.consumer.receiveMessage();
             Optional<Message> message4 = destinationSetup.consumer.receiveMessage();
 
-            assertThat(message1).usingFieldByFieldValueComparator().contains(new Message(destinationSetup.destination, destinationSetup.messages[0]));
-            assertThat(message2).usingFieldByFieldValueComparator().contains(new Message(destinationSetup.destination, destinationSetup.messages[1]));
-            assertThat(message3).usingFieldByFieldValueComparator().contains(new Message(destinationSetup.destination, destinationSetup.messages[2]));
-            assertThat(message4).usingFieldByFieldValueComparator().contains(new Message(destinationSetup.destination, destinationSetup.messages[3]));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new Message(destinationSetup.destination, destinationSetup.messages[0]));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new Message(destinationSetup.destination, destinationSetup.messages[1]));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new Message(destinationSetup.destination, destinationSetup.messages[2]));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new Message(destinationSetup.destination, destinationSetup.messages[3]));
 
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();

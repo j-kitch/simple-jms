@@ -3,6 +3,8 @@ package kitchen.josh.simplejms.client;
 import kitchen.josh.simplejms.common.MessageModel;
 import org.springframework.web.client.RestTemplate;
 
+import static java.util.Collections.emptyList;
+
 /**
  * A producer for sending messages to a broker's destination.
  */
@@ -26,7 +28,7 @@ public class Producer implements AutoCloseable {
     public void sendMessage(String message) {
         String sendUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
                 + "/producer/" + id.getId() + "/send";
-        restTemplate.postForEntity(sendUrl, new MessageModel(message), Void.class);
+        restTemplate.postForEntity(sendUrl, new MessageModel(emptyList(), message), Void.class);
     }
 
     /**

@@ -8,12 +8,14 @@ import org.springframework.util.Assert;
 public final class Message {
 
     private final Destination destination;
+    private final Properties properties;
     private final String message;
 
     public Message(Destination destination, String message) {
         Assert.notNull(destination, "Destination is required");
         Assert.notNull(message, "String is required");
         this.destination = destination;
+        this.properties = new Properties();
         this.message = message;
     }
 
@@ -24,6 +26,15 @@ public final class Message {
      */
     public final String getMessage() {
         return message;
+    }
+
+    /**
+     * Get the properties in this message.
+     *
+     * @return the message properties
+     */
+    public Properties getProperties() {
+        return properties;
     }
 
     /**

@@ -1,8 +1,12 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,6 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -38,6 +43,9 @@ public class DestinationControllerIntegrationTest {
 
     @MockBean
     private DestinationService destinationService;
+
+    @Captor
+    private ArgumentCaptor<Message> messageCaptor;
 
     @Test
     public void createDestination_topic_returnsOkAndId() throws Exception {
@@ -262,8 +270,10 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
+        verify(singleDestinationService).addMessage(eq(PRODUCER_ID), messageCaptor.capture());
         verifyNoMoreInteractions(destinationService, singleDestinationService);
+        assertThat(messageCaptor.getValue())
+                .isEqualToComparingFieldByFieldRecursively(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
     }
 
     @Test
@@ -307,8 +317,10 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
+        verify(singleDestinationService).addMessage(eq(PRODUCER_ID), messageCaptor.capture());
         verifyNoMoreInteractions(destinationService, singleDestinationService);
+        assertThat(messageCaptor.getValue())
+                .isEqualToComparingFieldByFieldRecursively(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
     }
 
     @Test
@@ -328,7 +340,7 @@ public class DestinationControllerIntegrationTest {
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
+        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE)));
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
