@@ -9,11 +9,13 @@ public class PropertyModelFactory {
 
     public List<PropertyModel> createPropertyModels(Properties properties) {
         return list(properties.getPropertyNames()).stream()
-                .map(name -> {
-                    Object value = properties.getObjectProperty(name);
-                    Class<?> type = value.getClass();
-                    return new PropertyModel(name, type.getSimpleName(), value);
-                })
+                .map(name -> convert(properties, name))
                 .collect(Collectors.toList());
+    }
+
+    private static PropertyModel convert(Properties properties, String name) {
+        Object value = properties.getObjectProperty(name);
+        Class<?> type = value.getClass();
+        return new PropertyModel(name, type.getSimpleName(), value);
     }
 }
