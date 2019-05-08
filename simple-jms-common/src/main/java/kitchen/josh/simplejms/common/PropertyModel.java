@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.common;
 
+import java.util.Objects;
+
 public class PropertyModel {
 
     private String name;
@@ -38,5 +40,24 @@ public class PropertyModel {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        PropertyModel model = (PropertyModel) o;
+        return Objects.equals(name, model.name) &&
+                Objects.equals(type, model.type) &&
+                Objects.equals(value, model.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, type, value);
     }
 }
