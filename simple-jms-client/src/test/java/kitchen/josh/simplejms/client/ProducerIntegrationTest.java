@@ -34,15 +34,17 @@ public class ProducerIntegrationTest {
 
     @Test
     public void sendMessage() {
+        Message message = new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE);
+
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID));
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\"}"))
+                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\", properties: []}", true))
                 .andRespond(withSuccess());
 
-        producer.sendMessage(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
+        producer.sendMessage(message);
 
         mockRestServiceServer.verify();
     }

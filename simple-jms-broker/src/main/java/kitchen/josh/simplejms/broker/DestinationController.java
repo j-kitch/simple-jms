@@ -152,8 +152,8 @@ public class DestinationController {
      */
     @ExceptionHandler(ApiException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public MessageModel apiExceptionHandler(ApiException apiException) {
-        return new MessageModel(emptyList(), apiException.getMessage());
+    public ErrorModel apiExceptionHandler(ApiException apiException) {
+        return new ErrorModel(apiException.getMessage());
     }
 
     private static DestinationType toType(String type) {

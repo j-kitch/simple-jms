@@ -54,7 +54,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/topic"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.TOPIC);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -67,7 +67,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/queue"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.QUEUE);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -89,7 +89,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/consumer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).createConsumer();
@@ -113,7 +113,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -127,7 +127,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}"));
+                .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).createProducer();
@@ -151,7 +151,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -186,7 +186,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -201,7 +201,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).removeConsumer(CONSUMER_ID);
@@ -237,7 +237,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -252,7 +252,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).removeProducer(PRODUCER_ID);
@@ -297,7 +297,7 @@ public class DestinationControllerIntegrationTest {
                 .content("{\"message\": \"" + MESSAGE + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService);
@@ -314,7 +314,7 @@ public class DestinationControllerIntegrationTest {
                 .content("{\"message\": \"" + MESSAGE + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).addMessage(eq(PRODUCER_ID), messageCaptor.capture());
@@ -330,7 +330,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": null}"));
+                .andExpect(content().json("{\"message\": null, \"properties\": []}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);
@@ -344,7 +344,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\"}"));
+                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\", \"properties\": []}"));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);

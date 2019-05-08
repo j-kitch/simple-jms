@@ -42,7 +42,7 @@ public class ConsumerIntegrationTest {
     public void receiveMessage_noMessage_returnsEmpty() {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"message\": null}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess("{\"message\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID));
 
         Optional<Message> message = consumer.receiveMessage();
@@ -55,7 +55,7 @@ public class ConsumerIntegrationTest {
     public void receiveMessage_message_returnsMessage() {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"message\": \"" + MESSAGE + "\"}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess("{\"message\": \"" + MESSAGE + "\", \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID));
 
         Optional<Message> received = consumer.receiveMessage();
