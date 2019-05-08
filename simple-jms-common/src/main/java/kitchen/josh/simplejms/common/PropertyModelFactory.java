@@ -7,7 +7,7 @@ import static java.util.Collections.list;
 
 public class PropertyModelFactory {
 
-    public List<PropertyModel> createPropertyModels(Properties properties) {
+    public List<PropertyModel> create(Properties properties) {
         return list(properties.getPropertyNames()).stream()
                 .map(name -> convert(properties, name))
                 .collect(Collectors.toList());

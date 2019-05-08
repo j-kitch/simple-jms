@@ -17,102 +17,102 @@ public class PropertyModelFactoryTest {
     }
 
     @Test
-    public void createPropertyModels_noProperties_returnsEmptyList() {
+    public void create_noProperties_returnsEmptyList() {
         Properties properties = new Properties();
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).isEmpty();
     }
 
     @Test
-    public void createPropertyModels_booleanProperty_returnsBooleanModel() {
+    public void create_booleanProperty_returnsBooleanModel() {
         Properties properties = new Properties();
         properties.setBooleanProperty("property", true);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Boolean", true));
     }
 
     @Test
-    public void createPropertyModels_byteProperty_returnsByteModel() {
+    public void create_byteProperty_returnsByteModel() {
         Properties properties = new Properties();
         properties.setByteProperty("property", (byte) 2);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Byte", (byte) 2));
     }
 
     @Test
-    public void createPropertyModels_shortProperty_returnsShortModel() {
+    public void create_shortProperty_returnsShortModel() {
         Properties properties = new Properties();
         properties.setShortProperty("property", (short) 3);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Short", (short) 3));
     }
 
     @Test
-    public void createPropertyModels_intProperty_returnsIntModel() {
+    public void create_intProperty_returnsIntModel() {
         Properties properties = new Properties();
         properties.setIntProperty("property", 4);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Integer", 4));
     }
 
     @Test
-    public void createPropertyModels_longProperty_returnsLongModel() {
+    public void create_longProperty_returnsLongModel() {
         Properties properties = new Properties();
         properties.setLongProperty("property", 5);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Long", 5L));
     }
 
     @Test
-    public void createPropertyModels_floatProperty_returnsFloatModel() {
+    public void create_floatProperty_returnsFloatModel() {
         Properties properties = new Properties();
         properties.setFloatProperty("property", 1.2f);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Float", 1.2f));
     }
 
     @Test
-    public void createPropertyModels_doubleProperty_returnsDoubleModel() {
+    public void create_doubleProperty_returnsDoubleModel() {
         Properties properties = new Properties();
         properties.setDoubleProperty("property", 2.3);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "Double", 2.3));
     }
 
     @Test
-    public void createPropertyModels_stringProperty_returnsStringModel() {
+    public void create_stringProperty_returnsStringModel() {
         Properties properties = new Properties();
         properties.setStringProperty("property", "hello world");
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactly(new PropertyModel("property", "String", "hello world"));
     }
 
     @Test
-    public void createPropertyModels_multipleProperties_returnsMultipleModels() {
+    public void create_multipleProperties_returnsMultipleModels() {
         Properties properties = new Properties();
         properties.setFloatProperty("property 1", 1.2f);
         properties.setDoubleProperty("property 2", 2.3);
         properties.setByteProperty("property 3", (byte) 2);
 
-        List<PropertyModel> propertyModels = propertyModelFactory.createPropertyModels(properties);
+        List<PropertyModel> propertyModels = propertyModelFactory.create(properties);
 
         assertThat(propertyModels).containsExactlyInAnyOrder(
                 new PropertyModel("property 1", "Float", 1.2f),
