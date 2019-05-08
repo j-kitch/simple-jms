@@ -17,9 +17,11 @@ import static java.util.Collections.emptyList;
 public class DestinationController {
 
     private final DestinationService destinationService;
+    private final MessageModelFactory messageModelFactory;
 
-    public DestinationController(DestinationService destinationService) {
+    public DestinationController(DestinationService destinationService, MessageModelFactory messageModelFactory) {
         this.destinationService = destinationService;
+        this.messageModelFactory = messageModelFactory;
     }
 
     /**
@@ -133,12 +135,11 @@ public class DestinationController {
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
         try {
-            String message = destinationService.findDestination(toType(destinationType), destinationId)
+            return destinationService.findDestination(toType(destinationType), destinationId)
                     .orElseThrow(() -> new ApiException("Failed to receive message: the " + destinationType + " " + destinationId + " does not exist."))
                     .readMessage(consumerId)
-                    .map(Message::getMessage)
-                    .orElse(null);
-            return new MessageModel(emptyList(), message);
+                    .map(messageModelFactory::create)
+                    .orElse(new MessageModel(emptyList(), null));
         } catch (ConsumerDoesNotExistException e) {
             throw new ApiException("Failed to receive message: the consumer " + consumerId + " does not exist.");
         }
