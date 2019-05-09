@@ -1,9 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
-import kitchen.josh.simplejms.common.MessageModel;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -61,10 +59,22 @@ public class ProducerTest {
 
     @Test
     public void sendMessage_restTemplateReturns_returns() {
-        producer.sendMessage(new Message(DESTINATION, MESSAGE));
+        Message message = new Message(DESTINATION, MESSAGE);
+        message.getProperties().setBooleanProperty("property 1", true);
+        message.getProperties().setStringProperty("property 2", "other property");
+
+        MessageModel model = new MessageModel(
+                asList(new PropertyModel("property 1", "Boolean", true),
+                        new PropertyModel("property 2", "String", "other property")),
+                MESSAGE);
+
+        producer.sendMessage(message);
 
         verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));
+        assertThat(messageCaptor.getValue().getMessage()).isEqualTo(MESSAGE);
+        assertThat(messageCaptor.getValue().getProperties())
+                .usingFieldByFieldElementComparator()
+                .containsExactlyInAnyOrderElementsOf(model.getProperties());
         verifyNoMoreInteractions(restTemplate);
     }
 

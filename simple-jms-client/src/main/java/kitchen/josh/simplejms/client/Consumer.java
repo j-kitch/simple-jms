@@ -5,6 +5,7 @@ import kitchen.josh.simplejms.common.MessageModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import javax.jms.MessageFormatException;
 import java.util.Optional;
 
 /**
@@ -33,8 +34,18 @@ public class Consumer implements AutoCloseable {
 
         return Optional.ofNullable(restTemplate.postForEntity(receiveUrl, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
-                .map(MessageModel::getMessage)
-                .map(message -> new Message(id.getDestination(), message));
+                .filter(model -> model.getMessage() != null)
+                .map(model -> {
+                    Message message = new Message(id.getDestination(), model.getMessage());
+                    model.getProperties().forEach(property -> {
+                        try {
+                            message.getProperties().setObjectProperty(property.getName(), property.getValue());
+                        } catch (MessageFormatException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+                    return message;
+                });
     }
 
     /**

@@ -1,9 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
-import kitchen.josh.simplejms.common.MessageModel;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -70,11 +68,18 @@ public class ConsumerTest {
 
     @Test
     public void receiveMessage_messageExists_returnsMessage() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(emptyList(), MESSAGE)));
+        MessageModel messageModel = new MessageModel(
+                asList(new PropertyModel("property 1", "Float", 1.2f), new PropertyModel("property 2", "Boolean", false)),
+                "hello world");
+        Message message = new Message(DESTINATION, MESSAGE);
+        message.getProperties().setFloatProperty("property 1", 1.2f);
+        message.getProperties().setBooleanProperty("property 2", false);
 
-        Optional<Message> message = consumer.receiveMessage();
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(messageModel));
 
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE));
+        Optional<Message> received = consumer.receiveMessage();
+
+        assertThat(received).get().isEqualToComparingFieldByFieldRecursively(message);
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
