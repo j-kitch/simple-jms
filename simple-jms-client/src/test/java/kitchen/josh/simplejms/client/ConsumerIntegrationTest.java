@@ -53,14 +53,23 @@ public class ConsumerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() {
+        String json = "{\"message\": \"" + MESSAGE + "\", \"properties\": [" +
+                "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
+                "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
+        Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);
+        message.getProperties().setFloatProperty("property 1", 1.2f);
+        message.getProperties().setStringProperty("property 2", "other property");
+
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"message\": \"" + MESSAGE + "\", \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID));
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received).get().isEqualToComparingFieldByFieldRecursively(new Message(TOPIC, MESSAGE));
+        assertThat(received.get().getMessage()).isEqualTo(MESSAGE);
+        assertThat(received.get().getDestination()).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, DESTINATION_ID));
+        assertThat(received.get().getProperties()).isEqualToComparingFieldByField(message.getProperties());
         mockRestServiceServer.verify();
     }
 

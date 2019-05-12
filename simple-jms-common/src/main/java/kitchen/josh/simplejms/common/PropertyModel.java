@@ -1,7 +1,10 @@
 package kitchen.josh.simplejms.common;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import java.util.Objects;
 
+@JsonDeserialize(using = PropertyModelDeserializer.class)
 public class PropertyModel {
 
     private String name;
