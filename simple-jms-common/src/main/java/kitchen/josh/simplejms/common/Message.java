@@ -19,6 +19,12 @@ public final class Message {
         this.message = message;
     }
 
+    public Message(Destination destination, Properties properties, String message) {
+        this.destination = destination;
+        this.properties = properties;
+        this.message = message;
+    }
+
     /**
      * Get the plain text message.
      *
