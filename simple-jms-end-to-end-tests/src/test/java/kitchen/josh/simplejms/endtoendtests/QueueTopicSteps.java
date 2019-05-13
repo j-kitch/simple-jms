@@ -10,6 +10,7 @@ import kitchen.josh.simplejms.client.*;
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.Properties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ContextConfiguration;
@@ -28,6 +29,8 @@ public class QueueTopicSteps {
     private static final String[] MESSAGES = {
             "a", "b", "c", "d"
     };
+
+    private static final Properties[] PROPERTIES = createProperties();
 
     @LocalServerPort
     private int port;
@@ -102,6 +105,14 @@ public class QueueTopicSteps {
         producer.sendMessage(new Message(destination, MESSAGES[3]));
     }
 
+    @When("the producer sends messages with properties")
+    public void the_producer_sends_messages_with_properties() {
+        producer.sendMessage(new Message(destination, PROPERTIES[0], MESSAGES[0]));
+        producer.sendMessage(new Message(destination, PROPERTIES[1], MESSAGES[1]));
+        producer.sendMessage(new Message(destination, PROPERTIES[2], MESSAGES[2]));
+        producer.sendMessage(new Message(destination, PROPERTIES[3], MESSAGES[3]));
+    }
+
     @When("the producer tries to send a message")
     public void the_producer_tries_to_send_a_message() {
         try {
@@ -154,6 +165,22 @@ public class QueueTopicSteps {
         assertThat(consumer1.receiveMessage()).isEmpty();
     }
 
+    @Then("the consumer receives messages with properties")
+    public void the_consumer_receives_messages_with_properties() {
+        Optional<Message> message1 = consumer1.receiveMessage();
+        Optional<Message> message2 = consumer1.receiveMessage();
+        Optional<Message> message3 = consumer1.receiveMessage();
+        Optional<Message> message4 = consumer1.receiveMessage();
+
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, PROPERTIES[0], MESSAGES[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, PROPERTIES[1], MESSAGES[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, PROPERTIES[2], MESSAGES[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new Message(destination, PROPERTIES[3], MESSAGES[3]));
+
+        assertThat(consumer1.receiveMessage()).isEmpty();
+        assertThat(consumer1.receiveMessage()).isEmpty();
+    }
+
     @Then("each message is received by every consumer")
     public void each_message_is_received_by_every_consumer() {
         Stream.of(consumer1, consumer2).forEach(consumer -> {
@@ -181,5 +208,18 @@ public class QueueTopicSteps {
     @Then("an exception was thrown")
     public void an_exception_was_thrown() {
         assertThat(throwable).isNotNull();
+    }
+
+    private static Properties[] createProperties() {
+        Properties[] properties = {new Properties(), new Properties(), new Properties(), new Properties()};
+        properties[0].setBooleanProperty("property 1", false);
+        properties[0].setByteProperty("property 2", (byte) 2);
+        properties[1].setShortProperty("property 3", (short) 3);
+        properties[1].setIntProperty("property 4", 4);
+        properties[2].setLongProperty("property 5", 5);
+        properties[2].setFloatProperty("property 6", 1.2f);
+        properties[3].setDoubleProperty("property 7", 2.3);
+        properties[3].setStringProperty("property 8", "hello world");
+        return properties;
     }
 }
