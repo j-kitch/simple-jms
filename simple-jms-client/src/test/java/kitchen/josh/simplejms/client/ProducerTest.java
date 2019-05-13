@@ -4,18 +4,14 @@ import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Field;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -31,51 +27,48 @@ public class ProducerTest {
     private static final String SEND_URL = BROKER_URL + "/topic/" + DESTINATION.getId() + "/producer/" + PRODUCER_ID + "/send";
     private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION.getId() + "/producer/" + PRODUCER_ID;
 
-    private static final String MESSAGE = "hello world";
+    private static final String TEXT = "hello world";
+    private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
+    private static final Message MESSAGE = new Message(DESTINATION, TEXT);
 
     @Mock
     private RestTemplate restTemplate;
 
-    @Captor
-    private ArgumentCaptor<MessageModel> messageCaptor;
+    @Mock
+    private MessageModelFactory messageModelFactory;
 
     private Producer producer;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         producer = new Producer(BROKER_URL, restTemplate, new ProducerId(DESTINATION, PRODUCER_ID));
+
+        Field field = Producer.class.getDeclaredField("messageModelFactory");
+        field.setAccessible(true);
+        field.set(producer, messageModelFactory);
     }
 
     @Test
     public void sendMessage_restTemplateThrows_throws() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
+        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
 
         assertThatExceptionOfType(RestClientException.class)
-                .isThrownBy(() -> producer.sendMessage(new Message(DESTINATION, MESSAGE)));
-        verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue()).isEqualToComparingFieldByField(new MessageModel(emptyList(), MESSAGE));
-        verifyNoMoreInteractions(restTemplate);
+                .isThrownBy(() -> producer.sendMessage(MESSAGE));
+        verify(messageModelFactory).create(MESSAGE);
+        verify(restTemplate).postForEntity(SEND_URL, MESSAGE_MODEL, Void.class);
+        verifyNoMoreInteractions(restTemplate, messageModelFactory);
     }
 
     @Test
     public void sendMessage_restTemplateReturns_returns() {
-        Message message = new Message(DESTINATION, MESSAGE);
-        message.getProperties().setBooleanProperty("property 1", true);
-        message.getProperties().setStringProperty("property 2", "other property");
+        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
 
-        MessageModel model = new MessageModel(
-                asList(new PropertyModel("property 1", "Boolean", true),
-                        new PropertyModel("property 2", "String", "other property")),
-                MESSAGE);
+        producer.sendMessage(MESSAGE);
 
-        producer.sendMessage(message);
-
-        verify(restTemplate).postForEntity(eq(SEND_URL), messageCaptor.capture(), eq(Void.class));
-        assertThat(messageCaptor.getValue().getMessage()).isEqualTo(MESSAGE);
-        assertThat(messageCaptor.getValue().getProperties())
-                .usingFieldByFieldElementComparator()
-                .containsExactlyInAnyOrderElementsOf(model.getProperties());
-        verifyNoMoreInteractions(restTemplate);
+        verify(messageModelFactory).create(MESSAGE);
+        verify(restTemplate).postForEntity(SEND_URL, MESSAGE_MODEL, Void.class);
+        verifyNoMoreInteractions(restTemplate, messageModelFactory);
     }
 
     @Test
@@ -83,5 +76,6 @@ public class ProducerTest {
         producer.close();
 
         verify(restTemplate).delete(DELETE_URL);
+        verifyNoMoreInteractions(restTemplate, messageModelFactory);
     }
 }
