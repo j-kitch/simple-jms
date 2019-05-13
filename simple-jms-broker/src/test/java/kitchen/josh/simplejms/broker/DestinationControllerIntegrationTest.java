@@ -57,7 +57,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.TOPIC);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.QUEUE);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -78,7 +78,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/ooga-booga"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -93,7 +93,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).createConsumer();
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -102,7 +102,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -116,7 +116,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).createProducer();
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -140,7 +140,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -154,7 +154,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -166,7 +166,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).removeConsumer(CONSUMER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -175,7 +175,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -189,7 +189,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -205,7 +205,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).removeConsumer(CONSUMER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -217,7 +217,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).removeProducer(PRODUCER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -226,7 +226,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -240,7 +240,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(singleDestinationService).removeProducer(PRODUCER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -273,7 +273,7 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -284,7 +284,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -300,7 +300,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -320,7 +320,7 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
         verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -334,7 +334,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -351,7 +351,7 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);
         verify(messageModelFactory).create(message);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -360,7 +360,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -374,7 +374,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
     @Test
@@ -390,6 +390,6 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
+        verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 }
