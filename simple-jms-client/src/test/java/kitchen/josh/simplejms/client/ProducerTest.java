@@ -43,6 +43,7 @@ public class ProducerTest {
     public void setUp() throws Exception {
         producer = new Producer(BROKER_URL, restTemplate, new ProducerId(DESTINATION, PRODUCER_ID));
 
+        // TODO: Add MessageModelFactory to constructor and remove reflection!
         Field field = Producer.class.getDeclaredField("messageModelFactory");
         field.setAccessible(true);
         field.set(producer, messageModelFactory);
