@@ -1,7 +1,9 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.MessageFactory;
 import kitchen.josh.simplejms.common.MessageModel;
+import kitchen.josh.simplejms.common.PropertiesFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -16,11 +18,13 @@ public class Consumer implements AutoCloseable {
     private final String brokerUrl;
     private final RestTemplate restTemplate;
     private final ConsumerId id;
+    private final MessageFactory messageFactory;
 
     public Consumer(String brokerUrl, RestTemplate restTemplate, ConsumerId id) {
         this.brokerUrl = brokerUrl;
         this.restTemplate = restTemplate;
         this.id = id;
+        this.messageFactory = new MessageFactory(new PropertiesFactory());
     }
 
     /**
@@ -34,18 +38,7 @@ public class Consumer implements AutoCloseable {
 
         return Optional.ofNullable(restTemplate.postForEntity(receiveUrl, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
-                .filter(model -> model.getMessage() != null)
-                .map(model -> {
-                    Message message = new Message(id.getDestination(), model.getMessage());
-                    model.getProperties().forEach(property -> {
-                        try {
-                            message.getProperties().setObjectProperty(property.getName(), property.getValue());
-                        } catch (MessageFormatException e) {
-                            throw new RuntimeException(e);
-                        }
-                    });
-                    return message;
-                });
+                .map(this::createMessage);
     }
 
     /**
@@ -57,5 +50,13 @@ public class Consumer implements AutoCloseable {
                 + id.getId();
 
         restTemplate.delete(deleteUrl);
+    }
+
+    private Message createMessage(MessageModel model) {
+        try {
+            return messageFactory.create(id.getDestination(), model);
+        } catch (MessageFormatException mfe) {
+            throw new RuntimeException(mfe);
+        }
     }
 }

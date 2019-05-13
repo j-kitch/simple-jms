@@ -10,11 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
@@ -34,15 +33,25 @@ public class ConsumerTest {
     private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
 
     private static final String MESSAGE = "hello world";
+    private static final Message MESSAGE_2 = new Message(DESTINATION, new Properties(), MESSAGE);
+    private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
 
     @Mock
     private RestTemplate restTemplate;
 
+    @Mock
+    private MessageFactory messageFactory;
+
     private Consumer consumer;
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
         consumer = new Consumer(BROKER_URL, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID));
+
+        // TODO: Add MessageFactory to Consumer constructor so we can remove reflection.
+        Field field = Consumer.class.getDeclaredField("messageFactory");
+        field.setAccessible(true);
+        field.set(consumer, messageFactory);
     }
 
     @Test
@@ -52,36 +61,33 @@ public class ConsumerTest {
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> consumer.receiveMessage());
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verifyNoMoreInteractions(restTemplate);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test
-    public void receiveMessage_noMessage_returnsEmpty() {
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(new MessageModel(emptyList(), null)));
+    public void receiveMessage_noMessage_returnsEmpty() throws Exception {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
+        when(messageFactory.create(any(), any())).thenReturn(null);
 
         Optional<Message> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verifyNoMoreInteractions(restTemplate);
+        verify(messageFactory).create(DESTINATION, MESSAGE_MODEL);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test
-    public void receiveMessage_messageExists_returnsMessage() {
-        MessageModel messageModel = new MessageModel(
-                asList(new PropertyModel("property 1", "Float", 1.2f), new PropertyModel("property 2", "Boolean", false)),
-                "hello world");
-        Message message = new Message(DESTINATION, MESSAGE);
-        message.getProperties().setFloatProperty("property 1", 1.2f);
-        message.getProperties().setBooleanProperty("property 2", false);
-
-        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(messageModel));
+    public void receiveMessage_messageExists_returnsMessage() throws Exception {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
+        when(messageFactory.create(any(), any())).thenReturn(MESSAGE_2);
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received).get().isEqualToComparingFieldByFieldRecursively(message);
+        assertThat(received).contains(MESSAGE_2);
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verifyNoMoreInteractions(restTemplate);
+        verify(messageFactory).create(DESTINATION, MESSAGE_MODEL);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test
@@ -89,5 +95,6 @@ public class ConsumerTest {
         consumer.close();
 
         verify(restTemplate).delete(DELETE_URL);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 }
