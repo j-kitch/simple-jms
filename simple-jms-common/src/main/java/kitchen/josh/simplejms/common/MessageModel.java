@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.common;
 
 import java.util.List;
+import java.util.Objects;
 
 public class MessageModel {
 
@@ -30,5 +31,19 @@ public class MessageModel {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MessageModel that = (MessageModel) o;
+        return Objects.equals(properties, that.properties) &&
+                Objects.equals(message, that.message);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(properties, message);
     }
 }

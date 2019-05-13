@@ -3,8 +3,6 @@ package kitchen.josh.simplejms.broker;
 import kitchen.josh.simplejms.common.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -17,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,7 +29,8 @@ public class DestinationControllerIntegrationTest {
     private static final UUID DESTINATION_ID = UUID.randomUUID();
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
-    private static final String MESSAGE = "hello world";
+    private static final String TEXT = "hello world";
+    private static final Message MESSAGE = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,8 +44,8 @@ public class DestinationControllerIntegrationTest {
     @MockBean
     private MessageModelFactory messageModelFactory;
 
-    @Captor
-    private ArgumentCaptor<Message> messageCaptor;
+    @MockBean
+    private MessageFactory messageFactory;
 
     @Test
     public void createDestination_topic_returnsOkAndId() throws Exception {
@@ -264,25 +262,25 @@ public class DestinationControllerIntegrationTest {
     @Test
     public void sendMessage_returnsOk() throws Exception {
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        when(messageFactory.create(any(), any())).thenReturn(MESSAGE);
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .content("{\"message\": \"" + TEXT + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verify(singleDestinationService).addMessage(eq(PRODUCER_ID), messageCaptor.capture());
+        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
+        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
-        assertThat(messageCaptor.getValue())
-                .isEqualToComparingFieldByFieldRecursively(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
     }
 
     @Test
     public void sendMessage_unknownDestinationType_returnsNotFound() throws Exception {
         mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .content("{\"message\": \"" + TEXT + "\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
@@ -296,7 +294,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .content("{\"message\": \"" + TEXT + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
@@ -309,20 +307,20 @@ public class DestinationControllerIntegrationTest {
     public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
         String errorMessage = "Failed to send message to queue " + DESTINATION_ID + ": the producer " + PRODUCER_ID + " does not exist.";
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
+        when(messageFactory.create(any(), any())).thenReturn(MESSAGE);
         doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + MESSAGE + "\"}"))
+                .content("{\"message\": \"" + TEXT + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(DestinationType.QUEUE, DESTINATION_ID);
-        verify(singleDestinationService).addMessage(eq(PRODUCER_ID), messageCaptor.capture());
+        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
+        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
-        assertThat(messageCaptor.getValue())
-                .isEqualToComparingFieldByFieldRecursively(new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE));
     }
 
     @Test
@@ -341,14 +339,14 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);
-        when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), MESSAGE));
+        Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
+        when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), TEXT));
         when(destinationService.findDestination(any(), any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": \"" + MESSAGE + "\", \"properties\": []}"));
+                .andExpect(content().json("{\"message\": \"" + TEXT + "\", \"properties\": []}"));
 
         verify(destinationService).findDestination(DestinationType.TOPIC, DESTINATION_ID);
         verify(singleDestinationService).readMessage(CONSUMER_ID);

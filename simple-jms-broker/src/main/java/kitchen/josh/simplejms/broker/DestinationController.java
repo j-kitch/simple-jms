@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.jms.MessageFormatException;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
@@ -18,10 +19,12 @@ public class DestinationController {
 
     private final DestinationService destinationService;
     private final MessageModelFactory messageModelFactory;
+    private final MessageFactory messageFactory;
 
-    public DestinationController(DestinationService destinationService, MessageModelFactory messageModelFactory) {
+    public DestinationController(DestinationService destinationService, MessageModelFactory messageModelFactory, MessageFactory messageFactory) {
         this.destinationService = destinationService;
         this.messageModelFactory = messageModelFactory;
+        this.messageFactory = messageFactory;
     }
 
     /**
@@ -113,11 +116,12 @@ public class DestinationController {
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
     public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
-                            @PathVariable UUID producerId, @RequestBody MessageModel message) {
+                            @PathVariable UUID producerId, @RequestBody MessageModel message) throws MessageFormatException {
         try {
+            Destination destination = new Destination(toType(destinationType), destinationId);
             destinationService.findDestination(toType(destinationType), destinationId)
                     .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
-                    .addMessage(producerId, new Message(new Destination(toType(destinationType), destinationId), message.getMessage()));
+                    .addMessage(producerId, messageFactory.create(destination, message));
         } catch (ProducerDoesNotExistException e) {
             throw new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the producer " + producerId + " does not exist.");
         }
