@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Field;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -45,13 +44,8 @@ public class ConsumerTest {
     private Consumer consumer;
 
     @Before
-    public void setUp() throws Exception {
-        consumer = new Consumer(BROKER_URL, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID));
-
-        // TODO: Add MessageFactory to Consumer constructor so we can remove reflection.
-        Field field = Consumer.class.getDeclaredField("messageFactory");
-        field.setAccessible(true);
-        field.set(consumer, messageFactory);
+    public void setUp() {
+        consumer = new Consumer(BROKER_URL, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID), messageFactory);
     }
 
     @Test

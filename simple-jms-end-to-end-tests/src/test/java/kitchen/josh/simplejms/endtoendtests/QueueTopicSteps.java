@@ -7,10 +7,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.client.*;
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
-import kitchen.josh.simplejms.common.Properties;
+import kitchen.josh.simplejms.common.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ContextConfiguration;
@@ -60,8 +57,8 @@ public class QueueTopicSteps {
     @Given("a fake destination with a producer and consumer")
     public void a_fake_destination_with_a_producer_and_consumer() {
         destination = new Destination(DestinationType.QUEUE, UUID.randomUUID());
-        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()));
-        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()));
+        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()), new MessageModelFactory(new PropertyModelFactory()));
+        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()), new MessageFactory(new PropertiesFactory()));
     }
 
     @Given("a queue with a producer")

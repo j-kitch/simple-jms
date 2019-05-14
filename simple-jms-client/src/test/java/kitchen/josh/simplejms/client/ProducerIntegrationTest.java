@@ -1,8 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -36,7 +34,7 @@ public class ProducerIntegrationTest {
     public void sendMessage() {
         Message message = new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE);
 
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID));
+        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory()));
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
@@ -51,7 +49,7 @@ public class ProducerIntegrationTest {
 
     @Test
     public void close() {
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID));
+        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory()));
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());

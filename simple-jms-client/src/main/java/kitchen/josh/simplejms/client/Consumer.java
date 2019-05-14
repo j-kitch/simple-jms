@@ -3,7 +3,6 @@ package kitchen.josh.simplejms.client;
 import kitchen.josh.simplejms.common.Message;
 import kitchen.josh.simplejms.common.MessageFactory;
 import kitchen.josh.simplejms.common.MessageModel;
-import kitchen.josh.simplejms.common.PropertiesFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,11 +19,11 @@ public class Consumer implements AutoCloseable {
     private final ConsumerId id;
     private final MessageFactory messageFactory;
 
-    public Consumer(String brokerUrl, RestTemplate restTemplate, ConsumerId id) {
+    public Consumer(String brokerUrl, RestTemplate restTemplate, ConsumerId id, MessageFactory messageFactory) {
         this.brokerUrl = brokerUrl;
         this.restTemplate = restTemplate;
         this.id = id;
-        this.messageFactory = new MessageFactory(new PropertiesFactory());
+        this.messageFactory = messageFactory;
     }
 
     /**

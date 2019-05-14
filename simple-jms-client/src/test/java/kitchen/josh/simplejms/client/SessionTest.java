@@ -1,8 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.IdModel;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -70,7 +68,7 @@ public class SessionTest {
 
         Producer producer = session.createProducer(DESTINATION);
 
-        assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, new ProducerId(DESTINATION, producerId)));
+        assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, new ProducerId(DESTINATION, producerId), new MessageModelFactory(new PropertyModelFactory())));
         verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/producer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
@@ -90,7 +88,7 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer(DESTINATION);
 
-        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID)));
+        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID), new MessageFactory(new PropertiesFactory())));
         verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }

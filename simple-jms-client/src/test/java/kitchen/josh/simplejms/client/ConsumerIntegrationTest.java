@@ -1,8 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -43,7 +41,7 @@ public class ConsumerIntegrationTest {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -63,7 +61,7 @@ public class ConsumerIntegrationTest {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
         Optional<Message> received = consumer.receiveMessage();
 
@@ -75,7 +73,7 @@ public class ConsumerIntegrationTest {
 
     @Test
     public void close() {
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());

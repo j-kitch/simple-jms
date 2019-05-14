@@ -9,7 +9,6 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Field;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -40,13 +39,8 @@ public class ProducerTest {
     private Producer producer;
 
     @Before
-    public void setUp() throws Exception {
-        producer = new Producer(BROKER_URL, restTemplate, new ProducerId(DESTINATION, PRODUCER_ID));
-
-        // TODO: Add MessageModelFactory to constructor and remove reflection!
-        Field field = Producer.class.getDeclaredField("messageModelFactory");
-        field.setAccessible(true);
-        field.set(producer, messageModelFactory);
+    public void setUp() {
+        producer = new Producer(BROKER_URL, restTemplate, new ProducerId(DESTINATION, PRODUCER_ID), messageModelFactory);
     }
 
     @Test

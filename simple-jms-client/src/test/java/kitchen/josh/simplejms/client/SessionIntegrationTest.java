@@ -1,7 +1,6 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
@@ -45,7 +44,7 @@ public class SessionIntegrationTest {
         Consumer consumer = session.createConsumer(QUEUE);
 
         assertThat(consumer).isEqualToComparingFieldByFieldRecursively(
-                new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, ID)));
+                new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, ID), new MessageFactory(new PropertiesFactory())));
         mockRestServiceServer.verify();
     }
 
@@ -59,7 +58,7 @@ public class SessionIntegrationTest {
         Producer producer = session.createProducer(TOPIC);
 
         assertThat(producer).isEqualToComparingFieldByFieldRecursively(
-                new Producer(HOST, restTemplate, new ProducerId(TOPIC, ID)));
+                new Producer(HOST, restTemplate, new ProducerId(TOPIC, ID), new MessageModelFactory(new PropertyModelFactory())));
         mockRestServiceServer.verify();
     }
 }
