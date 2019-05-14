@@ -1,5 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,31 +41,31 @@ public class DestinationServiceTest {
 
     @Test
     public void findDestination_noDestination_returnsEmpty() {
-        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(DestinationType.QUEUE, UUID.randomUUID())).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.TOPIC, UUID.randomUUID()))).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.QUEUE, UUID.randomUUID()))).isEmpty();
     }
 
     @Test
     public void findDestination_queue_returnsForQueue() {
         UUID queueId = destinationService.createDestination(DestinationType.QUEUE);
 
-        Optional<SingleDestinationService> service = destinationService.findDestination(DestinationType.QUEUE, queueId);
+        Optional<SingleDestinationService> service = destinationService.findDestination(new Destination(DestinationType.QUEUE, queueId));
         assertThat(service).contains(destinationService.getQueues().get(queueId));
 
-        assertThat(destinationService.findDestination(DestinationType.QUEUE, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(DestinationType.TOPIC, queueId)).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.QUEUE, UUID.randomUUID()))).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.TOPIC, UUID.randomUUID()))).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.TOPIC, queueId))).isEmpty();
     }
 
     @Test
     public void findDestination_topic_returnsForTopic() {
         UUID topicId = destinationService.createDestination(DestinationType.TOPIC);
 
-        Optional<SingleDestinationService> service = destinationService.findDestination(DestinationType.TOPIC, topicId);
+        Optional<SingleDestinationService> service = destinationService.findDestination(new Destination(DestinationType.TOPIC, topicId));
         assertThat(service).contains(destinationService.getTopics().get(topicId));
 
-        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(DestinationType.TOPIC, UUID.randomUUID())).isEmpty();
-        assertThat(destinationService.findDestination(DestinationType.QUEUE, topicId)).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.TOPIC, UUID.randomUUID()))).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.TOPIC, UUID.randomUUID()))).isEmpty();
+        assertThat(destinationService.findDestination(new Destination(DestinationType.QUEUE, topicId))).isEmpty();
     }
 }

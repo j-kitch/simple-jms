@@ -39,14 +39,13 @@ public class DestinationService {
     }
 
     /**
-     * Find a destination in the broker.
+     * Find a destination service in the broker.
      *
-     * @param type the type of destination
-     * @param id   the id of the destination
+     * @param destination the destination
      * @return the destination searched for, or <code>Optional.empty()</code> if it doesn't exist
      */
-    public Optional<SingleDestinationService> findDestination(DestinationType type, UUID id) {
-        return Optional.ofNullable(destinations.get(new Destination(type, id)));
+    public Optional<SingleDestinationService> findDestination(Destination destination) {
+        return Optional.ofNullable(destinations.get(destination));
     }
 
     Map<UUID, SingleDestinationService> getQueues() {

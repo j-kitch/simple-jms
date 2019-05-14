@@ -47,7 +47,7 @@ public class DestinationController {
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
     public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
+        UUID consumerId = destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                 .map(SingleDestinationService::createConsumer)
                 .orElseThrow(() -> new ApiException("Failed to create consumer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
         return new IdModel(consumerId);
@@ -62,7 +62,7 @@ public class DestinationController {
      */
     @PostMapping(path = "/{destinationType}/{destinationId}/producer")
     public IdModel createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        UUID consumerId = destinationService.findDestination(toType(destinationType), destinationId)
+        UUID consumerId = destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                 .map(SingleDestinationService::createProducer)
                 .orElseThrow(() -> new ApiException("Failed to create producer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
         return new IdModel(consumerId);
@@ -79,7 +79,7 @@ public class DestinationController {
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID consumerId) {
         try {
-            destinationService.findDestination(toType(destinationType), destinationId)
+            destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                     .orElseThrow(() -> new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
                     .removeConsumer(consumerId);
         } catch (ConsumerDoesNotExistException e) {
@@ -98,7 +98,7 @@ public class DestinationController {
     public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID producerId) {
         try {
-            destinationService.findDestination(toType(destinationType), destinationId)
+            destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                     .orElseThrow(() -> new ApiException("Failed to delete producer " + producerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
                     .removeProducer(producerId);
         } catch (ProducerDoesNotExistException e) {
@@ -119,7 +119,7 @@ public class DestinationController {
                             @PathVariable UUID producerId, @RequestBody MessageModel message) throws MessageFormatException {
         try {
             Destination destination = new Destination(toType(destinationType), destinationId);
-            destinationService.findDestination(toType(destinationType), destinationId)
+            destinationService.findDestination(destination)
                     .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
                     .addMessage(producerId, messageFactory.create(destination, message));
         } catch (ProducerDoesNotExistException e) {
@@ -139,7 +139,7 @@ public class DestinationController {
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
         try {
-            return destinationService.findDestination(toType(destinationType), destinationId)
+            return destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                     .orElseThrow(() -> new ApiException("Failed to receive message: the " + destinationType + " " + destinationId + " does not exist."))
                     .readMessage(consumerId)
                     .map(messageModelFactory::create)
