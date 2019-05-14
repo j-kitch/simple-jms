@@ -51,7 +51,7 @@ public class MessageFactoryTest {
         Message message = messageFactory.create(DESTINATION, messageModel);
 
         assertThat(message.getDestination()).isEqualTo(DESTINATION);
-        assertThat(message.getMessage()).isEqualTo(MESSAGE);
+        assertThat(message.getBody()).isEqualTo(MESSAGE);
         assertThat(message.getProperties()).isEqualToComparingFieldByField(PROPERTIES);
         verify(propertiesFactory).create(PROPERTY_MODELS);
     }

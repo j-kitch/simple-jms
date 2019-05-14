@@ -67,7 +67,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received.get().getMessage()).isEqualTo(MESSAGE);
+        assertThat(received.get().getBody()).isEqualTo(MESSAGE);
         assertThat(received.get().getDestination()).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         assertThat(received.get().getProperties()).isEqualToComparingFieldByField(message.getProperties());
         mockRestServiceServer.verify();

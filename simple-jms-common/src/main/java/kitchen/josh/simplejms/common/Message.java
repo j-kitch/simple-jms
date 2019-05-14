@@ -9,29 +9,29 @@ public final class Message {
 
     private final Destination destination;
     private final Properties properties;
-    private final String message;
+    private final String body;
 
-    public Message(Destination destination, String message) {
+    public Message(Destination destination, String body) {
         Assert.notNull(destination, "Destination is required");
-        Assert.notNull(message, "String is required");
+        Assert.notNull(body, "String is required");
         this.destination = destination;
         this.properties = new Properties();
-        this.message = message;
+        this.body = body;
     }
 
-    public Message(Destination destination, Properties properties, String message) {
+    public Message(Destination destination, Properties properties, String body) {
         this.destination = destination;
         this.properties = properties;
-        this.message = message;
+        this.body = body;
     }
 
     /**
-     * Get the plain text message.
+     * Get the plain text body.
      *
-     * @return the message
+     * @return the body
      */
-    public final String getMessage() {
-        return message;
+    public final String getBody() {
+        return body;
     }
 
     /**
