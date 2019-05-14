@@ -48,7 +48,7 @@ public class ObjectMapperTest {
         String expected = "{\"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Double\", \"value\": 2.3}," +
                 "{\"name\": \"property 2\", \"type\": \"Boolean\", \"value\": false}" +
-                "], \"message\": \"hello world\"}";
+                "], \"body\": \"hello world\"}";
 
         String actual = objectMapper.writeValueAsString(model);
 

@@ -6,15 +6,15 @@ import java.util.Objects;
 public class MessageModel {
 
     private List<PropertyModel> properties;
-    private String message;
+    private String body;
 
     public MessageModel() {
 
     }
 
-    public MessageModel(List<PropertyModel> properties, String message) {
+    public MessageModel(List<PropertyModel> properties, String body) {
         this.properties = properties;
-        this.message = message;
+        this.body = body;
     }
 
     public List<PropertyModel> getProperties() {
@@ -25,12 +25,12 @@ public class MessageModel {
         this.properties = properties;
     }
 
-    public String getMessage() {
-        return message;
+    public String getBody() {
+        return body;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setBody(String body) {
+        this.body = body;
     }
 
     @Override
@@ -39,11 +39,11 @@ public class MessageModel {
         if (o == null || getClass() != o.getClass()) return false;
         MessageModel that = (MessageModel) o;
         return Objects.equals(properties, that.properties) &&
-                Objects.equals(message, that.message);
+                Objects.equals(body, that.body);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(properties, message);
+        return Objects.hash(properties, body);
     }
 }

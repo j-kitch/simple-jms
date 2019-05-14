@@ -266,12 +266,12 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + TEXT + "\"}"))
+                .content("{\"body\": \"" + TEXT + "\", \"properties\": []}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
+        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(emptyList(), TEXT));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -280,7 +280,7 @@ public class DestinationControllerIntegrationTest {
     public void sendMessage_unknownDestinationType_returnsNotFound() throws Exception {
         mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + TEXT + "\"}"))
+                .content("{\"body\": \"" + TEXT + "\", \"properties\": []}"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
 
@@ -294,7 +294,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + TEXT + "\"}"))
+                .content("{\"body\": \"" + TEXT + "\", \"properties\": []}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
@@ -312,13 +312,13 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"message\": \"" + TEXT + "\"}"))
+                .content("{\"body\": \"" + TEXT + "\", \"properties\": []}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(null, TEXT));
+        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(emptyList(), TEXT));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -330,7 +330,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": null, \"properties\": []}", true));
+                .andExpect(content().json("{\"body\": null, \"properties\": []}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);
@@ -346,7 +346,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"message\": \"" + TEXT + "\", \"properties\": []}"));
+                .andExpect(content().json("{\"body\": \"" + TEXT + "\", \"properties\": []}"));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);

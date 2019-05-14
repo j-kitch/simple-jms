@@ -11,9 +11,9 @@ public class MessageFactory {
     }
 
     public Message create(Destination destination, MessageModel messageModel) throws MessageFormatException {
-        if (messageModel.getMessage() == null) {
+        if (messageModel.getBody() == null) {
             return null;
         }
-        return new Message(destination, propertiesFactory.create(messageModel.getProperties()), messageModel.getMessage());
+        return new Message(destination, propertiesFactory.create(messageModel.getProperties()), messageModel.getBody());
     }
 }
