@@ -65,4 +65,14 @@ public class ObjectMapperTest {
 
         assertEquals(expected, actual, true);
     }
+
+    @Test
+    public void textBodyModel() throws Exception {
+        TextBodyModel model = new TextBodyModel("hello world");
+        String expected = "{\"text\": \"hello world\"}";
+
+        String actual = objectMapper.writeValueAsString(model);
+
+        assertEquals(expected, actual, true);
+    }
 }
