@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.util.UUID;
 
 import static java.util.Arrays.asList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.skyscreamer.jsonassert.JSONAssert.assertEquals;
 
 public class ObjectMapperTest {
@@ -67,12 +68,42 @@ public class ObjectMapperTest {
     }
 
     @Test
-    public void textBodyModel() throws Exception {
+    public void writeValueAsString_textBodyModel() throws Exception {
         TextBodyModel model = new TextBodyModel("hello world");
         String expected = "{\"text\": \"hello world\"}";
 
         String actual = objectMapper.writeValueAsString(model);
 
         assertEquals(expected, actual, true);
+    }
+
+    @Test
+    public void readValue_textBodyModel() throws Exception {
+        String json = "{\"text\": \"hello world\"}";
+        TextBodyModel expected = new TextBodyModel("hello world");
+
+        TextBodyModel actual = objectMapper.readValue(json, TextBodyModel.class);
+
+        assertThat(actual).isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    public void writeValueAsString_objectBodyModel() throws Exception {
+        ObjectBodyModel model = new ObjectBodyModel(new byte[]{1, 5, 10, 12});
+        String expected = "{\"object\": \"AQUKDA==\"}";
+
+        String actual = objectMapper.writeValueAsString(model);
+
+        assertEquals(expected, actual, true);
+    }
+
+    @Test
+    public void readValue_objectBodyModel() throws Exception {
+        String input = "{\"object\": \"AQUKDA==\"}";
+        ObjectBodyModel expected = new ObjectBodyModel(new byte[]{1, 5, 10, 12});
+
+        ObjectBodyModel actual = objectMapper.readValue(input, ObjectBodyModel.class);
+
+        assertThat(actual).isEqualToComparingFieldByField(expected);
     }
 }
