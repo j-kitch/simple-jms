@@ -70,7 +70,7 @@ public class ObjectMapperTest {
     @Test
     public void writeValueAsString_textBodyModel() throws Exception {
         TextBodyModel model = new TextBodyModel("hello world");
-        String expected = "{\"text\": \"hello world\"}";
+        String expected = "{\"text\": \"hello world\", \"type\": \"text\"}";
 
         String actual = objectMapper.writeValueAsString(model);
 
@@ -79,7 +79,7 @@ public class ObjectMapperTest {
 
     @Test
     public void readValue_textBodyModel() throws Exception {
-        String json = "{\"text\": \"hello world\"}";
+        String json = "{\"text\": \"hello world\", \"type\": \"text\"}";
         TextBodyModel expected = new TextBodyModel("hello world");
 
         TextBodyModel actual = objectMapper.readValue(json, TextBodyModel.class);
@@ -90,7 +90,7 @@ public class ObjectMapperTest {
     @Test
     public void writeValueAsString_objectBodyModel() throws Exception {
         ObjectBodyModel model = new ObjectBodyModel(new byte[]{1, 5, 10, 12});
-        String expected = "{\"object\": \"AQUKDA==\"}";
+        String expected = "{\"object\": \"AQUKDA==\", \"type\": \"object\"}";
 
         String actual = objectMapper.writeValueAsString(model);
 
@@ -99,7 +99,7 @@ public class ObjectMapperTest {
 
     @Test
     public void readValue_objectBodyModel() throws Exception {
-        String input = "{\"object\": \"AQUKDA==\"}";
+        String input = "{\"object\": \"AQUKDA==\", \"type\": \"object\"}";
         ObjectBodyModel expected = new ObjectBodyModel(new byte[]{1, 5, 10, 12});
 
         ObjectBodyModel actual = objectMapper.readValue(input, ObjectBodyModel.class);

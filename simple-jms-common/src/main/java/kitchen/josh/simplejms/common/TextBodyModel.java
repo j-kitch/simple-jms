@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.common;
 
-public class TextBodyModel {
+public class TextBodyModel extends BodyModel {
 
     private String text;
 

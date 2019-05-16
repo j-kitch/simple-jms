@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import java.util.Base64;
 
 @JsonIgnoreProperties("bytes")
-public class ObjectBodyModel {
+public class ObjectBodyModel extends BodyModel {
 
     private static final Base64.Decoder DECODER = Base64.getDecoder();
     private static final Base64.Encoder ENCODER = Base64.getEncoder();
