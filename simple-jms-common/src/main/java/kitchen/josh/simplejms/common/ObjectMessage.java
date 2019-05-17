@@ -2,14 +2,15 @@ package kitchen.josh.simplejms.common;
 
 import javax.jms.JMSException;
 import javax.jms.MessageFormatException;
+import java.io.Serializable;
 import java.util.Enumeration;
 
-public class TextMessage {
+public class ObjectMessage {
 
     private final Properties properties;
-    private final TextBody body;
+    private final ObjectBody body;
 
-    public TextMessage(Properties properties, TextBody body) {
+    public ObjectMessage(Properties properties, ObjectBody body) {
         this.properties = properties;
         this.body = body;
     }
@@ -110,11 +111,11 @@ public class TextMessage {
         return body.isBodyAssignableTo(c);
     }
 
-    public void setText(String text) {
-        body.setText(text);
+    public void setObject(Serializable serializable) {
+        body.setObject(serializable);
     }
 
-    public String getText() {
-        return body.getText();
+    public Serializable getObject() {
+        return body.getObject();
     }
 }

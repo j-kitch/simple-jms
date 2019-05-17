@@ -14,40 +14,41 @@ import static java.util.Collections.enumeration;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class TextMessageTest {
+public class ObjectMessageTest {
 
     @Mock
     private Properties properties;
 
     @Mock
-    private TextBody textBody;
+    private ObjectBody objectBody;
 
-    private TextMessage textMessage;
+    private ObjectMessage objectMessage;
 
     @Before
     public void setUp() {
-        textMessage = new TextMessage(properties, textBody);
+        objectMessage = new ObjectMessage(properties, objectBody);
     }
 
     @Test
     public void clearProperties() {
-        textMessage.clearProperties();
+        objectMessage.clearProperties();
 
         verify(properties).clearProperties();
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getBooleanProperty() throws JMSException {
         when(properties.getBooleanProperty(any())).thenReturn(true);
 
-        assertThat(textMessage.getBooleanProperty("property")).isTrue();
+        assertThat(objectMessage.getBooleanProperty("property")).isTrue();
 
         verify(properties).getBooleanProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -55,28 +56,28 @@ public class TextMessageTest {
         when(properties.getBooleanProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getBooleanProperty("property"));
+                .isThrownBy(() -> objectMessage.getBooleanProperty("property"));
 
         verify(properties).getBooleanProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setBooleanProperty() {
-        textMessage.setBooleanProperty("property", true);
+        objectMessage.setBooleanProperty("property", true);
 
         verify(properties).setBooleanProperty("property", true);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getByteProperty() throws JMSException {
         when(properties.getByteProperty(any())).thenReturn((byte) 1);
 
-        assertThat(textMessage.getByteProperty("property")).isEqualTo((byte) 1);
+        assertThat(objectMessage.getByteProperty("property")).isEqualTo((byte) 1);
 
         verify(properties).getByteProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -84,28 +85,28 @@ public class TextMessageTest {
         when(properties.getByteProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getByteProperty("property"));
+                .isThrownBy(() -> objectMessage.getByteProperty("property"));
 
         verify(properties).getByteProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setByteProperty() {
-        textMessage.setByteProperty("property", (byte) 2);
+        objectMessage.setByteProperty("property", (byte) 2);
 
         verify(properties).setByteProperty("property", (byte) 2);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getShortProperty() throws JMSException {
         when(properties.getShortProperty(any())).thenReturn((short) 3);
 
-        assertThat(textMessage.getShortProperty("property")).isEqualTo((short) 3);
+        assertThat(objectMessage.getShortProperty("property")).isEqualTo((short) 3);
 
         verify(properties).getShortProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -113,28 +114,27 @@ public class TextMessageTest {
         when(properties.getShortProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getShortProperty("property"));
+                .isThrownBy(() -> objectMessage.getShortProperty("property"));
 
         verify(properties).getShortProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setShortProperty() {
-        textMessage.setShortProperty("property", (short) 3);
+        objectMessage.setShortProperty("property", (short) 3);
 
         verify(properties).setShortProperty("property", (short) 3);
-        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
     public void getIntProperty() throws JMSException {
         when(properties.getIntProperty(any())).thenReturn(5);
 
-        assertThat(textMessage.getIntProperty("property")).isEqualTo(5);
+        assertThat(objectMessage.getIntProperty("property")).isEqualTo(5);
 
         verify(properties).getIntProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -142,28 +142,28 @@ public class TextMessageTest {
         when(properties.getIntProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getIntProperty("property"));
+                .isThrownBy(() -> objectMessage.getIntProperty("property"));
 
         verify(properties).getIntProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setIntProperty() {
-        textMessage.setIntProperty("property", 6);
+        objectMessage.setIntProperty("property", 6);
 
         verify(properties).setIntProperty("property", 6);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getLongProperty() throws JMSException {
         when(properties.getLongProperty(any())).thenReturn(6L);
 
-        assertThat(textMessage.getLongProperty("property")).isEqualTo(6L);
+        assertThat(objectMessage.getLongProperty("property")).isEqualTo(6L);
 
         verify(properties).getLongProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -171,28 +171,28 @@ public class TextMessageTest {
         when(properties.getLongProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getLongProperty("property"));
+                .isThrownBy(() -> objectMessage.getLongProperty("property"));
 
         verify(properties).getLongProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setLongProperty() {
-        textMessage.setLongProperty("property", 7L);
+        objectMessage.setLongProperty("property", 7L);
 
         verify(properties).setLongProperty("property", 7L);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getFloatProperty() throws JMSException {
         when(properties.getFloatProperty(any())).thenReturn(1.23f);
 
-        assertThat(textMessage.getFloatProperty("property")).isEqualTo(1.23f);
+        assertThat(objectMessage.getFloatProperty("property")).isEqualTo(1.23f);
 
         verify(properties).getFloatProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -200,28 +200,28 @@ public class TextMessageTest {
         when(properties.getFloatProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getFloatProperty("property"));
+                .isThrownBy(() -> objectMessage.getFloatProperty("property"));
 
         verify(properties).getFloatProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setFloatProperty() {
-        textMessage.setFloatProperty("property", 1.23f);
+        objectMessage.setFloatProperty("property", 1.23f);
 
         verify(properties).setFloatProperty("property", 1.23f);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getDoubleProperty() throws JMSException {
         when(properties.getDoubleProperty(any())).thenReturn(2.34);
 
-        assertThat(textMessage.getDoubleProperty("property")).isEqualTo(2.34);
+        assertThat(objectMessage.getDoubleProperty("property")).isEqualTo(2.34);
 
         verify(properties).getDoubleProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -229,54 +229,54 @@ public class TextMessageTest {
         when(properties.getDoubleProperty(any())).thenThrow(JMSException.class);
 
         assertThatExceptionOfType(JMSException.class)
-                .isThrownBy(() -> textMessage.getDoubleProperty("property"));
+                .isThrownBy(() -> objectMessage.getDoubleProperty("property"));
 
         verify(properties).getDoubleProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setDoubleProperty() {
-        textMessage.setDoubleProperty("property", 2.34);
+        objectMessage.setDoubleProperty("property", 2.34);
 
         verify(properties).setDoubleProperty("property", 2.34);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getStringProperty() {
         when(properties.getStringProperty(any())).thenReturn("hello world");
 
-        assertThat(textMessage.getStringProperty("property")).isEqualTo("hello world");
+        assertThat(objectMessage.getStringProperty("property")).isEqualTo("hello world");
 
         verify(properties).getStringProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setStringProperty() {
-        textMessage.setStringProperty("property", "hello world");
+        objectMessage.setStringProperty("property", "hello world");
 
         verify(properties).setStringProperty("property", "hello world");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getObjectProperty() {
         when(properties.getObjectProperty(any())).thenReturn(2);
 
-        assertThat(textMessage.getObjectProperty("property")).isEqualTo(2);
+        assertThat(objectMessage.getObjectProperty("property")).isEqualTo(2);
 
         verify(properties).getObjectProperty("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void setObjectProperty() throws JMSException {
-        textMessage.setObjectProperty("property", 2);
+        objectMessage.setObjectProperty("property", 2);
 
         verify(properties).setObjectProperty("property", 2);
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
@@ -284,76 +284,76 @@ public class TextMessageTest {
         Enumeration<String> propertyNames = enumeration(singleton("hello"));
         when(properties.getPropertyNames()).thenReturn(propertyNames);
 
-        assertThat(textMessage.getPropertyNames()).isEqualTo(propertyNames);
+        assertThat(objectMessage.getPropertyNames()).isEqualTo(propertyNames);
 
         verify(properties).getPropertyNames();
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void propertyExists() {
         when(properties.propertyExists(any())).thenReturn(true);
 
-        assertThat(textMessage.propertyExists("property")).isTrue();
+        assertThat(objectMessage.propertyExists("property")).isTrue();
 
         verify(properties).propertyExists("property");
-        verifyNoMoreInteractions(properties, textBody);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void clearBody() {
-        textMessage.clearBody();
+        objectMessage.clearBody();
 
-        verify(textBody).clearBody();
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).clearBody();
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getBody() throws Exception {
-        when(textBody.getBody(any())).thenReturn(2);
+        when(objectBody.getBody(any())).thenReturn(2);
 
-        assertThat(textMessage.getBody(int.class)).isEqualTo(2);
+        assertThat(objectMessage.getBody(int.class)).isEqualTo(2);
 
-        verify(textBody).getBody(int.class);
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).getBody(int.class);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void getBody_throwsMessageFormat_throwsMessageFormat() throws MessageFormatException {
-        when(textBody.getBody(any())).thenThrow(MessageFormatException.class);
+        when(objectBody.getBody(any())).thenThrow(MessageFormatException.class);
 
         assertThatExceptionOfType(MessageFormatException.class)
-                .isThrownBy(() -> textMessage.getBody(int.class));
+                .isThrownBy(() -> objectMessage.getBody(int.class));
 
-        verify(textBody).getBody(int.class);
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).getBody(int.class);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
     public void isBodyAssignableTo() {
-        when(textBody.isBodyAssignableTo(any())).thenReturn(true);
+        when(objectBody.isBodyAssignableTo(any())).thenReturn(true);
 
-        assertThat(textMessage.isBodyAssignableTo(int.class)).isTrue();
+        assertThat(objectMessage.isBodyAssignableTo(int.class)).isTrue();
 
-        verify(textBody).isBodyAssignableTo(int.class);
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).isBodyAssignableTo(int.class);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
-    public void getText() {
-        when(textBody.getText()).thenReturn("hello world");
+    public void getObject() {
+        when(objectBody.getObject()).thenReturn(2);
 
-        assertThat(textMessage.getText()).isEqualTo("hello world");
+        assertThat(objectMessage.getObject()).isEqualTo(2);
 
-        verify(textBody).getText();
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).getObject();
+        verifyNoMoreInteractions(properties, objectBody);
     }
 
     @Test
-    public void setText() {
-        textMessage.setText("hello world");
+    public void setObject() {
+        objectMessage.setObject(2);
 
-        verify(textBody).setText("hello world");
-        verifyNoMoreInteractions(properties, textBody);
+        verify(objectBody).setObject(2);
+        verifyNoMoreInteractions(properties, objectBody);
     }
 }
