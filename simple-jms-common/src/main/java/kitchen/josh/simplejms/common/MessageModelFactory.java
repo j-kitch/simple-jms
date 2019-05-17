@@ -8,12 +8,6 @@ public class MessageModelFactory {
         this.propertyModelFactory = propertyModelFactory;
     }
 
-    public MessageModel create(OldMessage message) {
-        return new MessageModel(
-                propertyModelFactory.create(message.getProperties()),
-                new TextBodyModel(message.getBody().getText()));
-    }
-
     public MessageModel create(TextMessage message) {
         return new MessageModel(
                 propertyModelFactory.create(message),

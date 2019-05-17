@@ -202,7 +202,9 @@ public class TopicServiceTest {
         topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
 
         Optional<TextMessage> message = topicService.readMessage(consumerId);
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGE_1));
+        TextBody textBody = new TextBody();
+        textBody.setText(MESSAGE_1);
+        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), textBody));
         assertThat(topicService.getConsumerQueues().get(consumerId)).usingRecursiveFieldByFieldElementComparator()
                 .containsOnly(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
         assertThat(topicService.getConsumerQueues().get(otherId)).usingRecursiveFieldByFieldElementComparator().containsOnly(

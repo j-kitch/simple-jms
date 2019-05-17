@@ -54,9 +54,9 @@ public class ConsumerIntegrationTest {
         String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, \"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
                 "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
-        OldMessage message = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);
-        message.getProperties().setFloatProperty("property 1", 1.2f);
-        message.getProperties().setStringProperty("property 2", "other property");
+        Properties properties = new PropertiesImpl();
+        properties.setFloatProperty("property 1", 1.2f);
+        properties.setStringProperty("property 2", "other property");
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
@@ -65,7 +65,7 @@ public class ConsumerIntegrationTest {
 
         Optional<TextMessage> received = consumer.receiveMessage();
 
-        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(message.getProperties(), createTextBody()));
+        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, createTextBody()));
         mockRestServiceServer.verify();
     }
 

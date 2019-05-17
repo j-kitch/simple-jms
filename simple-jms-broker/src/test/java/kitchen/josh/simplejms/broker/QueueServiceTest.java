@@ -136,7 +136,7 @@ public class QueueServiceTest {
 
         Optional<TextMessage> read = queueService.readMessage(consumerId);
 
-        assertThat(read).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGES[0]));
+        assertThat(read).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
         assertThat(queueService.getProducers()).containsOnly(producerId);
         assertThat(queueService.getMessages())
