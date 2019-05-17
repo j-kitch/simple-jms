@@ -44,4 +44,18 @@ public class MessageModelFactoryTest {
         assertThat(messageModel).isEqualToComparingFieldByFieldRecursively(new MessageModel(propertyModels, new TextBodyModel(MESSAGE)));
         verify(propertyModelFactory).create(properties);
     }
+
+    @Test
+    public void create_copiesTextMessageAndDelegatesPropertiesToFactory() {
+        TextMessage message = new TextMessage(new PropertiesImpl(), new TextBody());
+        message.setText(MESSAGE);
+        message.setIntProperty("property", 0);
+        List<PropertyModel> propertyModels = Collections.singletonList(new PropertyModel("property", "Integer", 0));
+        when(propertyModelFactory.create(any())).thenReturn(propertyModels);
+
+        MessageModel messageModel = messageModelFactory.create(message);
+
+        assertThat(messageModel).isEqualToComparingFieldByFieldRecursively(new MessageModel(propertyModels, new TextBodyModel(MESSAGE)));
+        verify(propertyModelFactory).create(message);
+    }
 }

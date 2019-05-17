@@ -13,4 +13,10 @@ public class MessageModelFactory {
                 propertyModelFactory.create(message.getProperties()),
                 new TextBodyModel(message.getBody().getText()));
     }
+
+    public MessageModel create(TextMessage message) {
+        return new MessageModel(
+                propertyModelFactory.create(message),
+                new TextBodyModel(message.getText()));
+    }
 }
