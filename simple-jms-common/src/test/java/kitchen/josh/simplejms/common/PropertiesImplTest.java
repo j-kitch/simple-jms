@@ -13,16 +13,16 @@ import static java.util.Collections.list;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class PropertiesTest {
+public class PropertiesImplTest {
 
     private static final String PROPERTY_1 = "hello";
     private static final String PROPERTY_2 = "world";
 
-    private Properties properties;
+    private PropertiesImpl properties;
 
     @Before
     public void setUp() {
-        properties = new Properties();
+        properties = new PropertiesImpl();
     }
 
     @Test

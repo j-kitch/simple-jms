@@ -208,7 +208,7 @@ public class QueueTopicSteps {
     }
 
     private static Properties[] createProperties() {
-        Properties[] properties = {new Properties(), new Properties(), new Properties(), new Properties()};
+        Properties[] properties = {new PropertiesImpl(), new PropertiesImpl(), new PropertiesImpl(), new PropertiesImpl()};
         properties[0].setBooleanProperty("property 1", false);
         properties[0].setByteProperty("property 2", (byte) 2);
         properties[1].setShortProperty("property 3", (short) 3);

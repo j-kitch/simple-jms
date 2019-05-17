@@ -15,7 +15,7 @@ public final class Message {
         Assert.notNull(destination, "Destination is required");
         Assert.notNull(body, "String is required");
         this.destination = destination;
-        this.properties = new Properties();
+        this.properties = new PropertiesImpl();
         this.body = new TextBody();
         this.body.setText(body);
     }

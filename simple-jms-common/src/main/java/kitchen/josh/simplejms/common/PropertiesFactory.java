@@ -6,7 +6,7 @@ import java.util.List;
 public class PropertiesFactory {
 
     public Properties create(List<PropertyModel> propertyModels) throws MessageFormatException {
-        Properties properties = new Properties();
+        PropertiesImpl properties = new PropertiesImpl();
         for (PropertyModel model : propertyModels) {
             properties.setObjectProperty(model.getName(), model.getValue());
         }

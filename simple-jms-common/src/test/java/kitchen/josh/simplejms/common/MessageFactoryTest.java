@@ -57,7 +57,7 @@ public class MessageFactoryTest {
     }
 
     private static Properties createProperties() {
-        Properties properties = new Properties();
+        Properties properties = new PropertiesImpl();
         properties.setFloatProperty("property 1", 1.2f);
         properties.setBooleanProperty("property 2", false);
         return properties;
