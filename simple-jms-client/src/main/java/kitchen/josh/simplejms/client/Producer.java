@@ -1,7 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.MessageModelFactory;
-import kitchen.josh.simplejms.common.OldMessage;
+import kitchen.josh.simplejms.common.TextMessage;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -26,7 +26,7 @@ public class Producer implements AutoCloseable {
      *
      * @param message the message to send
      */
-    public void sendMessage(OldMessage message) {
+    public void sendMessage(TextMessage message) {
         String sendUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
                 + "/producer/" + id.getId() + "/send";
 

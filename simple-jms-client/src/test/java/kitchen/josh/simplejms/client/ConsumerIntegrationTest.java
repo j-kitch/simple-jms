@@ -43,7 +43,7 @@ public class ConsumerIntegrationTest {
                 .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
-        Optional<OldMessage> message = consumer.receiveMessage();
+        Optional<TextMessage> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         mockRestServiceServer.verify();
@@ -63,11 +63,9 @@ public class ConsumerIntegrationTest {
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
-        Optional<OldMessage> received = consumer.receiveMessage();
+        Optional<TextMessage> received = consumer.receiveMessage();
 
-        assertThat(received.get().getBody()).isEqualToComparingFieldByField(createTextBody());
-        assertThat(received.get().getDestination()).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        assertThat(received.get().getProperties()).isEqualToComparingFieldByField(message.getProperties());
+        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(message.getProperties(), createTextBody()));
         mockRestServiceServer.verify();
     }
 

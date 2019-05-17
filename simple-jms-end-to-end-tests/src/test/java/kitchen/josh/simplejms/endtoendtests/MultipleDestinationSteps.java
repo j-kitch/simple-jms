@@ -8,9 +8,7 @@ import cucumber.api.java.en.When;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.OldMessage;
+import kitchen.josh.simplejms.common.*;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
@@ -66,28 +64,34 @@ public class MultipleDestinationSteps {
     @When("each destination's producers send messages")
     public void each_destination_s_producers_send_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
-            destinationSetup.producer.sendMessage(new OldMessage(destinationSetup.destination, destinationSetup.messages[0]));
-            destinationSetup.producer.sendMessage(new OldMessage(destinationSetup.destination, destinationSetup.messages[1]));
-            destinationSetup.producer.sendMessage(new OldMessage(destinationSetup.destination, destinationSetup.messages[2]));
-            destinationSetup.producer.sendMessage(new OldMessage(destinationSetup.destination, destinationSetup.messages[3]));
+            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[0])));
+            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[1])));
+            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[2])));
+            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[3])));
         });
     }
 
     @Then("each destination's consumers only receive their destinations messages")
     public void each_destination_s_consumers_only_receive_their_destinations_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
-            Optional<OldMessage> message1 = destinationSetup.consumer.receiveMessage();
-            Optional<OldMessage> message2 = destinationSetup.consumer.receiveMessage();
-            Optional<OldMessage> message3 = destinationSetup.consumer.receiveMessage();
-            Optional<OldMessage> message4 = destinationSetup.consumer.receiveMessage();
+            Optional<TextMessage> message1 = destinationSetup.consumer.receiveMessage();
+            Optional<TextMessage> message2 = destinationSetup.consumer.receiveMessage();
+            Optional<TextMessage> message3 = destinationSetup.consumer.receiveMessage();
+            Optional<TextMessage> message4 = destinationSetup.consumer.receiveMessage();
 
-            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destinationSetup.destination, destinationSetup.messages[0]));
-            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destinationSetup.destination, destinationSetup.messages[1]));
-            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destinationSetup.destination, destinationSetup.messages[2]));
-            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destinationSetup.destination, destinationSetup.messages[3]));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[0])));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[1])));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[2])));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[3])));
 
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
         });
+    }
+
+    private static TextBody createTextBody(String text) {
+        TextBody textBody = new TextBody();
+        textBody.setText(text);
+        return textBody;
     }
 }

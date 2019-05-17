@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.OldMessage;
+import kitchen.josh.simplejms.common.TextMessage;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -47,7 +47,7 @@ public interface SingleDestinationService {
      * @param message    the message sent to the destination
      * @throws ProducerDoesNotExistException if the producer doesn't exist
      */
-    void addMessage(UUID producerId, OldMessage message);
+    void addMessage(UUID producerId, TextMessage message);
 
     /**
      * Receive and remove a message from the destination for a consumer.
@@ -56,5 +56,5 @@ public interface SingleDestinationService {
      * @return the message received from the destination, or <code>Optional.empty()</code> if there isn't a message
      * @throws ConsumerDoesNotExistException if the consumer doesn't exist
      */
-    Optional<OldMessage> readMessage(UUID consumerId);
+    Optional<TextMessage> readMessage(UUID consumerId);
 }

@@ -30,7 +30,7 @@ public class DestinationControllerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
-    private static final OldMessage MESSAGE = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
+    private static final TextMessage MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
 
     @Autowired
     private MockMvc mockMvc;
@@ -262,7 +262,7 @@ public class DestinationControllerIntegrationTest {
     @Test
     public void sendMessage_returnsOk() throws Exception {
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(messageFactory.create(any(), any())).thenReturn(MESSAGE);
+        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -271,7 +271,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).createTextMessage(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -307,7 +307,7 @@ public class DestinationControllerIntegrationTest {
     public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
         String errorMessage = "Failed to send message to queue " + DESTINATION_ID + ": the producer " + PRODUCER_ID + " does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(messageFactory.create(any(), any())).thenReturn(MESSAGE);
+        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
         doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
@@ -318,7 +318,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new Destination(DestinationType.QUEUE, DESTINATION_ID), new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).createTextMessage(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -339,8 +339,10 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        OldMessage message = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
-        when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        TextBody textBody = new TextBody();
+        textBody.setText(TEXT);
+        TextMessage message = new TextMessage(new PropertiesImpl(), textBody);
+        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));
 
@@ -391,5 +393,11 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
+    }
+
+    private static TextBody createTextBody() {
+        TextBody textBody = new TextBody();
+        textBody.setText(TEXT);
+        return textBody;
     }
 }

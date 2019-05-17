@@ -96,24 +96,24 @@ public class QueueTopicSteps {
 
     @When("the producer sends messages")
     public void the_producer_sends_messages() {
-        producer.sendMessage(new OldMessage(destination, MESSAGES[0]));
-        producer.sendMessage(new OldMessage(destination, MESSAGES[1]));
-        producer.sendMessage(new OldMessage(destination, MESSAGES[2]));
-        producer.sendMessage(new OldMessage(destination, MESSAGES[3]));
+        producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
+        producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[1])));
+        producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[2])));
+        producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[3])));
     }
 
     @When("the producer sends messages with properties")
     public void the_producer_sends_messages_with_properties() {
-        producer.sendMessage(new OldMessage(destination, PROPERTIES[0], MESSAGES[0]));
-        producer.sendMessage(new OldMessage(destination, PROPERTIES[1], MESSAGES[1]));
-        producer.sendMessage(new OldMessage(destination, PROPERTIES[2], MESSAGES[2]));
-        producer.sendMessage(new OldMessage(destination, PROPERTIES[3], MESSAGES[3]));
+        producer.sendMessage(new TextMessage(PROPERTIES[0], createTextBody(MESSAGES[0])));
+        producer.sendMessage(new TextMessage(PROPERTIES[1], createTextBody(MESSAGES[1])));
+        producer.sendMessage(new TextMessage(PROPERTIES[2], createTextBody(MESSAGES[2])));
+        producer.sendMessage(new TextMessage(PROPERTIES[3], createTextBody(MESSAGES[3])));
     }
 
     @When("the producer tries to send a message")
     public void the_producer_tries_to_send_a_message() {
         try {
-            producer.sendMessage(new OldMessage(destination, MESSAGES[0]));
+            producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
         } catch (Throwable t) {
             throwable = t;
         }
@@ -130,15 +130,15 @@ public class QueueTopicSteps {
 
     @Then("each message is only received by a single consumer")
     public void each_message_is_only_received_by_a_single_consumer() {
-        Optional<OldMessage> message1 = consumer1.receiveMessage();
-        Optional<OldMessage> message2 = consumer2.receiveMessage();
-        Optional<OldMessage> message3 = consumer2.receiveMessage();
-        Optional<OldMessage> message4 = consumer1.receiveMessage();
+        Optional<TextMessage> message1 = consumer1.receiveMessage();
+        Optional<TextMessage> message2 = consumer2.receiveMessage();
+        Optional<TextMessage> message3 = consumer2.receiveMessage();
+        Optional<TextMessage> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[1])));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[2])));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[3])));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -148,15 +148,15 @@ public class QueueTopicSteps {
 
     @Then("the consumer receives messages")
     public void the_consumer_receives_messages() {
-        Optional<OldMessage> message1 = consumer1.receiveMessage();
-        Optional<OldMessage> message2 = consumer1.receiveMessage();
-        Optional<OldMessage> message3 = consumer1.receiveMessage();
-        Optional<OldMessage> message4 = consumer1.receiveMessage();
+        Optional<TextMessage> message1 = consumer1.receiveMessage();
+        Optional<TextMessage> message2 = consumer1.receiveMessage();
+        Optional<TextMessage> message3 = consumer1.receiveMessage();
+        Optional<TextMessage> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[1])));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[2])));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[3])));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -164,15 +164,15 @@ public class QueueTopicSteps {
 
     @Then("the consumer receives messages with properties")
     public void the_consumer_receives_messages_with_properties() {
-        Optional<OldMessage> message1 = consumer1.receiveMessage();
-        Optional<OldMessage> message2 = consumer1.receiveMessage();
-        Optional<OldMessage> message3 = consumer1.receiveMessage();
-        Optional<OldMessage> message4 = consumer1.receiveMessage();
+        Optional<TextMessage> message1 = consumer1.receiveMessage();
+        Optional<TextMessage> message2 = consumer1.receiveMessage();
+        Optional<TextMessage> message3 = consumer1.receiveMessage();
+        Optional<TextMessage> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, PROPERTIES[0], MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, PROPERTIES[1], MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, PROPERTIES[2], MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, PROPERTIES[3], MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES[0], createTextBody(MESSAGES[0])));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES[1], createTextBody(MESSAGES[1])));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES[2], createTextBody(MESSAGES[2])));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES[3], createTextBody(MESSAGES[3])));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -181,19 +181,25 @@ public class QueueTopicSteps {
     @Then("each message is received by every consumer")
     public void each_message_is_received_by_every_consumer() {
         Stream.of(consumer1, consumer2).forEach(consumer -> {
-            Optional<OldMessage> message1 = consumer.receiveMessage();
-            Optional<OldMessage> message2 = consumer.receiveMessage();
-            Optional<OldMessage> message3 = consumer.receiveMessage();
-            Optional<OldMessage> message4 = consumer.receiveMessage();
+            Optional<TextMessage> message1 = consumer.receiveMessage();
+            Optional<TextMessage> message2 = consumer.receiveMessage();
+            Optional<TextMessage> message3 = consumer.receiveMessage();
+            Optional<TextMessage> message4 = consumer.receiveMessage();
 
-            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[0]));
-            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[1]));
-            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[2]));
-            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(destination, MESSAGES[3]));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[0])));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[1])));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[2])));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGES[3])));
 
             assertThat(consumer.receiveMessage()).isEmpty();
             assertThat(consumer.receiveMessage()).isEmpty();
         });
+    }
+
+    private static TextBody createTextBody(String text) {
+        TextBody textBody = new TextBody();
+        textBody.setText(text);
+        return textBody;
     }
 
     @Then("the consumer receives no messages")

@@ -31,8 +31,8 @@ public class ConsumerTest {
     private static final String RECEIVE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
     private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
 
-    private static final String MESSAGE = "hello world";
-    private static final OldMessage MESSAGE_2 = new OldMessage(DESTINATION, new PropertiesImpl(), MESSAGE);
+    private static final String TEXT = "hello world";
+    private static final TextMessage MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
 
     @Mock
@@ -61,26 +61,26 @@ public class ConsumerTest {
     @Test
     public void receiveMessage_noMessage_returnsEmpty() throws Exception {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
-        when(messageFactory.create(any(), any())).thenReturn(null);
+        when(messageFactory.createTextMessage(any())).thenReturn(null);
 
-        Optional<OldMessage> message = consumer.receiveMessage();
+        Optional<TextMessage> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verify(messageFactory).create(DESTINATION, MESSAGE_MODEL);
+        verify(messageFactory).createTextMessage(MESSAGE_MODEL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test
     public void receiveMessage_messageExists_returnsMessage() throws Exception {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
-        when(messageFactory.create(any(), any())).thenReturn(MESSAGE_2);
+        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
 
-        Optional<OldMessage> received = consumer.receiveMessage();
+        Optional<TextMessage> received = consumer.receiveMessage();
 
-        assertThat(received).contains(MESSAGE_2);
+        assertThat(received).contains(MESSAGE);
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verify(messageFactory).create(DESTINATION, MESSAGE_MODEL);
+        verify(messageFactory).createTextMessage(MESSAGE_MODEL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
@@ -90,5 +90,11 @@ public class ConsumerTest {
 
         verify(restTemplate).delete(DELETE_URL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
+    }
+
+    private static TextBody createTextBody() {
+        TextBody textBody = new TextBody();
+        textBody.setText(TEXT);
+        return textBody;
     }
 }

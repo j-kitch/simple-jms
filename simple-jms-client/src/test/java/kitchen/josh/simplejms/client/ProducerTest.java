@@ -28,7 +28,7 @@ public class ProducerTest {
 
     private static final String TEXT = "hello world";
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
-    private static final OldMessage MESSAGE = new OldMessage(DESTINATION, TEXT);
+    private static final TextMessage MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
 
     @Mock
     private RestTemplate restTemplate;
@@ -46,7 +46,7 @@ public class ProducerTest {
     @Test
     public void sendMessage_restTemplateThrows_throws() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
-        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
+        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(MESSAGE_MODEL);
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> producer.sendMessage(MESSAGE));
@@ -57,7 +57,7 @@ public class ProducerTest {
 
     @Test
     public void sendMessage_restTemplateReturns_returns() {
-        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
+        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(MESSAGE_MODEL);
 
         producer.sendMessage(MESSAGE);
 
@@ -72,5 +72,11 @@ public class ProducerTest {
 
         verify(restTemplate).delete(DELETE_URL);
         verifyNoMoreInteractions(restTemplate, messageModelFactory);
+    }
+
+    private static TextBody createTextBody() {
+        TextBody textBody = new TextBody();
+        textBody.setText(TEXT);
+        return textBody;
     }
 }
