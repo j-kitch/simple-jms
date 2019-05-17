@@ -9,6 +9,8 @@ public class MessageModelFactory {
     }
 
     public MessageModel create(Message message) {
-        return new MessageModel(propertyModelFactory.create(message.getProperties()), new TextBodyModel(message.getBody()));
+        return new MessageModel(
+                propertyModelFactory.create(message.getProperties()),
+                new TextBodyModel(message.getBody().getText()));
     }
 }

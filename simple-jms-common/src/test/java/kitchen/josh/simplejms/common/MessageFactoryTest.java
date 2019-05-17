@@ -51,7 +51,7 @@ public class MessageFactoryTest {
         Message message = messageFactory.create(DESTINATION, messageModel);
 
         assertThat(message.getDestination()).isEqualTo(DESTINATION);
-        assertThat(message.getBody()).isEqualTo(MESSAGE);
+        assertThat(message.getBody()).isEqualToComparingFieldByField(createTextBody());
         assertThat(message.getProperties()).isEqualToComparingFieldByField(PROPERTIES);
         verify(propertiesFactory).create(PROPERTY_MODELS);
     }
@@ -68,5 +68,11 @@ public class MessageFactoryTest {
         propertyModels.add(new PropertyModel("property 1", "Float", 1.2f));
         propertyModels.add(new PropertyModel("property 2", "Boolean", false));
         return propertyModels;
+    }
+
+    private static TextBody createTextBody() {
+        TextBody textBody = new TextBody();
+        textBody.setText(MESSAGE);
+        return textBody;
     }
 }

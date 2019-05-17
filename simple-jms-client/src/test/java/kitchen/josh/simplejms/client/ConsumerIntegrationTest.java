@@ -65,7 +65,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received.get().getBody()).isEqualTo(MESSAGE);
+        assertThat(received.get().getBody()).isEqualToComparingFieldByField(createTextBody());
         assertThat(received.get().getDestination()).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         assertThat(received.get().getProperties()).isEqualToComparingFieldByField(message.getProperties());
         mockRestServiceServer.verify();
@@ -81,5 +81,11 @@ public class ConsumerIntegrationTest {
         consumer.close();
 
         mockRestServiceServer.verify();
+    }
+
+    private static TextBody createTextBody() {
+        TextBody textBody = new TextBody();
+        textBody.setText(MESSAGE);
+        return textBody;
     }
 }

@@ -9,20 +9,22 @@ public final class Message {
 
     private final Destination destination;
     private final Properties properties;
-    private final String body;
+    private final TextBody body;
 
     public Message(Destination destination, String body) {
         Assert.notNull(destination, "Destination is required");
         Assert.notNull(body, "String is required");
         this.destination = destination;
         this.properties = new Properties();
-        this.body = body;
+        this.body = new TextBody();
+        this.body.setText(body);
     }
 
     public Message(Destination destination, Properties properties, String body) {
         this.destination = destination;
         this.properties = properties;
-        this.body = body;
+        this.body = new TextBody();
+        this.body.setText(body);
     }
 
     /**
@@ -30,7 +32,7 @@ public final class Message {
      *
      * @return the body
      */
-    public final String getBody() {
+    public final TextBody getBody() {
         return body;
     }
 
