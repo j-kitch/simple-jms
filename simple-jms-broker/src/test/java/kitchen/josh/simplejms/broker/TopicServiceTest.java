@@ -2,7 +2,7 @@ package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.OldMessage;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TopicServiceTest {
 
         assertThat(consumerId).isNotNull();
         assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerId);
-        Queue<Message> consumerQueue = topicService.getConsumerQueues().get(consumerId);
+        Queue<OldMessage> consumerQueue = topicService.getConsumerQueues().get(consumerId);
         assertThat(consumerQueue).isEmpty();
     }
 
@@ -69,8 +69,8 @@ public class TopicServiceTest {
     public void removeConsumer_removesConsumerAndQueue() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_1));
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_2));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_1));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_2));
 
         topicService.removeConsumer(consumerId);
 
@@ -107,7 +107,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new Message(DESTINATION, MESSAGE_1)));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new OldMessage(DESTINATION, MESSAGE_1)));
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).isEmpty();
@@ -116,7 +116,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_noConsumers_doesNothing() {
         UUID producerId = topicService.createProducer();
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_1));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_1));
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).containsOnly(producerId);
@@ -128,9 +128,9 @@ public class TopicServiceTest {
         topicService.createConsumer();
 
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new Message(DESTINATION, MESSAGE_1)));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new OldMessage(DESTINATION, MESSAGE_1)));
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new Message(DESTINATION, MESSAGE_2)));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new OldMessage(DESTINATION, MESSAGE_2)));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
@@ -145,13 +145,13 @@ public class TopicServiceTest {
         topicService.createConsumer();
         topicService.createConsumer();
 
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_1));
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_2));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_1));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_2));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
-            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE_1));
-            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE_2));
+            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGE_1));
+            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGE_2));
         });
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
@@ -168,7 +168,7 @@ public class TopicServiceTest {
     @Test
     public void readMessage_consumerExists_emptyQueue_returnsEmpty() {
         UUID consumerId = topicService.createConsumer();
-        Optional<Message> message = topicService.readMessage(consumerId);
+        Optional<OldMessage> message = topicService.readMessage(consumerId);
         assertThat(message).isEmpty();
     }
 
@@ -176,13 +176,13 @@ public class TopicServiceTest {
     public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_1));
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_2));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_1));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_2));
 
-        Optional<Message> message = topicService.readMessage(consumerId);
+        Optional<OldMessage> message = topicService.readMessage(consumerId);
 
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE_1));
-        assertThat(topicService.getConsumerQueues().get(consumerId)).usingRecursiveFieldByFieldElementComparator().containsOnly(new Message(DESTINATION, MESSAGE_2));
+        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGE_1));
+        assertThat(topicService.getConsumerQueues().get(consumerId)).usingRecursiveFieldByFieldElementComparator().containsOnly(new OldMessage(DESTINATION, MESSAGE_2));
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 
@@ -192,16 +192,16 @@ public class TopicServiceTest {
         UUID consumerId = topicService.createConsumer();
         UUID otherId = topicService.createConsumer();
 
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_1));
-        topicService.addMessage(producerId, new Message(DESTINATION, MESSAGE_2));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_1));
+        topicService.addMessage(producerId, new OldMessage(DESTINATION, MESSAGE_2));
 
-        Optional<Message> message = topicService.readMessage(consumerId);
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new Message(DESTINATION, MESSAGE_1));
+        Optional<OldMessage> message = topicService.readMessage(consumerId);
+        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new OldMessage(DESTINATION, MESSAGE_1));
         assertThat(topicService.getConsumerQueues().get(consumerId)).usingRecursiveFieldByFieldElementComparator()
-                .containsOnly(new Message(DESTINATION, MESSAGE_2));
+                .containsOnly(new OldMessage(DESTINATION, MESSAGE_2));
         assertThat(topicService.getConsumerQueues().get(otherId)).usingRecursiveFieldByFieldElementComparator().containsOnly(
-                new Message(DESTINATION, MESSAGE_1),
-                new Message(DESTINATION, MESSAGE_2));
+                new OldMessage(DESTINATION, MESSAGE_1),
+                new OldMessage(DESTINATION, MESSAGE_2));
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 }

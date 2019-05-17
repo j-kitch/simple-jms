@@ -33,7 +33,7 @@ public class MessageModelFactoryTest {
 
     @Test
     public void create_copiesMessageAndDelegatesPropertiesToFactory() {
-        Message message = new Message(DESTINATION, MESSAGE);
+        OldMessage message = new OldMessage(DESTINATION, MESSAGE);
         message.getProperties().setIntProperty("property", 0);
         Properties properties = message.getProperties();
         List<PropertyModel> propertyModels = Collections.singletonList(new PropertyModel("property", "Integer", 0));

@@ -37,7 +37,7 @@ public class MessageFactoryTest {
     public void create_messageTextIsNull_returnsNull() throws MessageFormatException {
         MessageModel messageModel = new MessageModel(Collections.emptyList(), null);
 
-        Message message = messageFactory.create(DESTINATION, messageModel);
+        OldMessage message = messageFactory.create(DESTINATION, messageModel);
 
         assertThat(message).isNull();
         verifyZeroInteractions(propertiesFactory);
@@ -48,7 +48,7 @@ public class MessageFactoryTest {
         MessageModel messageModel = new MessageModel(PROPERTY_MODELS, new TextBodyModel(MESSAGE));
         when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
 
-        Message message = messageFactory.create(DESTINATION, messageModel);
+        OldMessage message = messageFactory.create(DESTINATION, messageModel);
 
         assertThat(message.getDestination()).isEqualTo(DESTINATION);
         assertThat(message.getBody()).isEqualToComparingFieldByField(createTextBody());

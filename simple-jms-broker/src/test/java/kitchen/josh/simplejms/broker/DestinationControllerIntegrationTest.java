@@ -30,7 +30,7 @@ public class DestinationControllerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
-    private static final Message MESSAGE = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
+    private static final OldMessage MESSAGE = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
 
     @Autowired
     private MockMvc mockMvc;
@@ -339,7 +339,7 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
+        OldMessage message = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), TEXT);
         when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));

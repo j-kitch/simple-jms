@@ -32,7 +32,7 @@ public class ProducerIntegrationTest {
 
     @Test
     public void sendMessage() {
-        Message message = new Message(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE);
+        OldMessage message = new OldMessage(new Destination(DestinationType.QUEUE, DESTINATION_ID), MESSAGE);
 
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory()));
 

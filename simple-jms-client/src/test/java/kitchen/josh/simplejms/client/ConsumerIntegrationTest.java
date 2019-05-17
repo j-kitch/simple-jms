@@ -43,7 +43,7 @@ public class ConsumerIntegrationTest {
                 .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
-        Optional<Message> message = consumer.receiveMessage();
+        Optional<OldMessage> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         mockRestServiceServer.verify();
@@ -54,7 +54,7 @@ public class ConsumerIntegrationTest {
         String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, \"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
                 "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
-        Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);
+        OldMessage message = new OldMessage(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);
         message.getProperties().setFloatProperty("property 1", 1.2f);
         message.getProperties().setStringProperty("property 2", "other property");
 
@@ -63,7 +63,7 @@ public class ConsumerIntegrationTest {
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
         Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory()));
 
-        Optional<Message> received = consumer.receiveMessage();
+        Optional<OldMessage> received = consumer.receiveMessage();
 
         assertThat(received.get().getBody()).isEqualToComparingFieldByField(createTextBody());
         assertThat(received.get().getDestination()).isEqualToComparingFieldByField(new Destination(DestinationType.TOPIC, DESTINATION_ID));

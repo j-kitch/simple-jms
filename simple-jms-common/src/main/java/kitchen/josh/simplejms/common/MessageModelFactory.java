@@ -8,7 +8,7 @@ public class MessageModelFactory {
         this.propertyModelFactory = propertyModelFactory;
     }
 
-    public MessageModel create(Message message) {
+    public MessageModel create(OldMessage message) {
         return new MessageModel(
                 propertyModelFactory.create(message.getProperties()),
                 new TextBodyModel(message.getBody().getText()));

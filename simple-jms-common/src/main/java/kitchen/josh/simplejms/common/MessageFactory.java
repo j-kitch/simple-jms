@@ -10,11 +10,11 @@ public class MessageFactory {
         this.propertiesFactory = propertiesFactory;
     }
 
-    public Message create(Destination destination, MessageModel messageModel) throws MessageFormatException {
+    public OldMessage create(Destination destination, MessageModel messageModel) throws MessageFormatException {
         if (messageModel.getBody() == null) {
             return null;
         }
         TextBodyModel textBodyModel = messageModel.getBody();
-        return new Message(destination, propertiesFactory.create(messageModel.getProperties()), textBodyModel.getText());
+        return new OldMessage(destination, propertiesFactory.create(messageModel.getProperties()), textBodyModel.getText());
     }
 }

@@ -3,14 +3,16 @@ package kitchen.josh.simplejms.common;
 import javax.jms.MessageFormatException;
 import java.io.*;
 
-public class ObjectBody {
+public class ObjectBody implements Body {
 
     private byte[] bytes;
 
+    @Override
     public void clearBody() {
         bytes = null;
     }
 
+    @Override
     public <T> T getBody(Class<T> type) throws MessageFormatException {
         try {
             return type.cast(getObject());
@@ -19,6 +21,7 @@ public class ObjectBody {
         }
     }
 
+    @Override
     public boolean isBodyAssignableTo(Class c) {
         if (bytes == null) {
             return true;

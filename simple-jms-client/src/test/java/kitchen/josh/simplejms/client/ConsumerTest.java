@@ -32,7 +32,7 @@ public class ConsumerTest {
     private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
 
     private static final String MESSAGE = "hello world";
-    private static final Message MESSAGE_2 = new Message(DESTINATION, new PropertiesImpl(), MESSAGE);
+    private static final OldMessage MESSAGE_2 = new OldMessage(DESTINATION, new PropertiesImpl(), MESSAGE);
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
 
     @Mock
@@ -63,7 +63,7 @@ public class ConsumerTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
         when(messageFactory.create(any(), any())).thenReturn(null);
 
-        Optional<Message> message = consumer.receiveMessage();
+        Optional<OldMessage> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
@@ -76,7 +76,7 @@ public class ConsumerTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
         when(messageFactory.create(any(), any())).thenReturn(MESSAGE_2);
 
-        Optional<Message> received = consumer.receiveMessage();
+        Optional<OldMessage> received = consumer.receiveMessage();
 
         assertThat(received).contains(MESSAGE_2);
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);

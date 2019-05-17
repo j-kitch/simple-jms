@@ -2,14 +2,16 @@ package kitchen.josh.simplejms.common;
 
 import javax.jms.MessageFormatException;
 
-public class TextBody {
+public class TextBody implements Body {
 
     private String text;
 
+    @Override
     public void clearBody() {
         this.text = null;
     }
 
+    @Override
     public <T> T getBody(Class<T> type) throws MessageFormatException {
         try {
             return type.cast(text);
@@ -18,6 +20,7 @@ public class TextBody {
         }
     }
 
+    @Override
     public boolean isBodyAssignableTo(Class c) {
         if (text == null) {
             return true;

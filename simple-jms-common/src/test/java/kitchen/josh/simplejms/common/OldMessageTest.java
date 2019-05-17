@@ -6,19 +6,19 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class MessageTest {
+public class OldMessageTest {
 
     @Test
     public void newMessage_nullDestination_throwsIllegalArgument() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Message(null, ""))
+                .isThrownBy(() -> new OldMessage(null, ""))
                 .withMessage("Destination is required");
     }
 
     @Test
     public void newMessage_nullString_throwsIllegalArgument() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> new Message(new Destination(DestinationType.QUEUE, UUID.randomUUID()), null))
+                .isThrownBy(() -> new OldMessage(new Destination(DestinationType.QUEUE, UUID.randomUUID()), null))
                 .withMessage("String is required");
     }
 }
