@@ -47,6 +47,7 @@ public class TextMessageTest {
         assertThat(textMessage.getBooleanProperty("property")).isTrue();
 
         verify(properties).getBooleanProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -57,6 +58,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getBooleanProperty("property"));
 
         verify(properties).getBooleanProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -64,6 +66,7 @@ public class TextMessageTest {
         textMessage.setBooleanProperty("property", true);
 
         verify(properties).setBooleanProperty("property", true);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -73,6 +76,7 @@ public class TextMessageTest {
         assertThat(textMessage.getByteProperty("property")).isEqualTo((byte) 1);
 
         verify(properties).getByteProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -83,6 +87,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getByteProperty("property"));
 
         verify(properties).getByteProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -90,6 +95,7 @@ public class TextMessageTest {
         textMessage.setByteProperty("property", (byte) 2);
 
         verify(properties).setByteProperty("property", (byte) 2);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -99,6 +105,7 @@ public class TextMessageTest {
         assertThat(textMessage.getShortProperty("property")).isEqualTo((short) 3);
 
         verify(properties).getShortProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -109,6 +116,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getShortProperty("property"));
 
         verify(properties).getShortProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -116,6 +124,7 @@ public class TextMessageTest {
         textMessage.setShortProperty("property", (short) 3);
 
         verify(properties).setShortProperty("property", (short) 3);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -125,6 +134,7 @@ public class TextMessageTest {
         assertThat(textMessage.getIntProperty("property")).isEqualTo(5);
 
         verify(properties).getIntProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -135,6 +145,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getIntProperty("property"));
 
         verify(properties).getIntProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -142,6 +153,7 @@ public class TextMessageTest {
         textMessage.setIntProperty("property", 6);
 
         verify(properties).setIntProperty("property", 6);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -151,6 +163,7 @@ public class TextMessageTest {
         assertThat(textMessage.getLongProperty("property")).isEqualTo(6L);
 
         verify(properties).getLongProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -161,6 +174,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getLongProperty("property"));
 
         verify(properties).getLongProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -168,6 +182,7 @@ public class TextMessageTest {
         textMessage.setLongProperty("property", 7L);
 
         verify(properties).setLongProperty("property", 7L);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -177,6 +192,7 @@ public class TextMessageTest {
         assertThat(textMessage.getFloatProperty("property")).isEqualTo(1.23f);
 
         verify(properties).getFloatProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -187,6 +203,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getFloatProperty("property"));
 
         verify(properties).getFloatProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -194,6 +211,7 @@ public class TextMessageTest {
         textMessage.setFloatProperty("property", 1.23f);
 
         verify(properties).setFloatProperty("property", 1.23f);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -203,6 +221,7 @@ public class TextMessageTest {
         assertThat(textMessage.getDoubleProperty("property")).isEqualTo(2.34);
 
         verify(properties).getDoubleProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -213,6 +232,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getDoubleProperty("property"));
 
         verify(properties).getDoubleProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -220,6 +240,7 @@ public class TextMessageTest {
         textMessage.setDoubleProperty("property", 2.34);
 
         verify(properties).setDoubleProperty("property", 2.34);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -229,6 +250,7 @@ public class TextMessageTest {
         assertThat(textMessage.getStringProperty("property")).isEqualTo("hello world");
 
         verify(properties).getStringProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -236,6 +258,7 @@ public class TextMessageTest {
         textMessage.setStringProperty("property", "hello world");
 
         verify(properties).setStringProperty("property", "hello world");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -245,6 +268,7 @@ public class TextMessageTest {
         assertThat(textMessage.getObjectProperty("property")).isEqualTo(2);
 
         verify(properties).getObjectProperty("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -252,6 +276,7 @@ public class TextMessageTest {
         textMessage.setObjectProperty("property", 2);
 
         verify(properties).setObjectProperty("property", 2);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -262,6 +287,7 @@ public class TextMessageTest {
         assertThat(textMessage.getPropertyNames()).isEqualTo(propertyNames);
 
         verify(properties).getPropertyNames();
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -271,6 +297,7 @@ public class TextMessageTest {
         assertThat(textMessage.propertyExists("property")).isTrue();
 
         verify(properties).propertyExists("property");
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -280,6 +307,7 @@ public class TextMessageTest {
         assertThat(textMessage.getBody(int.class)).isEqualTo(2);
 
         verify(textBody).getBody(int.class);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -290,6 +318,7 @@ public class TextMessageTest {
                 .isThrownBy(() -> textMessage.getBody(int.class));
 
         verify(textBody).getBody(int.class);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -299,6 +328,7 @@ public class TextMessageTest {
         assertThat(textMessage.isBodyAssignableTo(int.class)).isTrue();
 
         verify(textBody).isBodyAssignableTo(int.class);
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -308,6 +338,7 @@ public class TextMessageTest {
         assertThat(textMessage.getText()).isEqualTo("hello world");
 
         verify(textBody).getText();
+        verifyNoMoreInteractions(properties, textBody);
     }
 
     @Test
@@ -315,5 +346,6 @@ public class TextMessageTest {
         textMessage.setText("hello world");
 
         verify(textBody).setText("hello world");
+        verifyNoMoreInteractions(properties, textBody);
     }
 }
