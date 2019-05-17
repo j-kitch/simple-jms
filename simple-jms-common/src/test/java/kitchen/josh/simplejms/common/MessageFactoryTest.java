@@ -56,6 +56,27 @@ public class MessageFactoryTest {
         verify(propertiesFactory).create(PROPERTY_MODELS);
     }
 
+    @Test
+    public void createTextMessage_messageTextIsNull_returnsNull() throws MessageFormatException {
+        MessageModel messageModel = new MessageModel(Collections.emptyList(), null);
+
+        TextMessage message = messageFactory.createTextMessage(messageModel);
+
+        assertThat(message).isNull();
+        verifyZeroInteractions(propertiesFactory);
+    }
+
+    @Test
+    public void createTextMessage_messageText_returnsMessage() throws MessageFormatException {
+        MessageModel messageModel = new MessageModel(PROPERTY_MODELS, new TextBodyModel(MESSAGE));
+        when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
+
+        TextMessage message = messageFactory.createTextMessage(messageModel);
+
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, createTextBody()));
+        verify(propertiesFactory).create(PROPERTY_MODELS);
+    }
+
     private static Properties createProperties() {
         Properties properties = new PropertiesImpl();
         properties.setFloatProperty("property 1", 1.2f);

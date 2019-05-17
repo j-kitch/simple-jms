@@ -17,4 +17,13 @@ public class MessageFactory {
         TextBodyModel textBodyModel = messageModel.getBody();
         return new OldMessage(destination, propertiesFactory.create(messageModel.getProperties()), textBodyModel.getText());
     }
+
+    public TextMessage createTextMessage(MessageModel messageModel) throws MessageFormatException {
+        if (messageModel.getBody() == null) {
+            return null;
+        }
+        TextBody textBody = new TextBody();
+        textBody.setText(messageModel.getBody().getText());
+        return new TextMessage(propertiesFactory.create(messageModel.getProperties()), textBody);
+    }
 }
