@@ -51,7 +51,7 @@ public class ConsumerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() {
-        String json = "{\"body\": \"" + MESSAGE + "\", \"properties\": [" +
+        String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, \"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
                 "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
         Message message = new Message(new Destination(DestinationType.TOPIC, DESTINATION_ID), MESSAGE);

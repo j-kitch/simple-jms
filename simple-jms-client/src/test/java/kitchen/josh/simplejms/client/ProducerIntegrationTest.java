@@ -39,7 +39,7 @@ public class ProducerIntegrationTest {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"body\": \"" + MESSAGE + "\", properties: []}", true))
+                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, properties: []}", true))
                 .andRespond(withSuccess());
 
         producer.sendMessage(message);

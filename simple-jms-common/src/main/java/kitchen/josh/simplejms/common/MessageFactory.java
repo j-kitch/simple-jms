@@ -14,6 +14,7 @@ public class MessageFactory {
         if (messageModel.getBody() == null) {
             return null;
         }
-        return new Message(destination, propertiesFactory.create(messageModel.getProperties()), messageModel.getBody());
+        TextBodyModel textBodyModel = messageModel.getBody();
+        return new Message(destination, propertiesFactory.create(messageModel.getProperties()), textBodyModel.getText());
     }
 }

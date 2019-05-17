@@ -45,11 +45,11 @@ public class ObjectMapperTest {
         MessageModel model = new MessageModel(asList(
                 new PropertyModel("property 1", "Double", 2.3),
                 new PropertyModel("property 2", "Boolean", false)),
-                "hello world");
+                new TextBodyModel("hello world"));
         String expected = "{\"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Double\", \"value\": 2.3}," +
                 "{\"name\": \"property 2\", \"type\": \"Boolean\", \"value\": false}" +
-                "], \"body\": \"hello world\"}";
+                "], \"body\": {\"type\": \"text\", \"text\": \"hello world\"}}";
 
         String actual = objectMapper.writeValueAsString(model);
 

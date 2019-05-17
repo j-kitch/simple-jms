@@ -45,7 +45,7 @@ public class MessageFactoryTest {
 
     @Test
     public void create_messageText_returnsMessage() throws MessageFormatException {
-        MessageModel messageModel = new MessageModel(PROPERTY_MODELS, MESSAGE);
+        MessageModel messageModel = new MessageModel(PROPERTY_MODELS, new TextBodyModel(MESSAGE));
         when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
 
         Message message = messageFactory.create(DESTINATION, messageModel);

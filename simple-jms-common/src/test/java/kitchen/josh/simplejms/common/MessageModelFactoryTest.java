@@ -41,7 +41,7 @@ public class MessageModelFactoryTest {
 
         MessageModel messageModel = messageModelFactory.create(message);
 
-        assertThat(messageModel).isEqualToComparingFieldByField(new MessageModel(propertyModels, MESSAGE));
+        assertThat(messageModel).isEqualToComparingFieldByFieldRecursively(new MessageModel(propertyModels, new TextBodyModel(MESSAGE)));
         verify(propertyModelFactory).create(properties);
     }
 }

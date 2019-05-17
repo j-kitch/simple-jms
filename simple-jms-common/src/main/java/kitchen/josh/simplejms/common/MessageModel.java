@@ -6,13 +6,13 @@ import java.util.Objects;
 public class MessageModel {
 
     private List<PropertyModel> properties;
-    private String body;
+    private TextBodyModel body;
 
     public MessageModel() {
 
     }
 
-    public MessageModel(List<PropertyModel> properties, String body) {
+    public MessageModel(List<PropertyModel> properties, TextBodyModel body) {
         this.properties = properties;
         this.body = body;
     }
@@ -25,11 +25,11 @@ public class MessageModel {
         this.properties = properties;
     }
 
-    public String getBody() {
+    public TextBodyModel getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(TextBodyModel body) {
         this.body = body;
     }
 
