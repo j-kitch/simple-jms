@@ -46,7 +46,7 @@ public class ProducerTest {
     @Test
     public void sendMessage_restTemplateThrows_throws() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
-        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(MESSAGE_MODEL);
+        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
 
         assertThatExceptionOfType(RestClientException.class)
                 .isThrownBy(() -> producer.sendMessage(MESSAGE));
@@ -57,7 +57,7 @@ public class ProducerTest {
 
     @Test
     public void sendMessage_restTemplateReturns_returns() {
-        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(MESSAGE_MODEL);
+        when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
 
         producer.sendMessage(MESSAGE);
 

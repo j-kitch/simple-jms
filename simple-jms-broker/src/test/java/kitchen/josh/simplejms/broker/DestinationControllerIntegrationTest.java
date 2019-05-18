@@ -342,7 +342,7 @@ public class DestinationControllerIntegrationTest {
         TextBody textBody = new TextBody();
         textBody.setText(TEXT);
         TextMessage message = new TextMessage(new PropertiesImpl(), textBody);
-        when(messageModelFactory.create(any(TextMessage.class))).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));
 
