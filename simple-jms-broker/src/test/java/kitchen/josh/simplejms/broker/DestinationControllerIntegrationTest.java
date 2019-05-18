@@ -262,7 +262,7 @@ public class DestinationControllerIntegrationTest {
     @Test
     public void sendMessage_returnsOk() throws Exception {
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
+        when(messageFactory.create(any())).thenReturn(MESSAGE);
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -271,7 +271,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).createTextMessage(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).create(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -307,7 +307,7 @@ public class DestinationControllerIntegrationTest {
     public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
         String errorMessage = "Failed to send message to queue " + DESTINATION_ID + ": the producer " + PRODUCER_ID + " does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
+        when(messageFactory.create(any())).thenReturn(MESSAGE);
         doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
@@ -318,7 +318,7 @@ public class DestinationControllerIntegrationTest {
                 .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).createTextMessage(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).create(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }

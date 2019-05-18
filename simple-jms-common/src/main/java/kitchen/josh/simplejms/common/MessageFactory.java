@@ -10,7 +10,7 @@ public class MessageFactory {
         this.propertiesFactory = propertiesFactory;
     }
 
-    public TextMessage createTextMessage(MessageModel messageModel) throws MessageFormatException {
+    public TextMessage create(MessageModel messageModel) throws MessageFormatException {
         if (messageModel.getBody() == null) {
             return null;
         }

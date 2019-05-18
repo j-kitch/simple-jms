@@ -61,26 +61,26 @@ public class ConsumerTest {
     @Test
     public void receiveMessage_noMessage_returnsEmpty() throws Exception {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
-        when(messageFactory.createTextMessage(any())).thenReturn(null);
+        when(messageFactory.create(any())).thenReturn(null);
 
         Optional<TextMessage> message = consumer.receiveMessage();
 
         assertThat(message).isEmpty();
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verify(messageFactory).createTextMessage(MESSAGE_MODEL);
+        verify(messageFactory).create(MESSAGE_MODEL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test
     public void receiveMessage_messageExists_returnsMessage() throws Exception {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok(MESSAGE_MODEL));
-        when(messageFactory.createTextMessage(any())).thenReturn(MESSAGE);
+        when(messageFactory.create(any())).thenReturn(MESSAGE);
 
         Optional<TextMessage> received = consumer.receiveMessage();
 
         assertThat(received).contains(MESSAGE);
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
-        verify(messageFactory).createTextMessage(MESSAGE_MODEL);
+        verify(messageFactory).create(MESSAGE_MODEL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
