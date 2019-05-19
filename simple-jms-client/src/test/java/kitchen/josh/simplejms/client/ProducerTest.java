@@ -28,7 +28,7 @@ public class ProducerTest {
 
     private static final String TEXT = "hello world";
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
-    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
 
     @Mock
     private RestTemplate restTemplate;
@@ -72,11 +72,5 @@ public class ProducerTest {
 
         verify(restTemplate).delete(DELETE_URL);
         verifyNoMoreInteractions(restTemplate, messageModelFactory);
-    }
-
-    private static TextBody createTextBody() {
-        TextBody textBody = new TextBody();
-        textBody.setText(TEXT);
-        return textBody;
     }
 }

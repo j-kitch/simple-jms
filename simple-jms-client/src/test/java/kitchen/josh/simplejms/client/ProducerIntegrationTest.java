@@ -32,9 +32,7 @@ public class ProducerIntegrationTest {
 
     @Test
     public void sendMessage() {
-        TextBody textBody = new TextBody();
-        textBody.setText(MESSAGE);
-        Message message = new TextMessage(new PropertiesImpl(), textBody);
+        Message message = new TextMessage(new PropertiesImpl(), new TextBody(MESSAGE));
 
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
 

@@ -228,12 +228,6 @@ public class QueueTopicSteps {
         });
     }
 
-    private static TextBody createTextBody(String text) {
-        TextBody textBody = new TextBody();
-        textBody.setText(text);
-        return textBody;
-    }
-
     @Then("the consumer receives no messages")
     public void the_consumer_receives_no_messages() {
         assertThat(consumer1.receiveMessage()).isEmpty();

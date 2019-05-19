@@ -23,20 +23,14 @@ public class BodyModelFactoryTest {
 
     @Test
     public void create_textBody_returnsTextBodyModel() {
-        TextBody textBody = new TextBody();
-        textBody.setText(TEXT);
-
-        BodyModel result = bodyModelFactory.create(textBody);
+        BodyModel result = bodyModelFactory.create(new TextBody(TEXT));
 
         assertThat(result).isEqualToComparingFieldByField(new TextBodyModel(TEXT));
     }
 
     @Test
     public void create_objectBody_returnsObjectBodyModel() {
-        ObjectBody objectBody = new ObjectBody();
-        objectBody.setObject(OBJECT);
-
-        BodyModel result = bodyModelFactory.create(objectBody);
+        BodyModel result = bodyModelFactory.create(new ObjectBody(OBJECT));
 
         assertThat(result).isEqualToComparingFieldByField(new ObjectBodyModel(ENCODED_OBJECT));
     }

@@ -17,14 +17,11 @@ public class BodyFactory {
     }
 
     private TextBody createTextBody(TextBodyModel textBodyModel) {
-        TextBody textBody = new TextBody();
-        textBody.setText(textBodyModel.getText());
-        return textBody;
+        return new TextBody(textBodyModel.getText());
+
     }
 
     private ObjectBody createObjectBody(ObjectBodyModel objectBodyModel) {
-        ObjectBody objectBody = new ObjectBody();
-        objectBody.setObject((Serializable) deserialize(objectBodyModel.getBytes()));
-        return objectBody;
+        return new ObjectBody((Serializable) deserialize(objectBodyModel.getBytes()));
     }
 }

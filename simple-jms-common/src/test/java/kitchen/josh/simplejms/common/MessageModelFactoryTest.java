@@ -36,8 +36,7 @@ public class MessageModelFactoryTest {
 
     @Test
     public void create_delegatesToPropertiesAndBodyModelFactories() {
-        TextMessage message = new TextMessage(new PropertiesImpl(), new TextBody());
-        message.setText(TEXT);
+        TextMessage message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
         message.setIntProperty("property", 0);
 
         when(propertyModelFactory.create(any())).thenReturn(PROPERTY_MODELS);

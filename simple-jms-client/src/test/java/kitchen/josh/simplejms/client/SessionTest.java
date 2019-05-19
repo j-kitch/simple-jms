@@ -29,10 +29,10 @@ public class SessionTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
     private static final String TEXT = "hello world";
-    private static final TextMessage TEXT_MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+    private static final TextMessage TEXT_MESSAGE = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
 
     private static final Serializable OBJECT = 10;
-    private static final ObjectMessage OBJECT_MESSAGE = new ObjectMessage(new PropertiesImpl(), createObjectBody());
+    private static final ObjectMessage OBJECT_MESSAGE = new ObjectMessage(new PropertiesImpl(), new ObjectBody(OBJECT));
 
     @Mock
     private RestTemplate restTemplate;
@@ -128,17 +128,5 @@ public class SessionTest {
         ObjectMessage message = session.createObjectMessage(10);
 
         assertThat(message).isEqualToComparingFieldByFieldRecursively(OBJECT_MESSAGE);
-    }
-
-    private static TextBody createTextBody() {
-        TextBody textBody = new TextBody();
-        textBody.setText(TEXT);
-        return textBody;
-    }
-
-    private static ObjectBody createObjectBody() {
-        ObjectBody objectBody = new ObjectBody();
-        objectBody.setObject(OBJECT);
-        return objectBody;
     }
 }

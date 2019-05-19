@@ -30,7 +30,7 @@ public class DestinationControllerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
-    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
 
     @Autowired
     private MockMvc mockMvc;
@@ -332,8 +332,6 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        TextBody textBody = new TextBody();
-        textBody.setText(TEXT);
         when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
@@ -383,11 +381,5 @@ public class DestinationControllerIntegrationTest {
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
-    }
-
-    private static TextBody createTextBody() {
-        TextBody textBody = new TextBody();
-        textBody.setText(TEXT);
-        return textBody;
     }
 }

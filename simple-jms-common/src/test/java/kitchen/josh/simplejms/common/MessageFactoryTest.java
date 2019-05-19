@@ -53,11 +53,11 @@ public class MessageFactoryTest {
     public void create_textMessage_returnsTextMessage() throws MessageFormatException {
         MessageModel messageModel = new MessageModel(PROPERTY_MODELS, TEXT_BODY_MODEL);
         when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
-        when(bodyFactory.create(any())).thenReturn(createTextBody());
+        when(bodyFactory.create(any())).thenReturn(new TextBody(MESSAGE));
 
         Message message = messageFactory.create(messageModel);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, createTextBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, new TextBody(MESSAGE)));
         verify(propertiesFactory).create(PROPERTY_MODELS);
         verify(bodyFactory).create(TEXT_BODY_MODEL);
     }
@@ -66,11 +66,11 @@ public class MessageFactoryTest {
     public void create_objectMessage_returnsObjectMessage() throws MessageFormatException {
         MessageModel messageModel = new MessageModel(PROPERTY_MODELS, OBJECT_BODY_MODEL);
         when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
-        when(bodyFactory.create(any())).thenReturn(createObjectBody());
+        when(bodyFactory.create(any())).thenReturn(new ObjectBody(OBJECT));
 
         Message message = messageFactory.create(messageModel);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(PROPERTIES, createObjectBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(PROPERTIES, new ObjectBody(OBJECT)));
         verify(propertiesFactory).create(PROPERTY_MODELS);
         verify(bodyFactory).create(OBJECT_BODY_MODEL);
     }
@@ -87,17 +87,5 @@ public class MessageFactoryTest {
         propertyModels.add(new PropertyModel("property 1", "Float", 1.2f));
         propertyModels.add(new PropertyModel("property 2", "Boolean", false));
         return propertyModels;
-    }
-
-    private static TextBody createTextBody() {
-        TextBody textBody = new TextBody();
-        textBody.setText(MESSAGE);
-        return textBody;
-    }
-
-    private static ObjectBody createObjectBody() {
-        ObjectBody objectBody = new ObjectBody();
-        objectBody.setObject(OBJECT);
-        return objectBody;
     }
 }

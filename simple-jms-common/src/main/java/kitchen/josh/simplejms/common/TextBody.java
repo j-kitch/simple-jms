@@ -6,6 +6,14 @@ public class TextBody implements Body {
 
     private String text;
 
+    public TextBody() {
+
+    }
+
+    public TextBody(String text) {
+        this.text = text;
+    }
+
     @Override
     public void clearBody() {
         this.text = null;

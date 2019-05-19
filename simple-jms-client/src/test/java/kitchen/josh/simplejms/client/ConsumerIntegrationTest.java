@@ -65,7 +65,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, createTextBody()));
+        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, new TextBody(MESSAGE)));
         mockRestServiceServer.verify();
     }
 
@@ -79,11 +79,5 @@ public class ConsumerIntegrationTest {
         consumer.close();
 
         mockRestServiceServer.verify();
-    }
-
-    private static TextBody createTextBody() {
-        TextBody textBody = new TextBody();
-        textBody.setText(MESSAGE);
-        return textBody;
     }
 }

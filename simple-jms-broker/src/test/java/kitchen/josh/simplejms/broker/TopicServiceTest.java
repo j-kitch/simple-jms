@@ -61,12 +61,6 @@ public class TopicServiceTest {
         assertThat(topicService.getProducers()).containsOnly(new ArrayList<>(producerIds).toArray(new UUID[]{}));
     }
 
-    private static TextBody createTextBody(String text) {
-        TextBody textBody = new TextBody();
-        textBody.setText(text);
-        return textBody;
-    }
-
     @Test
     public void removeConsumer_removesConsumerAndQueue() {
         UUID producerId = topicService.createProducer();
@@ -204,22 +198,19 @@ public class TopicServiceTest {
     }
 
     private static Message[] createMessages() {
-        TextMessage message1 = new TextMessage(new PropertiesImpl(), new TextBody());
-        ObjectMessage message2 = new ObjectMessage(new PropertiesImpl(), new ObjectBody());
-        TextMessage message3 = new TextMessage(new PropertiesImpl(), new TextBody());
-        ObjectMessage message4 = new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+        TextMessage message1 = new TextMessage(new PropertiesImpl(), new TextBody("hello world"));
+        ObjectMessage message2 = new ObjectMessage(new PropertiesImpl(), new ObjectBody(2));
+        TextMessage message3 = new TextMessage(new PropertiesImpl(), new TextBody("abcd"));
+        ObjectMessage message4 = new ObjectMessage(new PropertiesImpl(), new ObjectBody(12.3));
 
         message1.setIntProperty("prop1", 2);
         message1.setFloatProperty("prop2", 2.3f);
-        message1.setText("hello world");
 
         message2.setDoubleProperty("prop1", 2.3);
         message2.setShortProperty("prop", (short) 12);
-        message2.setObject(2);
 
         message3.setBooleanProperty("a", false);
         message3.setStringProperty("b", "hello");
-        message3.setText("abcd");
 
         message4.setObject(12.3);
 

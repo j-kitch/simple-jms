@@ -10,6 +10,14 @@ public class ObjectBody implements Body {
 
     private byte[] bytes;
 
+    public ObjectBody() {
+
+    }
+
+    public ObjectBody(Serializable serializable) {
+        setObject(serializable);
+    }
+
     @Override
     public void clearBody() {
         bytes = null;

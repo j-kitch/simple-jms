@@ -11,7 +11,6 @@ import kitchen.josh.simplejms.client.Session;
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.Message;
-import kitchen.josh.simplejms.common.TextBody;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
@@ -90,11 +89,5 @@ public class MultipleDestinationSteps {
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
         });
-    }
-
-    private static TextBody createTextBody(String text) {
-        TextBody textBody = new TextBody();
-        textBody.setText(text);
-        return textBody;
     }
 }
