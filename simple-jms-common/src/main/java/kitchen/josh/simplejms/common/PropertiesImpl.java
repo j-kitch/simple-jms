@@ -46,7 +46,7 @@ public class PropertiesImpl implements Properties {
     public byte getByteProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Byte.valueOf(null);
+            throw new NumberFormatException("null");
         }
         if (value.getClass() == Byte.class) {
             return (byte) value;
@@ -66,7 +66,7 @@ public class PropertiesImpl implements Properties {
     public short getShortProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Short.valueOf(null);
+            throw new NumberFormatException("null");
         }
         if (value.getClass() == Byte.class) {
             return (byte) value;
@@ -89,7 +89,7 @@ public class PropertiesImpl implements Properties {
     public int getIntProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Integer.valueOf(null);
+            throw new NumberFormatException("null");
         }
         if (value.getClass() == Byte.class) {
             return (byte) value;
@@ -115,7 +115,7 @@ public class PropertiesImpl implements Properties {
     public long getLongProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Long.valueOf(null);
+            throw new NumberFormatException("null");
         }
         if (value.getClass() == Byte.class) {
             return (byte) value;
@@ -144,7 +144,7 @@ public class PropertiesImpl implements Properties {
     public float getFloatProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Float.valueOf(null);
+            throw new NullPointerException();
         }
         if (value.getClass() == Float.class) {
             return (float) value;
@@ -164,7 +164,7 @@ public class PropertiesImpl implements Properties {
     public double getDoubleProperty(String name) throws JMSException {
         Object value = properties.get(name);
         if (value == null) {
-            return Double.valueOf(null);
+            throw new NullPointerException();
         }
         if (value.getClass() == Float.class) {
             return (float) value;
