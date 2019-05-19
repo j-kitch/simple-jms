@@ -19,7 +19,7 @@ public class ProducerIntegrationTest {
     private static final String HOST = "http://localhost:8080";
     private static final UUID DESTINATION_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
-    private static final String MESSAGE = "hello world";
+    private static final String TEXT = "hello world";
 
     private RestTemplate restTemplate;
     private MockRestServiceServer mockRestServiceServer;
@@ -32,14 +32,14 @@ public class ProducerIntegrationTest {
 
     @Test
     public void sendMessage() {
-        Message message = new TextMessage(new PropertiesImpl(), new TextBody(MESSAGE));
+        Message message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
 
         Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, properties: []}", true))
+                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, properties: []}", true))
                 .andRespond(withSuccess());
 
         producer.sendMessage(message);

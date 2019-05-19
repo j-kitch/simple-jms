@@ -21,11 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class MultipleDestinationSteps {
 
-    @LocalServerPort
-    private int port;
-
-    private Session session;
-
     private static class DestinationSetup {
         Destination destination;
         Producer producer;
@@ -33,6 +28,10 @@ public class MultipleDestinationSteps {
         String[] messages;
     }
 
+    @LocalServerPort
+    private int port;
+
+    private Session session;
     private DestinationSetup destinationSetup1;
     private DestinationSetup destinationSetup2;
 

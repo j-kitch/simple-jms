@@ -18,13 +18,13 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class MessageFactoryTest {
 
-    private static final String MESSAGE = "hello world";
+    private static final String TEXT = "hello world";
     private static final Properties PROPERTIES = createProperties();
     private static final List<PropertyModel> PROPERTY_MODELS = createPropertyModels();
     private static final byte[] BYTES = {1, 2, 3, 4};
     private static final Serializable OBJECT = 2;
     private static final ObjectBodyModel OBJECT_BODY_MODEL = new ObjectBodyModel(BYTES);
-    private static final TextBodyModel TEXT_BODY_MODEL = new TextBodyModel(MESSAGE);
+    private static final TextBodyModel TEXT_BODY_MODEL = new TextBodyModel(TEXT);
 
     @Mock
     private PropertiesFactory propertiesFactory;
@@ -53,11 +53,11 @@ public class MessageFactoryTest {
     public void create_textMessage_returnsTextMessage() throws MessageFormatException {
         MessageModel messageModel = new MessageModel(PROPERTY_MODELS, TEXT_BODY_MODEL);
         when(propertiesFactory.create(any())).thenReturn(PROPERTIES);
-        when(bodyFactory.create(any())).thenReturn(new TextBody(MESSAGE));
+        when(bodyFactory.create(any())).thenReturn(new TextBody(TEXT));
 
         Message message = messageFactory.create(messageModel);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, new TextBody(MESSAGE)));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, new TextBody(TEXT)));
         verify(propertiesFactory).create(PROPERTY_MODELS);
         verify(bodyFactory).create(TEXT_BODY_MODEL);
     }

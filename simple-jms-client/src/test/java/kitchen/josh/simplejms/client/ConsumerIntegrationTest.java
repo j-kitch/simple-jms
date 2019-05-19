@@ -22,7 +22,7 @@ public class ConsumerIntegrationTest {
     private static final String HOST = "http://localhost:8080";
     private static final UUID DESTINATION_ID = UUID.randomUUID();
     private static final UUID CONSUMER_ID = UUID.randomUUID();
-    private static final String MESSAGE = "hello world";
+    private static final String TEXT = "hello world";
 
     private static final Destination QUEUE = new Destination(DestinationType.QUEUE, DESTINATION_ID);
     private static final Destination TOPIC = new Destination(DestinationType.TOPIC, DESTINATION_ID);
@@ -51,7 +51,7 @@ public class ConsumerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() {
-        String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + MESSAGE + "\"}, \"properties\": [" +
+        String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
                 "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
         Properties properties = new PropertiesImpl();
@@ -65,7 +65,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, new TextBody(MESSAGE)));
+        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, new TextBody(TEXT)));
         mockRestServiceServer.verify();
     }
 
