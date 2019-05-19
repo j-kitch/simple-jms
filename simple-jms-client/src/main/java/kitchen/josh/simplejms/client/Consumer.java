@@ -53,7 +53,7 @@ public class Consumer implements AutoCloseable {
 
     private TextMessage createMessage(MessageModel model) {
         try {
-            return messageFactory.create(model);
+            return (TextMessage) messageFactory.create(model);
         } catch (MessageFormatException mfe) {
             throw new RuntimeException(mfe);
         }

@@ -44,7 +44,7 @@ public class SessionIntegrationTest {
         Consumer consumer = session.createConsumer(QUEUE);
 
         assertThat(consumer).isEqualToComparingFieldByFieldRecursively(
-                new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, ID), new MessageFactory(new PropertiesFactory())));
+                new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, ID), new MessageFactory(new PropertiesFactory(), new BodyFactory())));
         mockRestServiceServer.verify();
     }
 
@@ -58,7 +58,7 @@ public class SessionIntegrationTest {
         Producer producer = session.createProducer(TOPIC);
 
         assertThat(producer).isEqualToComparingFieldByFieldRecursively(
-                new Producer(HOST, restTemplate, new ProducerId(TOPIC, ID), new MessageModelFactory(new PropertyModelFactory())));
+                new Producer(HOST, restTemplate, new ProducerId(TOPIC, ID), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory())));
         mockRestServiceServer.verify();
     }
 }

@@ -1,9 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.MessageFactory;
-import kitchen.josh.simplejms.common.MessageModelFactory;
-import kitchen.josh.simplejms.common.PropertiesFactory;
-import kitchen.josh.simplejms.common.PropertyModelFactory;
+import kitchen.josh.simplejms.common.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,8 +13,13 @@ public class Config {
     }
 
     @Bean
+    public BodyModelFactory bodyModelFactory() {
+        return new BodyModelFactory();
+    }
+
+    @Bean
     public MessageModelFactory messageModelFactory() {
-        return new MessageModelFactory(propertyModelFactory());
+        return new MessageModelFactory(propertyModelFactory(), bodyModelFactory());
     }
 
     @Bean
@@ -26,7 +28,12 @@ public class Config {
     }
 
     @Bean
+    public BodyFactory bodyFactory() {
+        return new BodyFactory();
+    }
+
+    @Bean
     public MessageFactory messageFactory() {
-        return new MessageFactory(propertiesFactory());
+        return new MessageFactory(propertiesFactory(), bodyFactory());
     }
 }

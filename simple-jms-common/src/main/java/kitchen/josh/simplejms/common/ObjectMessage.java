@@ -142,4 +142,8 @@ public class ObjectMessage implements Message {
     public Serializable getObject() {
         return body.getObject();
     }
+
+    public ObjectBody getBody() {
+        return body;
+    }
 }

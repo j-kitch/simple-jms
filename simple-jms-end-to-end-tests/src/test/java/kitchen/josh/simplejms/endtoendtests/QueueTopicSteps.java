@@ -57,8 +57,8 @@ public class QueueTopicSteps {
     @Given("a fake destination with a producer and consumer")
     public void a_fake_destination_with_a_producer_and_consumer() {
         destination = new Destination(DestinationType.QUEUE, UUID.randomUUID());
-        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()), new MessageModelFactory(new PropertyModelFactory()));
-        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()), new MessageFactory(new PropertiesFactory()));
+        producer = new Producer("http://localhost:" + port, new RestTemplate(), new ProducerId(destination, UUID.randomUUID()), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
+        consumer1 = new Consumer("http://localhost:" + port, new RestTemplate(), new ConsumerId(destination, UUID.randomUUID()), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
     }
 
     @Given("a queue with a producer")

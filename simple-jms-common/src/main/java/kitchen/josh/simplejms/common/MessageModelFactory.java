@@ -3,14 +3,16 @@ package kitchen.josh.simplejms.common;
 public class MessageModelFactory {
 
     private final PropertyModelFactory propertyModelFactory;
+    private final BodyModelFactory bodyModelFactory;
 
-    public MessageModelFactory(PropertyModelFactory propertyModelFactory) {
+    public MessageModelFactory(PropertyModelFactory propertyModelFactory, BodyModelFactory bodyModelFactory) {
         this.propertyModelFactory = propertyModelFactory;
+        this.bodyModelFactory = bodyModelFactory;
     }
 
-    public MessageModel create(TextMessage message) {
+    public MessageModel create(Message message) {
         return new MessageModel(
                 propertyModelFactory.create(message),
-                new TextBodyModel(message.getText()));
+                bodyModelFactory.create(message.getBody()));
     }
 }

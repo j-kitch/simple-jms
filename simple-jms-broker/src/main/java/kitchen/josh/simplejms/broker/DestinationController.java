@@ -121,7 +121,7 @@ public class DestinationController {
             Destination destination = new Destination(toType(destinationType), destinationId);
             destinationService.findDestination(destination)
                     .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
-                    .addMessage(producerId, messageFactory.create(message));
+                    .addMessage(producerId, (TextMessage) messageFactory.create(message));
         } catch (ProducerDoesNotExistException e) {
             throw new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the producer " + producerId + " does not exist.");
         }

@@ -50,4 +50,8 @@ public class ObjectBody implements Body {
             throw new RuntimeException(e);
         }
     }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
 }

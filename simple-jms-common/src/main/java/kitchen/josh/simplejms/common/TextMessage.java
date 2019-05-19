@@ -141,4 +141,8 @@ public class TextMessage implements Message {
     public String getText() {
         return body.getText();
     }
+
+    public TextBody getBody() {
+        return body;
+    }
 }

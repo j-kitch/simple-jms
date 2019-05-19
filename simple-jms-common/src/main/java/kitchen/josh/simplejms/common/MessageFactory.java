@@ -5,17 +5,25 @@ import javax.jms.MessageFormatException;
 public class MessageFactory {
 
     private final PropertiesFactory propertiesFactory;
+    private final BodyFactory bodyFactory;
 
-    public MessageFactory(PropertiesFactory propertiesFactory) {
+    public MessageFactory(PropertiesFactory propertiesFactory, BodyFactory bodyFactory) {
         this.propertiesFactory = propertiesFactory;
+        this.bodyFactory = bodyFactory;
     }
 
-    public TextMessage create(MessageModel messageModel) throws MessageFormatException {
+    public Message create(MessageModel messageModel) throws MessageFormatException {
         if (messageModel.getBody() == null) {
             return null;
         }
-        TextBody textBody = new TextBody();
-        textBody.setText(messageModel.getBody().getText());
-        return new TextMessage(propertiesFactory.create(messageModel.getProperties()), textBody);
+        Properties properties = propertiesFactory.create(messageModel.getProperties());
+        Body body = bodyFactory.create(messageModel.getBody());
+        if (body.getClass() == TextBody.class) {
+            return new TextMessage(properties, (TextBody) body);
+        }
+        if (body.getClass() == ObjectBody.class) {
+            return new ObjectMessage(properties, (ObjectBody) body);
+        }
+        throw new RuntimeException("");
     }
 }
