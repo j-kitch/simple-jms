@@ -13,9 +13,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicServiceTest {
 
-    private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, UUID.randomUUID());
-    private static final String MESSAGE_1 = "hello world";
-    private static final String MESSAGE_2 = "HELLO WORLD";
+    private static final Message[] MESSAGES = createMessages();
 
     private TopicService topicService;
 
@@ -30,7 +28,7 @@ public class TopicServiceTest {
 
         assertThat(consumerId).isNotNull();
         assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerId);
-        Queue<TextMessage> consumerQueue = topicService.getConsumerQueues().get(consumerId);
+        Queue<Message> consumerQueue = topicService.getConsumerQueues().get(consumerId);
         assertThat(consumerQueue).isEmpty();
     }
 
@@ -73,8 +71,8 @@ public class TopicServiceTest {
     public void removeConsumer_removesConsumerAndQueue() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        topicService.addMessage(producerId, MESSAGES[0]);
+        topicService.addMessage(producerId, MESSAGES[1]);
 
         topicService.removeConsumer(consumerId);
 
@@ -111,7 +109,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1))));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[0]));
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).isEmpty();
@@ -120,7 +118,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_noConsumers_doesNothing() {
         UUID producerId = topicService.createProducer();
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
+        topicService.addMessage(producerId, MESSAGES[0]);
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).containsOnly(producerId);
@@ -132,9 +130,9 @@ public class TopicServiceTest {
         topicService.createConsumer();
 
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1))));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[0]));
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1))));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[1]));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
@@ -149,13 +147,13 @@ public class TopicServiceTest {
         topicService.createConsumer();
         topicService.createConsumer();
 
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        topicService.addMessage(producerId, MESSAGES[0]);
+        topicService.addMessage(producerId, MESSAGES[1]);
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
-            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-            assertThat(queue.poll()).isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+            assertThat(queue.poll()).isEqualTo(MESSAGES[0]);
+            assertThat(queue.poll()).isEqualTo(MESSAGES[1]);
         });
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
@@ -172,7 +170,7 @@ public class TopicServiceTest {
     @Test
     public void readMessage_consumerExists_emptyQueue_returnsEmpty() {
         UUID consumerId = topicService.createConsumer();
-        Optional<TextMessage> message = topicService.readMessage(consumerId);
+        Optional<Message> message = topicService.readMessage(consumerId);
         assertThat(message).isEmpty();
     }
 
@@ -180,15 +178,13 @@ public class TopicServiceTest {
     public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        topicService.addMessage(producerId, MESSAGES[0]);
+        topicService.addMessage(producerId, MESSAGES[1]);
 
-        Optional<TextMessage> message = topicService.readMessage(consumerId);
+        Optional<Message> message = topicService.readMessage(consumerId);
 
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-        assertThat(topicService.getConsumerQueues().get(consumerId))
-                .usingRecursiveFieldByFieldElementComparator()
-                .containsOnly(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        assertThat(message).contains(MESSAGES[0]);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(MESSAGES[1]);
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 
@@ -198,18 +194,37 @@ public class TopicServiceTest {
         UUID consumerId = topicService.createConsumer();
         UUID otherId = topicService.createConsumer();
 
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)));
-        topicService.addMessage(producerId, new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        topicService.addMessage(producerId, MESSAGES[0]);
+        topicService.addMessage(producerId, MESSAGES[1]);
 
-        Optional<TextMessage> message = topicService.readMessage(consumerId);
-        TextBody textBody = new TextBody();
-        textBody.setText(MESSAGE_1);
-        assertThat(message).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), textBody));
-        assertThat(topicService.getConsumerQueues().get(consumerId)).usingRecursiveFieldByFieldElementComparator()
-                .containsOnly(new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
-        assertThat(topicService.getConsumerQueues().get(otherId)).usingRecursiveFieldByFieldElementComparator().containsOnly(
-                new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_1)),
-                new TextMessage(new PropertiesImpl(), createTextBody(MESSAGE_2)));
+        Optional<Message> message = topicService.readMessage(consumerId);
+
+        assertThat(message).contains(MESSAGES[0]);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(MESSAGES[1]);
+        assertThat(topicService.getConsumerQueues().get(otherId)).containsExactly(MESSAGES[0], MESSAGES[1]);
         assertThat(topicService.getProducers()).containsOnly(producerId);
+    }
+
+    private static Message[] createMessages() {
+        TextMessage message1 = new TextMessage(new PropertiesImpl(), new TextBody());
+        ObjectMessage message2 = new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+        TextMessage message3 = new TextMessage(new PropertiesImpl(), new TextBody());
+        ObjectMessage message4 = new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+
+        message1.setIntProperty("prop1", 2);
+        message1.setFloatProperty("prop2", 2.3f);
+        message1.setText("hello world");
+
+        message2.setDoubleProperty("prop1", 2.3);
+        message2.setShortProperty("prop", (short) 12);
+        message2.setObject(2);
+
+        message3.setBooleanProperty("a", false);
+        message3.setStringProperty("b", "hello");
+        message3.setText("abcd");
+
+        message4.setObject(12.3);
+
+        return new Message[]{message1, message2, message3, message4};
     }
 }

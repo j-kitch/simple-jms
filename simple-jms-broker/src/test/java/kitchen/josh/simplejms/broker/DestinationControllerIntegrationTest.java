@@ -30,7 +30,7 @@ public class DestinationControllerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final UUID PRODUCER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
-    private static final TextMessage MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
 
     @Autowired
     private MockMvc mockMvc;
@@ -341,10 +341,9 @@ public class DestinationControllerIntegrationTest {
     public void receiveMessage_message_returnsMessage() throws Exception {
         TextBody textBody = new TextBody();
         textBody.setText(TEXT);
-        TextMessage message = new TextMessage(new PropertiesImpl(), textBody);
         when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(message));
+        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
@@ -352,7 +351,7 @@ public class DestinationControllerIntegrationTest {
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);
-        verify(messageModelFactory).create(message);
+        verify(messageModelFactory).create(MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 

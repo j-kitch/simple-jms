@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.TextMessage;
+import kitchen.josh.simplejms.common.Message;
 
 import java.util.*;
 
@@ -11,7 +11,7 @@ public class QueueService implements SingleDestinationService {
 
     private final Set<UUID> consumers;
     private final Set<UUID> producers;
-    private final Queue<TextMessage> messages;
+    private final Queue<Message> messages;
 
     QueueService() {
         consumers = new HashSet<>();
@@ -46,13 +46,13 @@ public class QueueService implements SingleDestinationService {
     }
 
     @Override
-    public void addMessage(UUID producer, TextMessage message) {
+    public void addMessage(UUID producer, Message message) {
         verifyProducerExists(producer);
         messages.add(message);
     }
 
     @Override
-    public Optional<TextMessage> readMessage(UUID consumerId) {
+    public Optional<Message> readMessage(UUID consumerId) {
         verifyConsumerExists(consumerId);
         return Optional.ofNullable(messages.poll());
     }
@@ -65,7 +65,7 @@ public class QueueService implements SingleDestinationService {
         return producers;
     }
 
-    Queue<TextMessage> getMessages() {
+    Queue<Message> getMessages() {
         return messages;
     }
 
