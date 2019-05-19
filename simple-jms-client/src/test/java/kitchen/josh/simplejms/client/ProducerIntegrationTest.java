@@ -17,9 +17,18 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class ProducerIntegrationTest {
 
     private static final String HOST = "http://localhost:8080";
-    private static final UUID DESTINATION_ID = UUID.randomUUID();
-    private static final UUID PRODUCER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
+
+    private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, DESTINATION_ID);
+
+    private static final UUID PRODUCER_UUID = UUID.randomUUID();
+    private static final ProducerId PRODUCER_ID = new ProducerId(DESTINATION, PRODUCER_UUID);
+
+    private static final String SEND_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID + "/send";
+    private static final String CLOSE_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID;
+
+    private static final MessageModelFactory MESSAGE_MODEL_FACTORY = new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory());
 
     private RestTemplate restTemplate;
     private MockRestServiceServer mockRestServiceServer;
@@ -34,11 +43,11 @@ public class ProducerIntegrationTest {
     public void sendMessage() {
         Message message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
         message.setId("ID:1234");
-        message.setDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
+        message.setDestination(DESTINATION);
 
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
+        Producer producer = new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY);
 
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
+        mockRestServiceServer.expect(once(), requestTo(SEND_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"queue:" + DESTINATION_ID + "\"}}", true))
@@ -51,8 +60,8 @@ public class ProducerIntegrationTest {
 
     @Test
     public void close() {
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+        Producer producer = new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY);
+        mockRestServiceServer.expect(once(), requestTo(CLOSE_URL))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
 

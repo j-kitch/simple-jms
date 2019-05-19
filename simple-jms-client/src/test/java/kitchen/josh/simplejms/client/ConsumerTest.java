@@ -52,8 +52,7 @@ public class ConsumerTest {
     public void receiveMessage_restTemplateThrows_throwsException() {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
 
-        assertThatExceptionOfType(RestClientException.class)
-                .isThrownBy(() -> consumer.receiveMessage());
+        assertThatExceptionOfType(RestClientException.class).isThrownBy(() -> consumer.receiveMessage());
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verifyNoMoreInteractions(restTemplate, messageFactory);
     }

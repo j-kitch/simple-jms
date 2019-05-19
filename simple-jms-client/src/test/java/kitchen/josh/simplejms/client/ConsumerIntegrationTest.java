@@ -20,28 +20,35 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 public class ConsumerIntegrationTest {
 
     private static final String HOST = "http://localhost:8080";
+
     private static final UUID DESTINATION_ID = UUID.randomUUID();
+    private static final Destination DESTINATION = new Destination(DestinationType.QUEUE, DESTINATION_ID);
+
     private static final UUID CONSUMER_ID = UUID.randomUUID();
+
+    private static final String RECEIVE_URL = HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
+    private static final String CLOSE_URL = HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
+
     private static final String TEXT = "hello world";
 
-    private static final Destination QUEUE = new Destination(DestinationType.QUEUE, DESTINATION_ID);
-    private static final Destination TOPIC = new Destination(DestinationType.TOPIC, DESTINATION_ID);
+    private static final MessageFactory MESSAGE_FACTORY = new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory());
 
-    private RestTemplate restTemplate;
     private MockRestServiceServer mockRestServiceServer;
+
+    private Consumer consumer;
 
     @Before
     public void setUp() {
-        restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
         mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
+        consumer = new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID), MESSAGE_FACTORY);
     }
 
     @Test
     public void receiveMessage_noMessage_returnsEmpty() {
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+        mockRestServiceServer.expect(once(), requestTo(RECEIVE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -59,10 +66,9 @@ public class ConsumerIntegrationTest {
         properties.setFloatProperty("property 1", 1.2f);
         properties.setStringProperty("property 2", "other property");
 
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+        mockRestServiceServer.expect(once(), requestTo(RECEIVE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
 
         Optional<Message> received = consumer.receiveMessage();
 
@@ -75,8 +81,7 @@ public class ConsumerIntegrationTest {
 
     @Test
     public void close() {
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+        mockRestServiceServer.expect(once(), requestTo(CLOSE_URL))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
 

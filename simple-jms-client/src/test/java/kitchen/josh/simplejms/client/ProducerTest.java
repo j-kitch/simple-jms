@@ -48,8 +48,7 @@ public class ProducerTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
         when(messageModelFactory.create(any())).thenReturn(MESSAGE_MODEL);
 
-        assertThatExceptionOfType(RestClientException.class)
-                .isThrownBy(() -> producer.sendMessage(MESSAGE));
+        assertThatExceptionOfType(RestClientException.class).isThrownBy(() -> producer.sendMessage(MESSAGE));
         verify(messageModelFactory).create(MESSAGE);
         verify(restTemplate).postForEntity(SEND_URL, MESSAGE_MODEL, Void.class);
         verifyNoMoreInteractions(restTemplate, messageModelFactory);
