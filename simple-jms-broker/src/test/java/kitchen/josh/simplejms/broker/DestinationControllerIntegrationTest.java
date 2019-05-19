@@ -78,6 +78,7 @@ public class DestinationControllerIntegrationTest {
         mockMvc.perform(post("/ooga-booga"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string(""));
+
         verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
 
@@ -107,13 +108,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void createConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to create consumer for topic " + DESTINATION_ID + ": the topic does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to create consumer: the destination does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -145,13 +145,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void createProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to create producer for queue " + DESTINATION_ID + ": the queue does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to create producer: the destination does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -180,13 +179,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void deleteConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to delete consumer " + CONSUMER_ID + " for topic " + DESTINATION_ID + ": the topic does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to delete consumer: the destination does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -194,14 +192,13 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void deleteConsumer_consumerDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to delete consumer " + CONSUMER_ID + " for queue " + DESTINATION_ID + ": the consumer does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         doThrow(ConsumerDoesNotExistException.class).when(singleDestinationService).removeConsumer(any());
 
         mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to delete consumer: the consumer does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verify(singleDestinationService).removeConsumer(CONSUMER_ID);
@@ -231,13 +228,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void deleteProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to delete producer " + PRODUCER_ID + " for topic " + DESTINATION_ID + ": the topic does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to delete producer: the destination does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -245,14 +241,13 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void deleteProducer_producerDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to delete producer " + PRODUCER_ID + " for queue " + DESTINATION_ID + ": the producer does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).removeProducer(any());
 
         mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to delete producer: the producer does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verify(singleDestinationService).removeProducer(PRODUCER_ID);
@@ -289,7 +284,6 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void sendMessage_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to send message to topic " + DESTINATION_ID + ": the topic does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
@@ -297,7 +291,7 @@ public class DestinationControllerIntegrationTest {
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to send message: the destination does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -305,7 +299,6 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to send message to queue " + DESTINATION_ID + ": the producer " + PRODUCER_ID + " does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(messageFactory.create(any())).thenReturn(MESSAGE);
         doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
@@ -315,7 +308,7 @@ public class DestinationControllerIntegrationTest {
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}", true));
+                .andExpect(content().json("{\"message\": \"Failed to send message: the producer does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verify(messageFactory).create(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
@@ -366,13 +359,12 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to receive message: the queue " + DESTINATION_ID + " does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"Failed to receive message: the destination does not exist\"}"));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
@@ -380,14 +372,13 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_consumerDoesNotExist_returnsBadRequest() throws Exception {
-        String errorMessage = "Failed to receive message: the consumer " + CONSUMER_ID + " does not exist.";
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         doThrow(ConsumerDoesNotExistException.class).when(singleDestinationService).readMessage(any());
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"" + errorMessage + "\"}"));
+                .andExpect(content().json("{\"message\": \"Failed to receive message: the consumer does not exist\"}"));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);

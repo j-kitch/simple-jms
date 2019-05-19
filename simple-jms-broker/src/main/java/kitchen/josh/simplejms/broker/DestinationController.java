@@ -17,6 +17,17 @@ import static java.util.Collections.emptyList;
 @RestController
 public class DestinationController {
 
+    private static final String FAILED_CREATE_PRODUCER = "Failed to create producer";
+    private static final String FAILED_CREATE_CONSUMER = "Failed to create consumer";
+    private static final String FAILED_DELETE_PRODUCER = "Failed to delete producer";
+    private static final String FAILED_DELETE_CONSUMER = "Failed to delete consumer";
+    private static final String FAILED_SEND_MESSAGE = "Failed to send message";
+    private static final String FAILED_RECEIVE_MESSAGE = "Failed to receive message";
+
+    private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
+    private static final String PRODUCER_DOES_NOT_EXIST = "the producer does not exist";
+    private static final String CONSUMER_DOES_NOT_EXIST = "the consumer does not exist";
+
     private final DestinationService destinationService;
     private final MessageModelFactory messageModelFactory;
     private final MessageFactory messageFactory;
@@ -49,7 +60,7 @@ public class DestinationController {
     public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         UUID consumerId = destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                 .map(SingleDestinationService::createConsumer)
-                .orElseThrow(() -> new ApiException("Failed to create consumer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
+                .orElseThrow(() -> createError(FAILED_CREATE_CONSUMER, DESTINATION_DOES_NOT_EXIST));
         return new IdModel(consumerId);
     }
 
@@ -64,7 +75,7 @@ public class DestinationController {
     public IdModel createProducer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
         UUID consumerId = destinationService.findDestination(new Destination(toType(destinationType), destinationId))
                 .map(SingleDestinationService::createProducer)
-                .orElseThrow(() -> new ApiException("Failed to create producer for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."));
+                .orElseThrow(() -> createError(FAILED_CREATE_PRODUCER, DESTINATION_DOES_NOT_EXIST));
         return new IdModel(consumerId);
     }
 
@@ -80,10 +91,10 @@ public class DestinationController {
                                @PathVariable UUID consumerId) {
         try {
             destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .orElseThrow(() -> createError(FAILED_DELETE_CONSUMER, DESTINATION_DOES_NOT_EXIST))
                     .removeConsumer(consumerId);
         } catch (ConsumerDoesNotExistException e) {
-            throw new ApiException("Failed to delete consumer " + consumerId + " for " + destinationType + " " + destinationId + ": the consumer does not exist.");
+            throw createError(FAILED_DELETE_CONSUMER, CONSUMER_DOES_NOT_EXIST);
         }
     }
 
@@ -99,10 +110,10 @@ public class DestinationController {
                                @PathVariable UUID producerId) {
         try {
             destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> new ApiException("Failed to delete producer " + producerId + " for " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .orElseThrow(() -> createError(FAILED_DELETE_PRODUCER, DESTINATION_DOES_NOT_EXIST))
                     .removeProducer(producerId);
         } catch (ProducerDoesNotExistException e) {
-            throw new ApiException("Failed to delete producer " + producerId + " for " + destinationType + " " + destinationId + ": the producer does not exist.");
+            throw createError(FAILED_DELETE_PRODUCER, PRODUCER_DOES_NOT_EXIST);
         }
     }
 
@@ -120,10 +131,10 @@ public class DestinationController {
         try {
             Destination destination = new Destination(toType(destinationType), destinationId);
             destinationService.findDestination(destination)
-                    .orElseThrow(() -> new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the " + destinationType + " does not exist."))
+                    .orElseThrow(() -> createError(FAILED_SEND_MESSAGE, DESTINATION_DOES_NOT_EXIST))
                     .addMessage(producerId, messageFactory.create(message));
         } catch (ProducerDoesNotExistException e) {
-            throw new ApiException("Failed to send message to " + destinationType + " " + destinationId + ": the producer " + producerId + " does not exist.");
+            throw createError(FAILED_SEND_MESSAGE, PRODUCER_DOES_NOT_EXIST);
         }
     }
 
@@ -140,12 +151,12 @@ public class DestinationController {
                                        @PathVariable UUID consumerId) {
         try {
             return destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> new ApiException("Failed to receive message: the " + destinationType + " " + destinationId + " does not exist."))
+                    .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, DESTINATION_DOES_NOT_EXIST))
                     .readMessage(consumerId)
                     .map(messageModelFactory::create)
                     .orElse(new MessageModel(emptyList(), null));
         } catch (ConsumerDoesNotExistException e) {
-            throw new ApiException("Failed to receive message: the consumer " + consumerId + " does not exist.");
+            throw createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST);
         }
     }
 
@@ -167,5 +178,9 @@ public class DestinationController {
         } catch (IllegalArgumentException iae) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
+    }
+
+    private static ApiException createError(String problem, String cause) {
+        return new ApiException(problem + ": " + cause);
     }
 }
