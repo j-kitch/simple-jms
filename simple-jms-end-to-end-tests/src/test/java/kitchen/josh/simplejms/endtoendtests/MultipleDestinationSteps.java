@@ -74,10 +74,10 @@ public class MultipleDestinationSteps {
     @Then("each destination's consumers only receive their destinations messages")
     public void each_destination_s_consumers_only_receive_their_destinations_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
-            Optional<TextMessage> message1 = destinationSetup.consumer.receiveMessage();
-            Optional<TextMessage> message2 = destinationSetup.consumer.receiveMessage();
-            Optional<TextMessage> message3 = destinationSetup.consumer.receiveMessage();
-            Optional<TextMessage> message4 = destinationSetup.consumer.receiveMessage();
+            Optional<Message> message1 = destinationSetup.consumer.receiveMessage();
+            Optional<Message> message2 = destinationSetup.consumer.receiveMessage();
+            Optional<Message> message3 = destinationSetup.consumer.receiveMessage();
+            Optional<Message> message4 = destinationSetup.consumer.receiveMessage();
 
             assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[0])));
             assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[1])));

@@ -1,8 +1,8 @@
 package kitchen.josh.simplejms.client;
 
+import kitchen.josh.simplejms.common.Message;
 import kitchen.josh.simplejms.common.MessageFactory;
 import kitchen.josh.simplejms.common.MessageModel;
-import kitchen.josh.simplejms.common.TextMessage;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -31,7 +31,7 @@ public class Consumer implements AutoCloseable {
      *
      * @return the next message for the consumer, or <code>Optional.empty()</code> if there isn't a message
      */
-    public Optional<TextMessage> receiveMessage() {
+    public Optional<Message> receiveMessage() {
         String receiveUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"
                 + id.getId() + "/receive";
 
@@ -51,9 +51,9 @@ public class Consumer implements AutoCloseable {
         restTemplate.delete(deleteUrl);
     }
 
-    private TextMessage createMessage(MessageModel model) {
+    private Message createMessage(MessageModel model) {
         try {
-            return (TextMessage) messageFactory.create(model);
+            return messageFactory.create(model);
         } catch (MessageFormatException mfe) {
             throw new RuntimeException(mfe);
         }
