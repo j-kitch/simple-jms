@@ -1,7 +1,10 @@
 package kitchen.josh.simplejms.common;
 
 import javax.jms.MessageFormatException;
-import java.io.*;
+import java.io.Serializable;
+
+import static org.springframework.util.SerializationUtils.deserialize;
+import static org.springframework.util.SerializationUtils.serialize;
 
 public class ObjectBody implements Body {
 
@@ -30,25 +33,11 @@ public class ObjectBody implements Body {
     }
 
     public void setObject(Serializable serializable) {
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-             ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream)) {
-            objectOutputStream.writeObject(serializable);
-            objectOutputStream.flush();
-            this.bytes = byteArrayOutputStream.toByteArray();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        this.bytes = serialize(serializable);
     }
 
     public Serializable getObject() {
-        if (bytes == null) {
-            return null;
-        }
-        try (ObjectInputStream inputStream = new ObjectInputStream(new ByteArrayInputStream(this.bytes))) {
-            return (Serializable) inputStream.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return (Serializable) deserialize(bytes);
     }
 
     public byte[] getBytes() {
