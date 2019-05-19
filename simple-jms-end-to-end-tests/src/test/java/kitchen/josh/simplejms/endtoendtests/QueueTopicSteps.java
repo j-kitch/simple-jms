@@ -26,6 +26,8 @@ public class QueueTopicSteps {
 
     private static final String[] TEXT = {"a", "b", "c", "d"};
     private static final Serializable[] OBJECTS = {2, "b", 3.4, false};
+    private static final String[] PROPERTY_NAMES = {"prop a", "prop b", "property c", "another one d", "e", "this-prop-f", "G", "prop-h"};
+    private static final Object[] PROPERTY_VALUES = {false, (byte) 1, (short) 2, 3, 4L, 1.2f, 2.3, "hello"};
 
     @LocalServerPort
     private int port;
@@ -101,11 +103,27 @@ public class QueueTopicSteps {
     }
 
     @When("the producer sends messages with properties")
-    public void the_producer_sends_messages_with_properties() {
-        producer.sendMessage(session.createTextMessage(TEXT[0]));
-        producer.sendMessage(session.createObjectMessage(OBJECTS[1]));
-        producer.sendMessage(session.createTextMessage(TEXT[2]));
-        producer.sendMessage(session.createObjectMessage(OBJECTS[3]));
+    public void the_producer_sends_messages_with_properties() throws Exception {
+        Message message1 = session.createTextMessage(TEXT[0]);
+        message1.setObjectProperty(PROPERTY_NAMES[0], PROPERTY_VALUES[0]);
+        message1.setObjectProperty(PROPERTY_NAMES[1], PROPERTY_VALUES[1]);
+
+        Message message2 = session.createObjectMessage(OBJECTS[1]);
+        message2.setObjectProperty(PROPERTY_NAMES[2], PROPERTY_VALUES[2]);
+        message2.setObjectProperty(PROPERTY_NAMES[3], PROPERTY_VALUES[3]);
+
+        Message message3 = session.createTextMessage(TEXT[2]);
+        message3.setObjectProperty(PROPERTY_NAMES[4], PROPERTY_VALUES[4]);
+        message3.setObjectProperty(PROPERTY_NAMES[5], PROPERTY_VALUES[5]);
+
+        Message message4 = session.createObjectMessage(OBJECTS[3]);
+        message4.setObjectProperty(PROPERTY_NAMES[6], PROPERTY_VALUES[6]);
+        message4.setObjectProperty(PROPERTY_NAMES[7], PROPERTY_VALUES[7]);
+
+        producer.sendMessage(message1);
+        producer.sendMessage(message2);
+        producer.sendMessage(message3);
+        producer.sendMessage(message4);
     }
 
     @When("the producer tries to send a message")
@@ -161,16 +179,32 @@ public class QueueTopicSteps {
     }
 
     @Then("the consumer receives messages with properties")
-    public void the_consumer_receives_messages_with_properties() {
-        Optional<Message> message1 = consumer1.receiveMessage();
-        Optional<Message> message2 = consumer1.receiveMessage();
-        Optional<Message> message3 = consumer1.receiveMessage();
-        Optional<Message> message4 = consumer1.receiveMessage();
+    public void the_consumer_receives_messages_with_properties() throws Exception {
+        Message message1 = session.createTextMessage(TEXT[0]);
+        message1.setObjectProperty(PROPERTY_NAMES[0], PROPERTY_VALUES[0]);
+        message1.setObjectProperty(PROPERTY_NAMES[1], PROPERTY_VALUES[1]);
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[3]));
+        Message message2 = session.createObjectMessage(OBJECTS[1]);
+        message2.setObjectProperty(PROPERTY_NAMES[2], PROPERTY_VALUES[2]);
+        message2.setObjectProperty(PROPERTY_NAMES[3], PROPERTY_VALUES[3]);
+
+        Message message3 = session.createTextMessage(TEXT[2]);
+        message3.setObjectProperty(PROPERTY_NAMES[4], PROPERTY_VALUES[4]);
+        message3.setObjectProperty(PROPERTY_NAMES[5], PROPERTY_VALUES[5]);
+
+        Message message4 = session.createObjectMessage(OBJECTS[3]);
+        message4.setObjectProperty(PROPERTY_NAMES[6], PROPERTY_VALUES[6]);
+        message4.setObjectProperty(PROPERTY_NAMES[7], PROPERTY_VALUES[7]);
+
+        Optional<Message> received1 = consumer1.receiveMessage();
+        Optional<Message> received2 = consumer1.receiveMessage();
+        Optional<Message> received3 = consumer1.receiveMessage();
+        Optional<Message> received4 = consumer1.receiveMessage();
+
+        assertThat(received1).get().isEqualToComparingFieldByFieldRecursively(message1);
+        assertThat(received2).get().isEqualToComparingFieldByFieldRecursively(message2);
+        assertThat(received3).get().isEqualToComparingFieldByFieldRecursively(message3);
+        assertThat(received4).get().isEqualToComparingFieldByFieldRecursively(message4);
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -209,18 +243,5 @@ public class QueueTopicSteps {
     @Then("an exception was thrown")
     public void an_exception_was_thrown() {
         assertThat(throwable).isNotNull();
-    }
-
-    private static Properties[] createProperties() {
-        Properties[] properties = {new PropertiesImpl(), new PropertiesImpl(), new PropertiesImpl(), new PropertiesImpl()};
-        properties[0].setBooleanProperty("property 1", false);
-        properties[0].setByteProperty("property 2", (byte) 2);
-        properties[1].setShortProperty("property 3", (short) 3);
-        properties[1].setIntProperty("property 4", 4);
-        properties[2].setLongProperty("property 5", 5);
-        properties[2].setFloatProperty("property 6", 1.2f);
-        properties[3].setDoubleProperty("property 7", 2.3);
-        properties[3].setStringProperty("property 8", "hello world");
-        return properties;
     }
 }
