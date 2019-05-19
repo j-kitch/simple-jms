@@ -28,7 +28,7 @@ public class ProducerTest {
 
     private static final String TEXT = "hello world";
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null);
-    private static final TextMessage MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
 
     @Mock
     private RestTemplate restTemplate;
