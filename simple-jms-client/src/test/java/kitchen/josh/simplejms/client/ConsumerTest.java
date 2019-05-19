@@ -32,7 +32,7 @@ public class ConsumerTest {
     private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
-    private static final Message MESSAGE = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
+    private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null, null);
 
     @Mock

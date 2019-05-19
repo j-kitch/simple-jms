@@ -31,10 +31,10 @@ public class SessionTest {
     private static final ProducerId PRODUCER_ID = new ProducerId(DESTINATION, UUID.randomUUID());
 
     private static final String TEXT = "hello world";
-    private static final TextMessage TEXT_MESSAGE = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
+    private static final TextMessage TEXT_MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
 
     private static final Serializable OBJECT = 10;
-    private static final ObjectMessage OBJECT_MESSAGE = new ObjectMessage(new PropertiesImpl(), new ObjectBody(OBJECT));
+    private static final ObjectMessage OBJECT_MESSAGE = new ObjectMessage(new HeadersImpl(), new PropertiesImpl(), new ObjectBody(OBJECT));
 
 
     private static final MessageFactory MESSAGE_FACTORY = new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory());
@@ -95,7 +95,7 @@ public class SessionTest {
     public void createTextMessage_createsEmptyTextMessage() {
         TextMessage message = session.createTextMessage();
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), new TextBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody()));
     }
 
     @Test
@@ -109,7 +109,7 @@ public class SessionTest {
     public void createObjectMessage_createsEmptyObjectMessage() {
         ObjectMessage message = session.createObjectMessage();
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(new PropertiesImpl(), new ObjectBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(new HeadersImpl(), new PropertiesImpl(), new ObjectBody()));
     }
 
     @Test

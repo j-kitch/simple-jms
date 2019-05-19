@@ -72,7 +72,7 @@ public class ConsumerIntegrationTest {
 
         Optional<Message> received = consumer.receiveMessage();
 
-        Message expected = new TextMessage(properties, new TextBody(TEXT));
+        Message expected = new TextMessage(new HeadersImpl(), properties, new TextBody(TEXT));
         expected.setId("ID:1234");
         expected.setDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(expected);

@@ -198,10 +198,10 @@ public class TopicServiceTest {
     }
 
     private static Message[] createMessages() {
-        TextMessage message1 = new TextMessage(new PropertiesImpl(), new TextBody("hello world"));
-        ObjectMessage message2 = new ObjectMessage(new PropertiesImpl(), new ObjectBody(2));
-        TextMessage message3 = new TextMessage(new PropertiesImpl(), new TextBody("abcd"));
-        ObjectMessage message4 = new ObjectMessage(new PropertiesImpl(), new ObjectBody(12.3));
+        TextMessage message1 = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody("hello world"));
+        ObjectMessage message2 = new ObjectMessage(new HeadersImpl(), new PropertiesImpl(), new ObjectBody(2));
+        TextMessage message3 = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody("abcd"));
+        ObjectMessage message4 = new ObjectMessage(new HeadersImpl(), new PropertiesImpl(), new ObjectBody(12.3));
 
         message1.setIntProperty("prop1", 2);
         message1.setFloatProperty("prop2", 2.3f);

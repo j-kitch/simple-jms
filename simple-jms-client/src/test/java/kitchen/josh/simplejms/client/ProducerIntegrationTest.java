@@ -47,7 +47,7 @@ public class ProducerIntegrationTest {
 
     @Test
     public void sendMessage() {
-        Message message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
+        Message message = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
         message.setId("ID:1234");
         message.setDestination(DESTINATION);
 

@@ -40,7 +40,7 @@ public class MessageModelFactoryTest {
 
     @Test
     public void create_delegatesToPropertiesAndBodyModelFactories() {
-        TextMessage message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
+        TextMessage message = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
         message.setIntProperty("property", 0);
 
         when(headersModelFactory.create(any())).thenReturn(HEADERS_MODEL);

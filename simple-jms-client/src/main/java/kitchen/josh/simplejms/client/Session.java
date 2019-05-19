@@ -56,7 +56,7 @@ public class Session {
     }
 
     public TextMessage createTextMessage() {
-        return new TextMessage(new PropertiesImpl(), new TextBody());
+        return new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody());
     }
 
     public TextMessage createTextMessage(String text) {
@@ -66,7 +66,7 @@ public class Session {
     }
 
     public ObjectMessage createObjectMessage() {
-        return new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+        return new ObjectMessage(new HeadersImpl(), new PropertiesImpl(), new ObjectBody());
     }
 
     public ObjectMessage createObjectMessage(Serializable serializable) {

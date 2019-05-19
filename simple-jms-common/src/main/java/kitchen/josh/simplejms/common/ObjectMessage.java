@@ -11,8 +11,8 @@ public class ObjectMessage implements Message {
     private final Properties properties;
     private final ObjectBody body;
 
-    public ObjectMessage(Properties properties, ObjectBody body) {
-        this.headers = new HeadersImpl();
+    public ObjectMessage(Headers headers, Properties properties, ObjectBody body) {
+        this.headers = headers;
         this.properties = properties;
         this.body = body;
     }

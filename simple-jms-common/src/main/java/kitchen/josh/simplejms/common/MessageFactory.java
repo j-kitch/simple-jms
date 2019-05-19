@@ -22,16 +22,10 @@ public class MessageFactory {
         Properties properties = propertiesFactory.create(messageModel.getProperties());
         Body body = bodyFactory.create(messageModel.getBody());
         if (body.getClass() == TextBody.class) {
-            TextMessage textMessage = new TextMessage(properties, (TextBody) body);
-            textMessage.setId(headers.getId());
-            textMessage.setDestination(headers.getDestination());
-            return textMessage;
+            return new TextMessage(headers, properties, (TextBody) body);
         }
         if (body.getClass() == ObjectBody.class) {
-            ObjectMessage objectMessage = new ObjectMessage(properties, (ObjectBody) body);
-            objectMessage.setId(headers.getId());
-            objectMessage.setDestination(headers.getDestination());
-            return objectMessage;
+            return new ObjectMessage(headers, properties, (ObjectBody) body);
         }
         throw new RuntimeException("");
     }

@@ -16,7 +16,6 @@ import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @RunWith(MockitoJUnitRunner.class)
 public class TextMessageTest {
@@ -34,8 +33,7 @@ public class TextMessageTest {
 
     @Before
     public void setUp() {
-        textMessage = new TextMessage(properties, textBody);
-        setField(textMessage, "headers", headers);
+        textMessage = new TextMessage(headers, properties, textBody);
     }
 
     @Test

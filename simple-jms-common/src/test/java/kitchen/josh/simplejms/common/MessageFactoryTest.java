@@ -63,7 +63,7 @@ public class MessageFactoryTest {
 
         Message message = messageFactory.create(messageModel);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(PROPERTIES, new TextBody(TEXT)));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(HEADERS, PROPERTIES, new TextBody(TEXT)));
         assertThat(message.getHeaders()).isEqualToComparingFieldByField(HEADERS);
         verify(headersFactory).create(HEADERS_MODEL);
         verify(propertiesFactory).create(PROPERTY_MODELS);
@@ -79,7 +79,7 @@ public class MessageFactoryTest {
 
         Message message = messageFactory.create(messageModel);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(PROPERTIES, new ObjectBody(OBJECT)));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(HEADERS, PROPERTIES, new ObjectBody(OBJECT)));
         assertThat(message.getHeaders()).isEqualToComparingFieldByField(HEADERS);
         verify(headersFactory).create(HEADERS_MODEL);
         verify(propertiesFactory).create(PROPERTY_MODELS);

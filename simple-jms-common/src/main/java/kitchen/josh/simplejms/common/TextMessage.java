@@ -10,8 +10,8 @@ public class TextMessage implements Message {
     private final Properties properties;
     private final TextBody body;
 
-    public TextMessage(Properties properties, TextBody body) {
-        this.headers = new HeadersImpl();
+    public TextMessage(Headers headers, Properties properties, TextBody body) {
+        this.headers = headers;
         this.properties = properties;
         this.body = body;
     }
