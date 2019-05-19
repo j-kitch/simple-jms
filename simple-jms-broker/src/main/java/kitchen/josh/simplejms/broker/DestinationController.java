@@ -154,7 +154,7 @@ public class DestinationController {
                     .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, DESTINATION_DOES_NOT_EXIST))
                     .readMessage(consumerId)
                     .map(messageModelFactory::create)
-                    .orElse(new MessageModel(emptyList(), null));
+                    .orElse(new MessageModel(null, emptyList(), null));
         } catch (ConsumerDoesNotExistException e) {
             throw createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST);
         }

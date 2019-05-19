@@ -23,6 +23,6 @@
     <properties>
         <cucumber.version>4.3.0</cucumber.version>
         <jacoco.version>0.8.3</jacoco.version>
-        <jacoco.coverage.minimum>0.92</jacoco.coverage.minimum>
+        <jacoco.coverage.minimum>0.50</jacoco.coverage.minimum>
     </properties>
 </project>

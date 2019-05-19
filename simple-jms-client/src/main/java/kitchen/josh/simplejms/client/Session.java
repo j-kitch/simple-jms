@@ -42,7 +42,7 @@ public class Session {
      */
     public Producer createProducer(Destination destination) {
         IdModel producerId = restTemplate.postForEntity(createProducerUrl(destination), null, IdModel.class).getBody();
-        return new Producer(host, restTemplate, new ProducerId(destination, producerId.getId()), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
+        return new Producer(host, restTemplate, new ProducerId(destination, producerId.getId()), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
     }
 
     /**
@@ -52,7 +52,7 @@ public class Session {
      */
     public Consumer createConsumer(Destination destination) {
         IdModel consumerId = restTemplate.postForEntity(createConsumerUrl(destination), null, IdModel.class).getBody();
-        return new Consumer(host, restTemplate, new ConsumerId(destination, consumerId.getId()), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
+        return new Consumer(host, restTemplate, new ConsumerId(destination, consumerId.getId()), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
     }
 
     public TextMessage createTextMessage() {

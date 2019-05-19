@@ -8,6 +8,11 @@ import org.springframework.context.annotation.Configuration;
 public class Config {
 
     @Bean
+    public HeadersModelFactory headersModelFactory() {
+        return new HeadersModelFactory();
+    }
+
+    @Bean
     public PropertyModelFactory propertyModelFactory() {
         return new PropertyModelFactory();
     }
@@ -19,7 +24,12 @@ public class Config {
 
     @Bean
     public MessageModelFactory messageModelFactory() {
-        return new MessageModelFactory(propertyModelFactory(), bodyModelFactory());
+        return new MessageModelFactory(headersModelFactory(), propertyModelFactory(), bodyModelFactory());
+    }
+
+    @Bean
+    public HeadersFactory headersFactory() {
+        return new HeadersFactory();
     }
 
     @Bean
@@ -34,6 +44,6 @@ public class Config {
 
     @Bean
     public MessageFactory messageFactory() {
-        return new MessageFactory(propertiesFactory(), bodyFactory());
+        return new MessageFactory(headersFactory(), propertiesFactory(), bodyFactory());
     }
 }

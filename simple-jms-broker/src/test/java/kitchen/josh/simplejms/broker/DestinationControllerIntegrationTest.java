@@ -261,12 +261,12 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
+                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).create(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -305,13 +305,13 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
+                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to send message: the producer does not exist\"}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(messageFactory).create(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        verify(messageFactory).create(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
         verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory, messageFactory);
     }
@@ -323,7 +323,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
-                .andExpect(content().json("{\"body\": null, \"properties\": []}", true));
+                .andExpect(content().json("{\"body\": null, \"properties\": [], headers: null}", true));
 
         verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).readMessage(CONSUMER_ID);
@@ -332,7 +332,7 @@ public class DestinationControllerIntegrationTest {
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
-        when(messageModelFactory.create(any())).thenReturn(new MessageModel(emptyList(), new TextBodyModel(TEXT)));
+        when(messageModelFactory.create(any())).thenReturn(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 

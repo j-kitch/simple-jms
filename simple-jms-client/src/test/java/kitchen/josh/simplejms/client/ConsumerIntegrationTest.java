@@ -41,7 +41,7 @@ public class ConsumerIntegrationTest {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(QUEUE, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -53,7 +53,8 @@ public class ConsumerIntegrationTest {
     public void receiveMessage_message_returnsMessage() {
         String json = "{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [" +
                 "{\"name\": \"property 1\", \"type\": \"Float\", \"value\": 1.2}," +
-                "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]}";
+                "{\"name\": \"property 2\", \"type\": \"String\", \"value\": \"other property\"}]," +
+                "\"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"topic:" + DESTINATION_ID + "\"}}";
         Properties properties = new PropertiesImpl();
         properties.setFloatProperty("property 1", 1.2f);
         properties.setStringProperty("property 2", "other property");
@@ -61,17 +62,20 @@ public class ConsumerIntegrationTest {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
 
         Optional<Message> received = consumer.receiveMessage();
 
-        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(new TextMessage(properties, new TextBody(TEXT)));
+        Message expected = new TextMessage(properties, new TextBody(TEXT));
+        expected.setId("ID:1234");
+        expected.setDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
+        assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(expected);
         mockRestServiceServer.verify();
     }
 
     @Test
     public void close() {
-        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
+        Consumer consumer = new Consumer(HOST, restTemplate, new ConsumerId(TOPIC, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());

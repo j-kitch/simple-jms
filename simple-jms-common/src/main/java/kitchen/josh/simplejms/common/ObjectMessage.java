@@ -165,6 +165,11 @@ public class ObjectMessage implements Message {
         return body.getObject();
     }
 
+    @Override
+    public Headers getHeaders() {
+        return headers;
+    }
+
     public ObjectBody getBody() {
         return body;
     }

@@ -33,13 +33,15 @@ public class ProducerIntegrationTest {
     @Test
     public void sendMessage() {
         Message message = new TextMessage(new PropertiesImpl(), new TextBody(TEXT));
+        message.setId("ID:1234");
+        message.setDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
 
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
+        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.QUEUE, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
 
         mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send"))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, properties: []}", true))
+                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"queue:" + DESTINATION_ID + "\"}}", true))
                 .andRespond(withSuccess());
 
         producer.sendMessage(message);
@@ -49,7 +51,7 @@ public class ProducerIntegrationTest {
 
     @Test
     public void close() {
-        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory()));
+        Producer producer = new Producer(HOST, restTemplate, new ProducerId(new Destination(DestinationType.TOPIC, DESTINATION_ID), PRODUCER_ID), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
         mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());

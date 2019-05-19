@@ -164,6 +164,11 @@ public class TextMessage implements Message {
         return body.getText();
     }
 
+    @Override
+    public Headers getHeaders() {
+        return headers;
+    }
+
     public TextBody getBody() {
         return body;
     }

@@ -75,7 +75,7 @@ public class SessionTest {
 
         Producer producer = session.createProducer(DESTINATION);
 
-        assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, new ProducerId(DESTINATION, producerId), new MessageModelFactory(new PropertyModelFactory(), new BodyModelFactory())));
+        assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, new ProducerId(DESTINATION, producerId), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory())));
         verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/producer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
@@ -95,7 +95,7 @@ public class SessionTest {
 
         Consumer consumer = session.createConsumer(DESTINATION);
 
-        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID), new MessageFactory(new PropertiesFactory(), new BodyFactory())));
+        assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, new ConsumerId(DESTINATION, CONSUMER_ID), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory())));
         verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
