@@ -92,4 +92,18 @@ public class SessionTest {
         verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
+
+    @Test
+    public void createTextMessage_createsEmptyTextMessage() {
+        TextMessage message = session.createTextMessage();
+
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), new TextBody()));
+    }
+
+    @Test
+    public void createObjectMessage_createsEmptyObjectMessage() {
+        ObjectMessage message = session.createObjectMessage();
+
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(new PropertiesImpl(), new ObjectBody()));
+    }
 }

@@ -53,6 +53,14 @@ public class Session {
         return new Consumer(host, restTemplate, new ConsumerId(destination, consumerId.getId()), new MessageFactory(new PropertiesFactory(), new BodyFactory()));
     }
 
+    public TextMessage createTextMessage() {
+        return new TextMessage(new PropertiesImpl(), new TextBody());
+    }
+
+    public ObjectMessage createObjectMessage() {
+        return new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+    }
+
     private String createConsumerUrl(Destination destination) {
         return host + "/" + destination.getType().name().toLowerCase() + "/" + destination.getId() + "/consumer";
     }
