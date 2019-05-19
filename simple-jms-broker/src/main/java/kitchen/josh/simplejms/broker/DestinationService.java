@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
+import java.util.function.Function;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toMap;
 @Component
 public class DestinationService {
 
-    private static final Map<DestinationType, Supplier<SingleDestinationService>> SERVICE_SUPPLIERS = createServiceSupplierMap();
+    private static final Map<DestinationType, Function<UUID, SingleDestinationService>> SERVICE_SUPPLIERS = createServiceSupplierMap();
 
     private final Map<Destination, SingleDestinationService> destinations;
 
@@ -34,7 +34,7 @@ public class DestinationService {
      */
     public UUID createDestination(DestinationType destinationType) {
         Destination destination = new Destination(destinationType, UUID.randomUUID());
-        destinations.put(destination, createService(destinationType));
+        destinations.put(destination, createService(destination));
         return destination.getId();
     }
 
@@ -60,14 +60,14 @@ public class DestinationService {
                 .collect(toMap(Destination::getId, destinations::get));
     }
 
-    private static Map<DestinationType, Supplier<SingleDestinationService>> createServiceSupplierMap() {
-        Map<DestinationType, Supplier<SingleDestinationService>> suppliers = new HashMap<>();
+    private static Map<DestinationType, Function<UUID, SingleDestinationService>> createServiceSupplierMap() {
+        Map<DestinationType, Function<UUID, SingleDestinationService>> suppliers = new HashMap<>();
         suppliers.put(DestinationType.TOPIC, TopicService::new);
         suppliers.put(DestinationType.QUEUE, QueueService::new);
         return suppliers;
     }
 
-    private static SingleDestinationService createService(DestinationType type) {
-        return SERVICE_SUPPLIERS.get(type).get();
+    private static SingleDestinationService createService(Destination destination) {
+        return SERVICE_SUPPLIERS.get(destination.getType()).apply(destination.getId());
     }
 }

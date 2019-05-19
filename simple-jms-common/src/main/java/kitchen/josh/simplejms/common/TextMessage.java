@@ -169,6 +169,12 @@ public class TextMessage implements Message {
         return headers;
     }
 
+    @Override
+    public Properties getProperties() {
+        return properties;
+    }
+
+    @Override
     public TextBody getBody() {
         return body;
     }

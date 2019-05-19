@@ -13,13 +13,16 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TopicServiceTest {
 
-    private static final Message[] MESSAGES = createMessages();
+    private static final UUID ID = UUID.randomUUID();
+
+    private Message[] messages;
 
     private TopicService topicService;
 
     @Before
     public void setUp() {
-        topicService = new TopicService();
+        messages = createMessages();
+        topicService = new TopicService(ID);
     }
 
     @Test
@@ -65,8 +68,8 @@ public class TopicServiceTest {
     public void removeConsumer_removesConsumerAndQueue() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, MESSAGES[0]);
-        topicService.addMessage(producerId, MESSAGES[1]);
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
 
         topicService.removeConsumer(consumerId);
 
@@ -103,7 +106,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[0]));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), messages[0]));
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).isEmpty();
@@ -112,7 +115,7 @@ public class TopicServiceTest {
     @Test
     public void addMessage_noConsumers_doesNothing() {
         UUID producerId = topicService.createProducer();
-        topicService.addMessage(producerId, MESSAGES[0]);
+        topicService.addMessage(producerId, messages[0]);
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
         assertThat(topicService.getProducers()).containsOnly(producerId);
@@ -124,9 +127,9 @@ public class TopicServiceTest {
         topicService.createConsumer();
 
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[0]));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), messages[0]));
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[1]));
+                .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), messages[1]));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> assertThat(queue).isEmpty());
@@ -139,13 +142,15 @@ public class TopicServiceTest {
         topicService.createConsumer();
         topicService.createConsumer();
 
-        topicService.addMessage(producerId, MESSAGES[0]);
-        topicService.addMessage(producerId, MESSAGES[1]);
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
-            assertThat(queue.poll()).isEqualTo(MESSAGES[0]);
-            assertThat(queue.poll()).isEqualTo(MESSAGES[1]);
+            assertThat(queue).containsExactly(messages[0], messages[1]);
+            assertThat(queue)
+                    .extracting(Message::getDestination)
+                    .containsExactly(new Destination(DestinationType.TOPIC, ID), new Destination(DestinationType.TOPIC, ID));
         });
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
@@ -170,13 +175,13 @@ public class TopicServiceTest {
     public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
         UUID producerId = topicService.createProducer();
         UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, MESSAGES[0]);
-        topicService.addMessage(producerId, MESSAGES[1]);
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
 
         Optional<Message> message = topicService.readMessage(consumerId);
 
-        assertThat(message).contains(MESSAGES[0]);
-        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(MESSAGES[1]);
+        assertThat(message).contains(messages[0]);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(messages[1]);
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 
@@ -186,14 +191,14 @@ public class TopicServiceTest {
         UUID consumerId = topicService.createConsumer();
         UUID otherId = topicService.createConsumer();
 
-        topicService.addMessage(producerId, MESSAGES[0]);
-        topicService.addMessage(producerId, MESSAGES[1]);
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
 
         Optional<Message> message = topicService.readMessage(consumerId);
 
-        assertThat(message).contains(MESSAGES[0]);
-        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(MESSAGES[1]);
-        assertThat(topicService.getConsumerQueues().get(otherId)).containsExactly(MESSAGES[0], MESSAGES[1]);
+        assertThat(message).contains(messages[0]);
+        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(messages[1]);
+        assertThat(topicService.getConsumerQueues().get(otherId)).containsExactly(messages[0], messages[1]);
         assertThat(topicService.getProducers()).containsOnly(producerId);
     }
 

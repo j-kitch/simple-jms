@@ -12,13 +12,16 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class QueueServiceTest {
 
-    private static final Message[] MESSAGES = createMessages();
+    private static final UUID ID = UUID.randomUUID();
+
+    private Message[] messages;
 
     private QueueService queueService;
 
     @Before
     public void setUp() {
-        queueService = new QueueService();
+        messages = createMessages();
+        queueService = new QueueService(ID);
     }
 
     @Test
@@ -78,9 +81,9 @@ public class QueueServiceTest {
     @Test
     public void addMessage_producerDoesNotExist_throwsProducerDoesNotExist() {
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[0]));
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), messages[0]));
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
-                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), MESSAGES[1]));
+                .isThrownBy(() -> queueService.addMessage(UUID.randomUUID(), messages[1]));
 
         assertThat(queueService.getMessages()).isEmpty();
         assertThat(queueService.getConsumers()).isEmpty();
@@ -90,22 +93,25 @@ public class QueueServiceTest {
     @Test
     public void addMessage_appendsMessageToMessages() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
+        queueService.addMessage(producerId, messages[0]);
+        queueService.addMessage(producerId, messages[1]);
 
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[0], MESSAGES[1]);
+        assertThat(queueService.getMessages()).containsExactly(messages[0], messages[1]);
+        assertThat(queueService.getMessages())
+                .extracting(Message::getDestination)
+                .containsExactly(new Destination(DestinationType.QUEUE, ID), new Destination(DestinationType.QUEUE, ID));
     }
 
     @Test
     public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
+        queueService.addMessage(producerId, messages[0]);
 
         assertThatExceptionOfType(ConsumerDoesNotExistException.class)
                 .isThrownBy(() -> queueService.readMessage(UUID.randomUUID()));
 
         assertThat(queueService.getConsumers()).isEmpty();
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[0]);
+        assertThat(queueService.getMessages()).containsExactly(messages[0]);
         assertThat(queueService.getProducers()).containsOnly(producerId);
     }
 
@@ -125,24 +131,24 @@ public class QueueServiceTest {
     public void readMessage_consumerExistsWithMessages_popsFirst() {
         UUID producerId = queueService.createProducer();
         UUID consumerId = queueService.createConsumer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
+        queueService.addMessage(producerId, messages[0]);
+        queueService.addMessage(producerId, messages[1]);
 
         Optional<Message> read = queueService.readMessage(consumerId);
 
-        assertThat(read).contains(MESSAGES[0]);
+        assertThat(read).contains(messages[0]);
         assertThat(queueService.getConsumers()).containsExactly(consumerId);
         assertThat(queueService.getProducers()).containsOnly(producerId);
-        assertThat(queueService.getMessages()).containsExactly(MESSAGES[1]);
+        assertThat(queueService.getMessages()).containsExactly(messages[1]);
     }
 
     @Test
     public void readMessage_multipleConsumers_popFromSameQueue() {
         UUID producerId = queueService.createProducer();
-        queueService.addMessage(producerId, MESSAGES[0]);
-        queueService.addMessage(producerId, MESSAGES[1]);
-        queueService.addMessage(producerId, MESSAGES[2]);
-        queueService.addMessage(producerId, MESSAGES[3]);
+        queueService.addMessage(producerId, messages[0]);
+        queueService.addMessage(producerId, messages[1]);
+        queueService.addMessage(producerId, messages[2]);
+        queueService.addMessage(producerId, messages[3]);
         UUID consumerId1 = queueService.createConsumer();
         UUID consumerId2 = queueService.createConsumer();
 
@@ -153,10 +159,10 @@ public class QueueServiceTest {
         Optional<Message> read5 = queueService.readMessage(consumerId2);
         Optional<Message> read6 = queueService.readMessage(consumerId1);
 
-        assertThat(read1).contains(MESSAGES[0]);
-        assertThat(read2).contains(MESSAGES[1]);
-        assertThat(read3).contains(MESSAGES[2]);
-        assertThat(read4).contains(MESSAGES[3]);
+        assertThat(read1).contains(messages[0]);
+        assertThat(read2).contains(messages[1]);
+        assertThat(read3).contains(messages[2]);
+        assertThat(read4).contains(messages[3]);
         assertThat(read5).isEmpty();
         assertThat(read6).isEmpty();
     }

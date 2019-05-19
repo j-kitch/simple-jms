@@ -8,9 +8,7 @@ import cucumber.api.java.en.When;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.*;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
@@ -80,13 +78,29 @@ public class MultipleDestinationSteps {
             Optional<Message> message3 = destinationSetup.consumer.receiveMessage();
             Optional<Message> message4 = destinationSetup.consumer.receiveMessage();
 
-            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[0]));
-            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[1]));
-            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[2]));
-            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[3]));
+            assertThat(message1.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
+            assertThat(message2.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
+            assertThat(message3.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
+            assertThat(message4.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
+
+            assertThat(message1.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
+            assertThat(message2.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
+            assertThat(message3.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
+            assertThat(message4.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
+
+            assertThat(message1.get().getBody()).isEqualToComparingFieldByField(new TextBody(destinationSetup.messages[0]));
+            assertThat(message2.get().getBody()).isEqualToComparingFieldByField(new TextBody(destinationSetup.messages[1]));
+            assertThat(message3.get().getBody()).isEqualToComparingFieldByField(new TextBody(destinationSetup.messages[2]));
+            assertThat(message4.get().getBody()).isEqualToComparingFieldByField(new TextBody(destinationSetup.messages[3]));
 
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
         });
+    }
+
+    private static Headers createHeaders(Destination destination) {
+        Headers headers = new HeadersImpl();
+        headers.setDestination(destination);
+        return headers;
     }
 }

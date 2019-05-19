@@ -4,5 +4,7 @@ public interface Message extends Headers, Properties, Body {
 
     Headers getHeaders();
 
+    Properties getProperties();
+
     Body getBody();
 }

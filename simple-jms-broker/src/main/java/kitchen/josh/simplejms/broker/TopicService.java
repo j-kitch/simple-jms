@@ -1,5 +1,7 @@
 package kitchen.josh.simplejms.broker;
 
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.Message;
 
 import java.util.*;
@@ -9,10 +11,12 @@ import java.util.*;
  */
 public class TopicService implements SingleDestinationService {
 
+    private final UUID id;
     private final Map<UUID, Queue<Message>> consumerQueues;
     private final Set<UUID> producers;
 
-    TopicService() {
+    TopicService(UUID id) {
+        this.id = id;
         consumerQueues = new HashMap<>();
         producers = new HashSet<>();
     }
@@ -46,6 +50,7 @@ public class TopicService implements SingleDestinationService {
     @Override
     public void addMessage(UUID producer, Message message) {
         verifyProducerExists(producer);
+        message.setDestination(new Destination(DestinationType.TOPIC, id));
         consumerQueues.values().forEach(queue -> queue.add(message));
     }
 

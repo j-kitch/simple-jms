@@ -170,6 +170,12 @@ public class ObjectMessage implements Message {
         return headers;
     }
 
+    @Override
+    public Properties getProperties() {
+        return properties;
+    }
+
+    @Override
     public ObjectBody getBody() {
         return body;
     }
