@@ -1,18 +1,16 @@
 package kitchen.josh.simplejms.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 import java.util.Objects;
 
 public class MessageModel {
 
-    private List<PropertyModel> properties;
-    private BodyModel body;
+    private final List<PropertyModel> properties;
+    private final BodyModel body;
 
-    public MessageModel() {
-
-    }
-
-    public MessageModel(List<PropertyModel> properties, BodyModel body) {
+    public MessageModel(@JsonProperty("properties") List<PropertyModel> properties, @JsonProperty("body") BodyModel body) {
         this.properties = properties;
         this.body = body;
     }
@@ -21,16 +19,8 @@ public class MessageModel {
         return properties;
     }
 
-    public void setProperties(List<PropertyModel> properties) {
-        this.properties = properties;
-    }
-
     public BodyModel getBody() {
         return body;
-    }
-
-    public void setBody(BodyModel body) {
-        this.body = body;
     }
 
     @Override

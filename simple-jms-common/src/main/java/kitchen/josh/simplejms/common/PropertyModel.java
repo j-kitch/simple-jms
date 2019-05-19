@@ -7,13 +7,9 @@ import java.util.Objects;
 @JsonDeserialize(using = PropertyModelDeserializer.class)
 public class PropertyModel {
 
-    private String name;
-    private String type;
-    private Object value;
-
-    public PropertyModel() {
-
-    }
+    private final String name;
+    private final String type;
+    private final Object value;
 
     public PropertyModel(String name, String type, Object value) {
         this.name = name;
@@ -25,24 +21,12 @@ public class PropertyModel {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
     public Object getValue() {
         return value;
-    }
-
-    public void setValue(Object value) {
-        this.value = value;
     }
 
     @Override

@@ -1,25 +1,19 @@
 package kitchen.josh.simplejms.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class TextBodyModel extends BodyModel {
 
-    private String text;
+    private final String text;
 
-    public TextBodyModel() {
-
-    }
-
-    public TextBodyModel(String text) {
+    public TextBodyModel(@JsonProperty("text") String text) {
         this.text = text;
     }
 
     public String getText() {
         return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     @Override
