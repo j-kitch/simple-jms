@@ -3,6 +3,8 @@ package kitchen.josh.simplejms.client;
 import kitchen.josh.simplejms.common.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
+
 /**
  * This class implements the session for connecting to a SimpleJMS broker.
  */
@@ -57,8 +59,20 @@ public class Session {
         return new TextMessage(new PropertiesImpl(), new TextBody());
     }
 
+    public TextMessage createTextMessage(String text) {
+        TextMessage textMessage = createTextMessage();
+        textMessage.setText(text);
+        return textMessage;
+    }
+
     public ObjectMessage createObjectMessage() {
         return new ObjectMessage(new PropertiesImpl(), new ObjectBody());
+    }
+
+    public ObjectMessage createObjectMessage(Serializable serializable) {
+        ObjectMessage objectMessage = createObjectMessage();
+        objectMessage.setObject(serializable);
+        return objectMessage;
     }
 
     private String createConsumerUrl(Destination destination) {

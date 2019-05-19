@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -97,13 +98,43 @@ public class SessionTest {
     public void createTextMessage_createsEmptyTextMessage() {
         TextMessage message = session.createTextMessage();
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), new TextBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(
+                new TextMessage(new PropertiesImpl(), new TextBody()));
+    }
+
+    @Test
+    public void createTextMessage_text_createsTextMessageWithText() {
+        TextMessage message = session.createTextMessage("hello world");
+
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(
+                new TextMessage(new PropertiesImpl(), createTextBody("hello world")));
     }
 
     @Test
     public void createObjectMessage_createsEmptyObjectMessage() {
         ObjectMessage message = session.createObjectMessage();
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(new ObjectMessage(new PropertiesImpl(), new ObjectBody()));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(
+                new ObjectMessage(new PropertiesImpl(), new ObjectBody()));
+    }
+
+    @Test
+    public void createObjectBody_object_createsObjectMessageWithObject() {
+        ObjectMessage message = session.createObjectMessage(10);
+
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(
+                new ObjectMessage(new PropertiesImpl(), createObjectBody(10)));
+    }
+
+    private static TextBody createTextBody(String text) {
+        TextBody textBody = new TextBody();
+        textBody.setText(text);
+        return textBody;
+    }
+
+    private static ObjectBody createObjectBody(Serializable serializable) {
+        ObjectBody objectBody = new ObjectBody();
+        objectBody.setObject(serializable);
+        return objectBody;
     }
 }
