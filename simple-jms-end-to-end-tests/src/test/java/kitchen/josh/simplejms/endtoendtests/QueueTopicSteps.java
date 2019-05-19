@@ -13,6 +13,7 @@ import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.Serializable;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -23,9 +24,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(classes = Broker.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class QueueTopicSteps {
 
-    private static final String[] MESSAGES = {
-            "a", "b", "c", "d"
-    };
+    private static final String[] TEXT = {"a", "b", "c", "d"};
+    private static final Serializable[] OBJECTS = {2, "b", 3.4, false};
 
     @LocalServerPort
     private int port;
@@ -94,24 +94,24 @@ public class QueueTopicSteps {
 
     @When("the producer sends messages")
     public void the_producer_sends_messages() {
-        producer.sendMessage(session.createTextMessage(MESSAGES[0]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[1]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[2]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[3]));
+        producer.sendMessage(session.createTextMessage(TEXT[0]));
+        producer.sendMessage(session.createObjectMessage(OBJECTS[1]));
+        producer.sendMessage(session.createTextMessage(TEXT[2]));
+        producer.sendMessage(session.createObjectMessage(OBJECTS[3]));
     }
 
     @When("the producer sends messages with properties")
     public void the_producer_sends_messages_with_properties() {
-        producer.sendMessage(session.createTextMessage(MESSAGES[0]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[1]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[2]));
-        producer.sendMessage(session.createTextMessage(MESSAGES[3]));
+        producer.sendMessage(session.createTextMessage(TEXT[0]));
+        producer.sendMessage(session.createObjectMessage(OBJECTS[1]));
+        producer.sendMessage(session.createTextMessage(TEXT[2]));
+        producer.sendMessage(session.createObjectMessage(OBJECTS[3]));
     }
 
     @When("the producer tries to send a message")
     public void the_producer_tries_to_send_a_message() {
         try {
-            producer.sendMessage(session.createTextMessage(MESSAGES[0]));
+            producer.sendMessage(session.createTextMessage(TEXT[0]));
         } catch (Throwable t) {
             throwable = t;
         }
@@ -133,10 +133,10 @@ public class QueueTopicSteps {
         Optional<Message> message3 = consumer2.receiveMessage();
         Optional<Message> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[3]));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -151,10 +151,10 @@ public class QueueTopicSteps {
         Optional<Message> message3 = consumer1.receiveMessage();
         Optional<Message> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[3]));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -167,10 +167,10 @@ public class QueueTopicSteps {
         Optional<Message> message3 = consumer1.receiveMessage();
         Optional<Message> message4 = consumer1.receiveMessage();
 
-        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[0]));
-        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[1]));
-        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[2]));
-        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[3]));
+        assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[0]));
+        assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[1]));
+        assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[2]));
+        assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[3]));
 
         assertThat(consumer1.receiveMessage()).isEmpty();
         assertThat(consumer1.receiveMessage()).isEmpty();
@@ -184,10 +184,10 @@ public class QueueTopicSteps {
             Optional<Message> message3 = consumer.receiveMessage();
             Optional<Message> message4 = consumer.receiveMessage();
 
-            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[0]));
-            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[1]));
-            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[2]));
-            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(MESSAGES[3]));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[0]));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[1]));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(TEXT[2]));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createObjectMessage(OBJECTS[3]));
 
             assertThat(consumer.receiveMessage()).isEmpty();
             assertThat(consumer.receiveMessage()).isEmpty();
