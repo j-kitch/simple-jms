@@ -28,15 +28,21 @@ public class ProducerIntegrationTest {
     private static final String SEND_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID + "/send";
     private static final String CLOSE_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID;
 
-    private static final MessageModelFactory MESSAGE_MODEL_FACTORY = new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory());
+    private static final String JSON = "{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []," +
+            "\"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"queue:" + DESTINATION_ID + "\"}}";
 
-    private RestTemplate restTemplate;
+    private static final MessageModelFactory MESSAGE_MODEL_FACTORY = new MessageModelFactory(
+            new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory());
+
     private MockRestServiceServer mockRestServiceServer;
+
+    private Producer producer;
 
     @Before
     public void setUp() {
-        restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate();
         mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
+        producer = new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY);
     }
 
     @Test
@@ -45,12 +51,10 @@ public class ProducerIntegrationTest {
         message.setId("ID:1234");
         message.setDestination(DESTINATION);
 
-        Producer producer = new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY);
-
         mockRestServiceServer.expect(once(), requestTo(SEND_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"queue:" + DESTINATION_ID + "\"}}", true))
+                .andExpect(content().json(JSON, true))
                 .andRespond(withSuccess());
 
         producer.sendMessage(message);
@@ -60,7 +64,6 @@ public class ProducerIntegrationTest {
 
     @Test
     public void close() {
-        Producer producer = new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY);
         mockRestServiceServer.expect(once(), requestTo(CLOSE_URL))
                 .andExpect(method(HttpMethod.DELETE))
                 .andRespond(withSuccess());
