@@ -101,6 +101,13 @@ public class PropertyModelDeserializerTest {
     }
 
     @Test
+    public void longProperty_intValue_returnsLong() throws Exception {
+        PropertyModel model = objectMapper.readValue(json(Long.class, INT), PropertyModel.class);
+
+        assertThat(model).isEqualToComparingFieldByField(new PropertyModel(NAME, "Long", (long) INT));
+    }
+
+    @Test
     public void longType_notLongValue_throwsJsonParse() {
         for (Object value : new Object[]{BOOLEAN, FLOAT, DOUBLE, STRING, OBJECT, ARRAY}) {
             assertThatExceptionOfType(JsonParseException.class)
@@ -193,7 +200,7 @@ public class PropertyModelDeserializerTest {
     }
 
     @Test
-    public void invalidValueTypes_throwsJsonParse() {
+    public void invalidPropertyValueTypes_throwsJsonParse() {
         String[] invalidValueTypes = {
                 "{\"name\": 2, \"type\": \"String\", \"value\": \"hello world\"}",
                 "{\"name\": \"property 8\", \"type\": false, \"value\": \"hello world\"}",
@@ -203,6 +210,13 @@ public class PropertyModelDeserializerTest {
         for (String string : invalidValueTypes) {
             assertThatExceptionOfType(JsonParseException.class).isThrownBy(() -> objectMapper.readValue(string, PropertyModel.class));
         }
+    }
+
+    @Test
+    public void invalidPropertyType_throwsJsonParse() {
+        String json = "{\"name\": \"prop\", \"type\": \"Array\", \"value\": []}";
+
+        assertThatExceptionOfType(JsonParseException.class).isThrownBy(() -> objectMapper.readValue(json, PropertyModel.class));
     }
 
     private static String json(Class<?> type, Object value) {
