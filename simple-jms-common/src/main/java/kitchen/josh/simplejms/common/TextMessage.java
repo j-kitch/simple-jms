@@ -6,12 +6,34 @@ import java.util.Enumeration;
 
 public class TextMessage implements Message {
 
+    private Headers headers;
     private final Properties properties;
     private final TextBody body;
 
     public TextMessage(Properties properties, TextBody body) {
+        this.headers = new HeadersImpl();
         this.properties = properties;
         this.body = body;
+    }
+
+    @Override
+    public String getId() {
+        return headers.getId();
+    }
+
+    @Override
+    public void setId(String id) {
+        headers.setId(id);
+    }
+
+    @Override
+    public Destination getDestination() {
+        return headers.getDestination();
+    }
+
+    @Override
+    public void setDestination(Destination destination) {
+        headers.setDestination(destination);
     }
 
     @Override

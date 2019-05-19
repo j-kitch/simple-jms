@@ -7,12 +7,34 @@ import java.util.Enumeration;
 
 public class ObjectMessage implements Message {
 
+    private final Headers headers;
     private final Properties properties;
     private final ObjectBody body;
 
     public ObjectMessage(Properties properties, ObjectBody body) {
+        this.headers = new HeadersImpl();
         this.properties = properties;
         this.body = body;
+    }
+
+    @Override
+    public String getId() {
+        return headers.getId();
+    }
+
+    @Override
+    public void setId(String id) {
+        headers.setId(id);
+    }
+
+    @Override
+    public Destination getDestination() {
+        return headers.getDestination();
+    }
+
+    @Override
+    public void setDestination(Destination destination) {
+        headers.setDestination(destination);
     }
 
     @Override

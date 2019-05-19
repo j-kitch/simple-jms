@@ -1,23 +1,12 @@
 package kitchen.josh.simplejms.common;
 
-public class Headers {
+public interface Headers {
 
-    private String id;
-    private Destination destination;
+    String getId();
 
-    public String getId() {
-        return id;
-    }
+    void setId(String id);
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    Destination getDestination();
 
-    public Destination getDestination() {
-        return destination;
-    }
-
-    public void setDestination(Destination destination) {
-        this.destination = destination;
-    }
+    void setDestination(Destination destination);
 }

@@ -5,7 +5,7 @@ import java.util.UUID;
 public class HeadersFactory {
 
     public Headers create(HeadersModel model) {
-        Headers headers = new Headers();
+        Headers headers = new HeadersImpl();
 
         String[] parts = model.getDestination().split(":");
         Destination destination = new Destination(DestinationType.valueOf(parts[0].toUpperCase()), UUID.fromString(parts[1]));

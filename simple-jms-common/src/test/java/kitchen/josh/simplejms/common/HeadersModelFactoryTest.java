@@ -22,7 +22,7 @@ public class HeadersModelFactoryTest {
 
     @Test
     public void create() {
-        Headers headers = new Headers();
+        Headers headers = new HeadersImpl();
         headers.setId(MESSAGE_ID);
         headers.setDestination(DESTINATION);
 

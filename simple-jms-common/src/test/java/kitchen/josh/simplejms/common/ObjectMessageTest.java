@@ -9,6 +9,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import javax.jms.JMSException;
 import javax.jms.MessageFormatException;
 import java.util.Enumeration;
+import java.util.UUID;
 
 import static java.util.Collections.enumeration;
 import static java.util.Collections.singleton;
@@ -16,9 +17,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ObjectMessageTest {
+
+    @Mock
+    private Headers headers;
 
     @Mock
     private Properties properties;
@@ -31,6 +36,42 @@ public class ObjectMessageTest {
     @Before
     public void setUp() {
         objectMessage = new ObjectMessage(properties, objectBody);
+        setField(objectMessage, "headers", headers);
+    }
+
+    @Test
+    public void getId() {
+        when(headers.getId()).thenReturn("id");
+
+        assertThat(objectMessage.getId()).isEqualTo("id");
+
+        verify(headers).getId();
+    }
+
+    @Test
+    public void setId() {
+        objectMessage.setId("id");
+
+        verify(headers).setId("id");
+    }
+
+    @Test
+    public void getDestination() {
+        Destination destination = new Destination(DestinationType.TOPIC, UUID.randomUUID());
+        when(headers.getDestination()).thenReturn(destination);
+
+        assertThat(objectMessage.getDestination()).isEqualTo(destination);
+
+        verify(headers).getDestination();
+    }
+
+    @Test
+    public void setDestination() {
+        Destination destination = new Destination(DestinationType.TOPIC, UUID.randomUUID());
+
+        objectMessage.setDestination(destination);
+
+        verify(headers).setDestination(destination);
     }
 
     @Test
