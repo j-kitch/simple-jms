@@ -8,7 +8,10 @@ import cucumber.api.java.en.When;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.TextBody;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
@@ -64,10 +67,10 @@ public class MultipleDestinationSteps {
     @When("each destination's producers send messages")
     public void each_destination_s_producers_send_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
-            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[0])));
-            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[1])));
-            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[2])));
-            destinationSetup.producer.sendMessage(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[3])));
+            destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[0]));
+            destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[1]));
+            destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[2]));
+            destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[3]));
         });
     }
 
@@ -79,10 +82,10 @@ public class MultipleDestinationSteps {
             Optional<Message> message3 = destinationSetup.consumer.receiveMessage();
             Optional<Message> message4 = destinationSetup.consumer.receiveMessage();
 
-            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[0])));
-            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[1])));
-            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[2])));
-            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(new TextMessage(new PropertiesImpl(), createTextBody(destinationSetup.messages[3])));
+            assertThat(message1).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[0]));
+            assertThat(message2).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[1]));
+            assertThat(message3).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[2]));
+            assertThat(message4).get().isEqualToComparingFieldByFieldRecursively(session.createTextMessage(destinationSetup.messages[3]));
 
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
