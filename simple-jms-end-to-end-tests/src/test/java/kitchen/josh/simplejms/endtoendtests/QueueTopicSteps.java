@@ -27,8 +27,6 @@ public class QueueTopicSteps {
             "a", "b", "c", "d"
     };
 
-    private static final Properties[] PROPERTIES = createProperties();
-
     @LocalServerPort
     private int port;
 

@@ -208,9 +208,8 @@ public class PropertiesImplTest {
             assertThat(properties.getObjectProperty(PROPERTY_1)).isEqualTo(value);
         });
 
-        Stream.of(new ArrayList<Integer>(), emptyMap(), new java.util.Properties(), 'c').forEach(value -> {
-            assertThatExceptionOfType(MessageFormatException.class).isThrownBy(() -> properties.setObjectProperty(PROPERTY_1, value));
-        });
+        Stream.of(new ArrayList<Integer>(), emptyMap(), new java.util.Properties(), 'c').forEach(value ->
+                assertThatExceptionOfType(MessageFormatException.class).isThrownBy(() -> properties.setObjectProperty(PROPERTY_1, value)));
     }
 
     @Test

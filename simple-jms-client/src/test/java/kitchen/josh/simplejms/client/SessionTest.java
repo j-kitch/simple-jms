@@ -28,6 +28,12 @@ public class SessionTest {
     private static final String HOST = "localhost:8080";
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
+    private static final String TEXT = "hello world";
+    private static final TextMessage TEXT_MESSAGE = new TextMessage(new PropertiesImpl(), createTextBody());
+
+    private static final Serializable OBJECT = 10;
+    private static final ObjectMessage OBJECT_MESSAGE = new ObjectMessage(new PropertiesImpl(), createObjectBody());
+
     @Mock
     private RestTemplate restTemplate;
 
@@ -104,10 +110,9 @@ public class SessionTest {
 
     @Test
     public void createTextMessage_text_createsTextMessageWithText() {
-        TextMessage message = session.createTextMessage("hello world");
+        TextMessage message = session.createTextMessage(TEXT);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(
-                new TextMessage(new PropertiesImpl(), createTextBody("hello world")));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(TEXT_MESSAGE);
     }
 
     @Test
@@ -122,19 +127,18 @@ public class SessionTest {
     public void createObjectBody_object_createsObjectMessageWithObject() {
         ObjectMessage message = session.createObjectMessage(10);
 
-        assertThat(message).isEqualToComparingFieldByFieldRecursively(
-                new ObjectMessage(new PropertiesImpl(), createObjectBody(10)));
+        assertThat(message).isEqualToComparingFieldByFieldRecursively(OBJECT_MESSAGE);
     }
 
-    private static TextBody createTextBody(String text) {
+    private static TextBody createTextBody() {
         TextBody textBody = new TextBody();
-        textBody.setText(text);
+        textBody.setText(TEXT);
         return textBody;
     }
 
-    private static ObjectBody createObjectBody(Serializable serializable) {
+    private static ObjectBody createObjectBody() {
         ObjectBody objectBody = new ObjectBody();
-        objectBody.setObject(serializable);
+        objectBody.setObject(OBJECT);
         return objectBody;
     }
 }

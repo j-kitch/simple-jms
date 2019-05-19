@@ -135,9 +135,7 @@ public class TopicServiceTest {
                 .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), MESSAGES[1]));
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
-        topicService.getConsumerQueues().values().forEach(queue -> {
-            assertThat(queue).isEmpty();
-        });
+        topicService.getConsumerQueues().values().forEach(queue -> assertThat(queue).isEmpty());
         assertThat(topicService.getProducers()).isEmpty();
     }
 
