@@ -58,7 +58,7 @@ public class Session {
      * @return the created producer
      */
     public Producer createProducer(Destination destination) {
-        IdModel producerId = restTemplate.postForEntity(createProducerUrl(destination), null, IdModel.class).getBody();
+        IdModel producerId = restTemplate.postForEntity(host + "/producer", new DestinationModel(destination), IdModel.class).getBody();
         return new Producer(host, restTemplate, new ProducerId(destination, producerId.getId()), new MessageModelFactory(new HeadersModelFactory(), new PropertyModelFactory(), new BodyModelFactory()));
     }
 
@@ -90,14 +90,6 @@ public class Session {
         ObjectMessage objectMessage = createObjectMessage();
         objectMessage.setObject(serializable);
         return objectMessage;
-    }
-
-    private String createConsumerUrl(Destination destination) {
-        return host + "/" + destination.getType().name().toLowerCase() + "/" + destination.getId() + "/consumer";
-    }
-
-    private String createProducerUrl(Destination destination) {
-        return host + "/" + destination.getType().name().toLowerCase() + "/" + destination.getId() + "/producer";
     }
 
     private String createDestinationUrl(DestinationType type) {

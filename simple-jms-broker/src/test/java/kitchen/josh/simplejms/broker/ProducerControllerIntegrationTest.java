@@ -58,7 +58,9 @@ public class ProducerControllerIntegrationTest {
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.createProducer()).thenReturn(PRODUCER_ID);
 
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer"))
+        mockMvc.perform(post("/producer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}", true));
@@ -69,10 +71,12 @@ public class ProducerControllerIntegrationTest {
     }
 
     @Test
-    public void createProducer_unknownDestinationType_returnsNotFound() throws Exception {
-        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string(""));
+    public void createProducer_unknownDestinationType_returnsBadRequest() throws Exception {
+        mockMvc.perform(post("/producer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"abcd\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().json("{\"message\": \"Malformed JSON\"}", true));
 
         verifyZeroInteractions(destinationService, singleDestinationService, messageFactory);
     }
@@ -81,7 +85,9 @@ public class ProducerControllerIntegrationTest {
     public void createProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer"))
+        mockMvc.perform(post("/producer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"queue:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to create producer: the destination does not exist\"}", true));

@@ -60,8 +60,10 @@ public class SessionIntegrationTest {
 
     @Test
     public void createProducer() {
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/topic/" + DESTINATION_ID + "/producer"))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/producer"))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"destination\": \"topic:" + DESTINATION_ID + "\"}", true))
                 .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON_UTF8));
         Session session = new Session(HOST, restTemplate);
 

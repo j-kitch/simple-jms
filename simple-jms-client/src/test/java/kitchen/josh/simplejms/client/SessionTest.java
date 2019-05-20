@@ -85,7 +85,7 @@ public class SessionTest {
         Producer producer = session.createProducer(DESTINATION);
 
         assertThat(producer).isEqualToComparingFieldByFieldRecursively(new Producer(HOST, restTemplate, PRODUCER_ID, MESSAGE_MODEL_FACTORY));
-        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/producer", null, IdModel.class);
+        verify(restTemplate).postForEntity(HOST + "/producer", new DestinationModel(DESTINATION), IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 
