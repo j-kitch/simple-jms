@@ -2,6 +2,11 @@ package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.message.Message;
+import kitchen.josh.simplejms.common.message.TextMessage;
+import kitchen.josh.simplejms.common.message.body.TextBody;
+import kitchen.josh.simplejms.common.message.headers.HeadersImpl;
+import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +26,7 @@ public class ConsumerServiceTest {
 
     private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, UUID.randomUUID());
     private static final UUID CONSUMER_ID = UUID.randomUUID();
+    private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody());
 
     @Mock
     private SingleDestinationService singleDestinationService;
@@ -58,23 +64,40 @@ public class ConsumerServiceTest {
     }
 
     @Test
-    public void findConsumerDestination_consumerDoesNotExist_returnsEmpty() {
-        assertThat(consumerService.findConsumerDestination(CONSUMER_ID)).isEmpty();
+    public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
+        assertThatExceptionOfType(ConsumerDoesNotExistException.class).isThrownBy(() -> consumerService.readMessage(CONSUMER_ID));
 
         verifyZeroInteractions(destinationService, singleDestinationService);
     }
 
     @Test
-    public void findConsumerDestination_consumerExists_returnsDestinationService() {
+    public void readMessage_noMessage_returnsEmpty() {
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         UUID consumerId = consumerService.createConsumer(DESTINATION);
         reset(singleDestinationService);
 
-        Optional<SingleDestinationService> destination = consumerService.findConsumerDestination(consumerId);
+        when(singleDestinationService.readMessage(any())).thenReturn(Optional.empty());
 
-        assertThat(destination).contains(singleDestinationService);
+        Optional<Message> message = consumerService.readMessage(consumerId);
+
+        assertThat(message).isEmpty();
         verify(destinationService, atLeastOnce()).findDestination(DESTINATION);
-        verifyNoMoreInteractions(destinationService, singleDestinationService);
+        verify(singleDestinationService).readMessage(consumerId);
+    }
+
+    @Test
+    public void readMessage_message_returnsMessage() {
+        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
+        UUID consumerId = consumerService.createConsumer(DESTINATION);
+        reset(singleDestinationService);
+
+        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
+
+        Optional<Message> message = consumerService.readMessage(consumerId);
+
+        assertThat(message).contains(MESSAGE);
+        verify(destinationService, atLeastOnce()).findDestination(DESTINATION);
+        verify(singleDestinationService).readMessage(consumerId);
     }
 
     @Test

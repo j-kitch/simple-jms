@@ -1,12 +1,13 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.DestinationModel;
+import kitchen.josh.simplejms.common.ErrorModel;
+import kitchen.josh.simplejms.common.IdModel;
 import kitchen.josh.simplejms.common.message.MessageModel;
 import kitchen.josh.simplejms.common.message.MessageModelFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.UUID;
 
@@ -22,11 +23,11 @@ public class ConsumerController {
     private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
     private static final String CONSUMER_DOES_NOT_EXIST = "the consumer does not exist";
 
-    private final DestinationService destinationService;
+    private final ConsumerService consumerService;
     private final MessageModelFactory messageModelFactory;
 
-    public ConsumerController(DestinationService destinationService, MessageModelFactory messageModelFactory) {
-        this.destinationService = destinationService;
+    public ConsumerController(ConsumerService consumerService, MessageModelFactory messageModelFactory) {
+        this.consumerService = consumerService;
         this.messageModelFactory = messageModelFactory;
     }
 
@@ -38,10 +39,11 @@ public class ConsumerController {
      */
     @PostMapping(path = "/consumer")
     public IdModel createConsumer(@RequestBody DestinationModel model) {
-        UUID consumerId = destinationService.findDestination(model.getDestination())
-                .map(SingleDestinationService::createConsumer)
-                .orElseThrow(() -> createError(FAILED_CREATE_CONSUMER, DESTINATION_DOES_NOT_EXIST));
-        return new IdModel(consumerId);
+        try {
+            return new IdModel(consumerService.createConsumer(model.getDestination()));
+        } catch (DestinationDoesNotExistException e) {
+            throw createError(FAILED_CREATE_CONSUMER, DESTINATION_DOES_NOT_EXIST);
+        }
     }
 
     /**
@@ -55,9 +57,7 @@ public class ConsumerController {
     public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                @PathVariable UUID consumerId) {
         try {
-            destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> createError(FAILED_DELETE_CONSUMER, DESTINATION_DOES_NOT_EXIST))
-                    .removeConsumer(consumerId);
+            consumerService.removeConsumer(consumerId);
         } catch (ConsumerDoesNotExistException e) {
             throw createError(FAILED_DELETE_CONSUMER, CONSUMER_DOES_NOT_EXIST);
         }
@@ -75,9 +75,7 @@ public class ConsumerController {
     public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
                                        @PathVariable UUID consumerId) {
         try {
-            return destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, DESTINATION_DOES_NOT_EXIST))
-                    .readMessage(consumerId)
+            return consumerService.readMessage(consumerId)
                     .map(messageModelFactory::create)
                     .orElse(new MessageModel(null, emptyList(), null));
         } catch (ConsumerDoesNotExistException e) {
@@ -101,14 +99,6 @@ public class ConsumerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorModel malformedJsonHandler() {
         return new ErrorModel("Malformed JSON");
-    }
-
-    private static DestinationType toType(String type) {
-        try {
-            return DestinationType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException iae) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
     }
 
     private static ApiException createError(String problem, String cause) {

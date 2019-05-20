@@ -1,12 +1,15 @@
 package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.message.Message;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class ConsumerService {
 
     private final DestinationService destinationService;
@@ -26,15 +29,21 @@ public class ConsumerService {
         return consumerId;
     }
 
-    public Optional<SingleDestinationService> findConsumerDestination(UUID consumerId) {
-        return Optional.ofNullable(consumers.get(consumerId))
-                .flatMap(destinationService::findDestination);
+    public Optional<Message> readMessage(UUID consumerId) {
+        return findDestinationService(consumerId)
+                .orElseThrow(ConsumerDoesNotExistException::new)
+                .readMessage(consumerId);
     }
 
     public void removeConsumer(UUID consumerId) {
-        findConsumerDestination(consumerId)
+        findDestinationService(consumerId)
                 .orElseThrow(ConsumerDoesNotExistException::new)
                 .removeConsumer(consumerId);
         consumers.remove(consumerId);
+    }
+
+    private Optional<SingleDestinationService> findDestinationService(UUID consumerId) {
+        return Optional.ofNullable(consumers.get(consumerId))
+                .flatMap(destinationService::findDestination);
     }
 }
