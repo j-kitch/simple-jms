@@ -30,20 +30,17 @@ public class ConsumerService {
     }
 
     public Optional<Message> readMessage(UUID consumerId) {
-        return findDestinationService(consumerId)
-                .orElseThrow(ConsumerDoesNotExistException::new)
-                .readMessage(consumerId);
+        return findDestinationService(consumerId).readMessage(consumerId);
     }
 
     public void removeConsumer(UUID consumerId) {
-        findDestinationService(consumerId)
-                .orElseThrow(ConsumerDoesNotExistException::new)
-                .removeConsumer(consumerId);
+        findDestinationService(consumerId).removeConsumer(consumerId);
         consumers.remove(consumerId);
     }
 
-    private Optional<SingleDestinationService> findDestinationService(UUID consumerId) {
+    private SingleDestinationService findDestinationService(UUID consumerId) {
         return Optional.ofNullable(consumers.get(consumerId))
-                .flatMap(destinationService::findDestination);
+                .flatMap(destinationService::findDestination)
+                .orElseThrow(ConsumerDoesNotExistException::new);
     }
 }
