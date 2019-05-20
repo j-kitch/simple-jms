@@ -32,8 +32,7 @@ public class Consumer implements AutoCloseable {
      * @return the next message for the consumer, or <code>Optional.empty()</code> if there isn't a message
      */
     public Optional<Message> receiveMessage() {
-        String receiveUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"
-                + id.getId() + "/receive";
+        String receiveUrl = brokerUrl + "/consumer/" + id.getId() + "/receive";
 
         return Optional.ofNullable(restTemplate.postForEntity(receiveUrl, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
@@ -45,8 +44,7 @@ public class Consumer implements AutoCloseable {
      */
     @Override
     public void close() {
-        String deleteUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId() + "/consumer/"
-                + id.getId();
+        String deleteUrl = brokerUrl + "/consumer/" + id.getId();
 
         restTemplate.delete(deleteUrl);
     }

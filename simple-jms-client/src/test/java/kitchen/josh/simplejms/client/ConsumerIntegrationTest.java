@@ -37,8 +37,8 @@ public class ConsumerIntegrationTest {
 
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
-    private static final String RECEIVE_URL = HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
-    private static final String CLOSE_URL = HOST + "/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
+    private static final String RECEIVE_URL = HOST + "/consumer/" + CONSUMER_ID + "/receive";
+    private static final String CLOSE_URL = HOST + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
 

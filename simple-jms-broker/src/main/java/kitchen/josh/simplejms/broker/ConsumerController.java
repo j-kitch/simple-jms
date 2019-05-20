@@ -49,13 +49,10 @@ public class ConsumerController {
     /**
      * Delete a consumer.
      *
-     * @param destinationType the type of destination
-     * @param destinationId   the id of the destination
-     * @param consumerId      the id of the consumer
+     * @param consumerId the id of the consumer
      */
-    @DeleteMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}")
-    public void deleteConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId,
-                               @PathVariable UUID consumerId) {
+    @DeleteMapping(path = "/consumer/{consumerId}")
+    public void deleteConsumer(@PathVariable UUID consumerId) {
         try {
             consumerService.removeConsumer(consumerId);
         } catch (ConsumerDoesNotExistException e) {
@@ -66,14 +63,11 @@ public class ConsumerController {
     /**
      * Receive a message for a consumer from a destination.
      *
-     * @param destinationType the type of destination
-     * @param destinationId   the id of the destination
-     * @param consumerId      the id of the consumer
+     * @param consumerId the id of the consumer
      * @return the message received from the destination
      */
-    @PostMapping(path = "/{destinationType}/{destinationId}/consumer/{consumerId}/receive")
-    public MessageModel receiveMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
-                                       @PathVariable UUID consumerId) {
+    @PostMapping(path = "/consumer/{consumerId}/receive")
+    public MessageModel receiveMessage(@PathVariable UUID consumerId) {
         try {
             return consumerService.readMessage(consumerId)
                     .map(messageModelFactory::create)

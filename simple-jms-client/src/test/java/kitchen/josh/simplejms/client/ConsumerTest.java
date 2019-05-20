@@ -36,8 +36,8 @@ public class ConsumerTest {
 
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
-    private static final String RECEIVE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive";
-    private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID;
+    private static final String RECEIVE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID + "/receive";
+    private static final String DELETE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
     private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));

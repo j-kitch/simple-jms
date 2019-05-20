@@ -93,7 +93,7 @@ public class ConsumerControllerIntegrationTest {
 
     @Test
     public void deleteConsumer_returnsOk() throws Exception {
-        mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+        mockMvc.perform(delete("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isOk());
 
         verify(consumerService).removeConsumer(CONSUMER_ID);
@@ -104,7 +104,7 @@ public class ConsumerControllerIntegrationTest {
     public void deleteConsumer_consumerDoesNotExist_returnsBadRequest() throws Exception {
         doThrow(ConsumerDoesNotExistException.class).when(consumerService).removeConsumer(any());
 
-        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID))
+        mockMvc.perform(delete("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to delete consumer: the consumer does not exist\"}", true));
@@ -117,7 +117,7 @@ public class ConsumerControllerIntegrationTest {
     public void receiveMessage_noMessage_returnsNull() throws Exception {
         when(consumerService.readMessage(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"body\": null, \"properties\": [], headers: null}", true));
 
@@ -130,7 +130,7 @@ public class ConsumerControllerIntegrationTest {
         when(messageModelFactory.create(any())).thenReturn(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
         when(consumerService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"));
 
@@ -143,7 +143,7 @@ public class ConsumerControllerIntegrationTest {
     public void receiveMessage_consumerDoesNotExist_returnsBadRequest() throws Exception {
         when(consumerService.readMessage(any())).thenThrow(ConsumerDoesNotExistException.class);
 
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer/" + CONSUMER_ID + "/receive"))
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to receive message: the consumer does not exist\"}"));
