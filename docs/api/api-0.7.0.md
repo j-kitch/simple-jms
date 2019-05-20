@@ -1,4 +1,4 @@
-# SimpleJMS 0.6.0 Rest API
+# SimpleJMS 0.7.0 Rest API
 
 ## Create a Destination
 ```
@@ -189,6 +189,10 @@ producer-id | string | false | The ID of the Producer.
 #### Request Body
 ```json
 {
+  "headers": {
+    "JMSDestination": null,
+    "JMSMessageID": null
+  },
   "properties": [
     {
       "name": "{property-name}", 
@@ -205,6 +209,9 @@ producer-id | string | false | The ID of the Producer.
 ```
 Path | Type | Optional | Description
 ---|---|---|---
+$.headers | object | false | The JMS message headers of this message.
+$.headers.JMSDestination | null | false | The destination of this message, not set by the client.
+$.headers.JMSMessageID | null | false | The message ID of this message, not set by the client.
 $.body.type | string | false | The type of the message body, either *text* or *object*.
 $.body.text | string | true | Present if the body is a text body, the text in the body.
 $.body.object | string | true | Present if the body is an object body, the object in the body.
@@ -252,6 +259,10 @@ The Consumer has received it's message from the broker.
 
 ```json
 {
+  "headers": {
+    "JMSDestination": "{destination-type}:{destination-id}",
+    "JMSMessageID": "ID:{message-id}"
+  },
   "properties": [
     {
       "name": "{property-name}", 
@@ -268,6 +279,9 @@ The Consumer has received it's message from the broker.
 ```
 Path | Type | Optional | Description
 ---|---|---|---
+$.headers | object | false | The JMS message headers of this message.
+$.headers.JMSDestination | string | false | The destination of this message, set by the broker.
+$.headers.JMSMessageID | string | false | The message ID of this message, set by the broker.
 $.body | object | true | Present if a message exists, the body of the message.
 $.body.type | string | false | The type of the message body, either *text* or *object*.
 $.body.text | string | true | Present if the body is a text body, the text in the body.
