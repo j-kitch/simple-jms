@@ -35,6 +35,38 @@ public class QueueServiceTest {
     }
 
     @Test
+    public void addConsumer_addsConsumerToConsumers() {
+        queueService.addConsumer(ID);
+
+        assertThat(queueService.getConsumers()).containsExactly(ID);
+        assertThat(queueService.getProducers()).isEmpty();
+        assertThat(queueService.getMessages()).isEmpty();
+    }
+
+    @Test
+    public void addConsumer_consumerAlreadyExists_throwsIllegalState() {
+        queueService.addConsumer(ID);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> queueService.addConsumer(ID));
+    }
+
+    @Test
+    public void addProducer_addsProducerToProducers() {
+        queueService.addProducer(ID);
+
+        assertThat(queueService.getConsumers()).isEmpty();
+        assertThat(queueService.getProducers()).containsExactly(ID);
+        assertThat(queueService.getMessages()).isEmpty();
+    }
+
+    @Test
+    public void addProducer_producerAlreadyExists_throwsIllegalState() {
+        queueService.addProducer(ID);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> queueService.addProducer(ID));
+    }
+
+    @Test
     public void createConsumer_shouldCreateNewUUIDAndAddToConsumers() {
         UUID consumerId = queueService.createConsumer();
 

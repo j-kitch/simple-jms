@@ -22,6 +22,22 @@ public class TopicService implements SingleDestinationService {
     }
 
     @Override
+    public void addConsumer(UUID consumerId) {
+        if (consumerQueues.containsKey(consumerId)) {
+            throw new IllegalStateException("Consumer " + consumerId + " already consuming from topic");
+        }
+        consumerQueues.put(consumerId, new LinkedList<>());
+    }
+
+    @Override
+    public void addProducer(UUID producerId) {
+        if (producers.contains(producerId)) {
+            throw new IllegalStateException("Producer " + producerId + " already producing to topic");
+        }
+        producers.add(producerId);
+    }
+
+    @Override
     public UUID createConsumer() {
         UUID consumerId = UUID.randomUUID();
         consumerQueues.put(consumerId, new LinkedList<>());

@@ -11,16 +11,40 @@ import java.util.UUID;
 public interface SingleDestinationService {
 
     /**
+     * Allocate resources for the consumer to start consuming from this destination.
+     *
+     * @param consumerId the id of the consumer to add
+     * @throws IllegalStateException if the consumer is already connected to the destination
+     */
+    void addConsumer(UUID consumerId);
+
+    /**
+     * Allocate resources for the producer to start sending messages to this destination.
+     *
+     * @param producerId the id of the producer to add
+     * @throws IllegalStateException if the producer is already connected to the destination
+     */
+    void addProducer(UUID producerId);
+
+    /**
      * Create a new consumer for this destination.
+     * TODO: We're removing creation of consumers from the SingleDestinationService, this will now be handled externally
+     *      * by other parts of the system.  These will instead call the {@link SingleDestinationService#addConsumer(UUID)}
+     *      * to notify the service about the consumer.
      *
      * @return the id of the new consumer
+     * @deprecated
      */
     UUID createConsumer();
 
     /**
      * Create a new producer for this destination.
+     * TODO: We're removing creation of producers from the SingleDestinationService, this will now be handled externally
+     *      * by other parts of the system.  These will instead call the {@link SingleDestinationService#addProducer(UUID)}
+     *      * to notify the service about the producer.
      *
      * @return the id of the producer
+     * @deprecated
      */
     UUID createProducer();
 

@@ -24,6 +24,22 @@ public class QueueService implements SingleDestinationService {
     }
 
     @Override
+    public void addConsumer(UUID consumerId) {
+        if (consumers.contains(consumerId)) {
+            throw new IllegalStateException("Consumer " + consumerId + " already consuming from queue");
+        }
+        consumers.add(consumerId);
+    }
+
+    @Override
+    public void addProducer(UUID producerId) {
+        if (producers.contains(producerId)) {
+            throw new IllegalStateException("Producer " + producerId + " already producing to queue");
+        }
+        producers.add(producerId);
+    }
+
+    @Override
     public UUID createConsumer() {
         UUID consumerId = UUID.randomUUID();
         consumers.add(consumerId);

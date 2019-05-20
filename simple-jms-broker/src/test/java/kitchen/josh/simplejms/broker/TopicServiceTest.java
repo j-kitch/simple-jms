@@ -34,6 +34,37 @@ public class TopicServiceTest {
     }
 
     @Test
+    public void addConsumer_createsQueueForConsumer() {
+        topicService.addConsumer(ID);
+
+        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(ID);
+        assertThat(topicService.getConsumerQueues().get(ID)).isEmpty();
+        assertThat(topicService.getProducers()).isEmpty();
+    }
+
+    @Test
+    public void addConsumer_consumerAlreadyExists_throwsIllegalState() {
+        topicService.addConsumer(ID);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> topicService.addConsumer(ID));
+    }
+
+    @Test
+    public void addProducer_addsToProducers() {
+        topicService.addProducer(ID);
+
+        assertThat(topicService.getConsumerQueues()).isEmpty();
+        assertThat(topicService.getProducers()).containsExactly(ID);
+    }
+
+    @Test
+    public void addProducer_producerAlreadyExists_throwsIllegalState() {
+        topicService.addProducer(ID);
+
+        assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> topicService.addProducer(ID));
+    }
+
+    @Test
     public void createConsumer_shouldCreateUUIDAndAddEntryWithEmptyQueue() {
         UUID consumerId = topicService.createConsumer();
 
