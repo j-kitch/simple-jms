@@ -97,6 +97,14 @@ public class QueueServiceTest {
         queueService.addMessage(producerId, messages[1]);
 
         assertThat(queueService.getMessages()).containsExactly(messages[0], messages[1]);
+    }
+
+    @Test
+    public void addMessage_setsDestinationToThis() {
+        UUID producerId = queueService.createProducer();
+        queueService.addMessage(producerId, messages[0]);
+        queueService.addMessage(producerId, messages[1]);
+
         assertThat(queueService.getMessages())
                 .extracting(Message::getDestination)
                 .containsExactly(new Destination(DestinationType.QUEUE, ID), new Destination(DestinationType.QUEUE, ID));

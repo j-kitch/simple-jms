@@ -148,11 +148,24 @@ public class TopicServiceTest {
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
             assertThat(queue).containsExactly(messages[0], messages[1]);
-            assertThat(queue)
-                    .extracting(Message::getDestination)
-                    .containsExactly(new Destination(DestinationType.TOPIC, ID), new Destination(DestinationType.TOPIC, ID));
         });
         assertThat(topicService.getProducers()).containsOnly(producerId);
+    }
+
+    @Test
+    public void addMessage_setsDestinationToThis() {
+
+        UUID producerId = topicService.createProducer();
+        topicService.createConsumer();
+        topicService.createConsumer();
+
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
+
+        topicService.getConsumerQueues().values().forEach(queue ->
+                assertThat(queue)
+                        .extracting(Message::getDestination)
+                        .containsExactly(new Destination(DestinationType.TOPIC, ID), new Destination(DestinationType.TOPIC, ID)));
     }
 
     @Test
