@@ -1,8 +1,8 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.Message;
-import kitchen.josh.simplejms.common.MessageFactory;
-import kitchen.josh.simplejms.common.MessageModel;
+import kitchen.josh.simplejms.common.message.Message;
+import kitchen.josh.simplejms.common.message.MessageFactory;
+import kitchen.josh.simplejms.common.message.MessageModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 

@@ -1,6 +1,14 @@
 package kitchen.josh.simplejms.client;
 
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.message.Message;
+import kitchen.josh.simplejms.common.message.MessageFactory;
+import kitchen.josh.simplejms.common.message.MessageModel;
+import kitchen.josh.simplejms.common.message.TextMessage;
+import kitchen.josh.simplejms.common.message.body.TextBody;
+import kitchen.josh.simplejms.common.message.headers.HeadersImpl;
+import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

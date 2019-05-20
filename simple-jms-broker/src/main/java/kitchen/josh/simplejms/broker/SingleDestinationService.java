@@ -1,6 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.message.Message;
 
 import java.util.Optional;
 import java.util.UUID;

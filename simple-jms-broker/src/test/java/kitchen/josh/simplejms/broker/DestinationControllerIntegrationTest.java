@@ -1,6 +1,13 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.message.*;
+import kitchen.josh.simplejms.common.message.body.TextBody;
+import kitchen.josh.simplejms.common.message.body.TextBodyModel;
+import kitchen.josh.simplejms.common.message.headers.HeadersImpl;
+import kitchen.josh.simplejms.common.message.headers.HeadersModel;
+import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

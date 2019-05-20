@@ -2,7 +2,7 @@ package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.Message;
+import kitchen.josh.simplejms.common.message.Message;
 
 import java.util.*;
 

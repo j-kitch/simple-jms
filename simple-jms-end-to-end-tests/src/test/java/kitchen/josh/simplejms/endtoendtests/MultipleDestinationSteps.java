@@ -8,7 +8,11 @@ import cucumber.api.java.en.When;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.message.Message;
+import kitchen.josh.simplejms.common.message.body.TextBody;
+import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.web.client.RestTemplate;
 
