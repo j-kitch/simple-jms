@@ -27,8 +27,7 @@ public class Producer implements AutoCloseable {
      * @param message the message to send
      */
     public void sendMessage(Message message) {
-        String sendUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
-                + "/producer/" + id.getId() + "/send";
+        String sendUrl = brokerUrl + "/producer/" + id.getId() + "/send";
 
         restTemplate.postForEntity(sendUrl, messageModelFactory.create(message), Void.class);
     }
@@ -47,8 +46,7 @@ public class Producer implements AutoCloseable {
      */
     @Override
     public void close() {
-        String deleteUrl = brokerUrl + "/" + id.getDestination().getType().name().toLowerCase() + "/" + id.getDestination().getId()
-                + "/producer/" + id.getId();
+        String deleteUrl = brokerUrl + "/producer/" + id.getId();
 
         restTemplate.delete(deleteUrl);
     }

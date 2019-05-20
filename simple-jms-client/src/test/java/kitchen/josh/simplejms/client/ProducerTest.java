@@ -31,8 +31,8 @@ public class ProducerTest {
     private static final Destination DESTINATION = new Destination(DestinationType.TOPIC, UUID.randomUUID());
     private static final String BROKER_URL = "http://localhost:9999";
 
-    private static final String SEND_URL = BROKER_URL + "/topic/" + DESTINATION.getId() + "/producer/" + PRODUCER_ID + "/send";
-    private static final String DELETE_URL = BROKER_URL + "/topic/" + DESTINATION.getId() + "/producer/" + PRODUCER_ID;
+    private static final String SEND_URL = BROKER_URL + "/producer/" + PRODUCER_ID + "/send";
+    private static final String DELETE_URL = BROKER_URL + "/producer/" + PRODUCER_ID;
 
     private static final String TEXT = "hello world";
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null, null);

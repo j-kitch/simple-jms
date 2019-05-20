@@ -2,12 +2,14 @@ package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.message.Message;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class ProducerService {
 
     private final DestinationService destinationService;

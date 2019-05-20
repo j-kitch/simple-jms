@@ -1,6 +1,9 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.*;
+import kitchen.josh.simplejms.common.DestinationModel;
+import kitchen.josh.simplejms.common.DestinationType;
+import kitchen.josh.simplejms.common.ErrorModel;
+import kitchen.josh.simplejms.common.IdModel;
 import kitchen.josh.simplejms.common.message.MessageFactory;
 import kitchen.josh.simplejms.common.message.MessageModel;
 import org.springframework.http.HttpStatus;
@@ -21,11 +24,11 @@ public class ProducerController {
     private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
     private static final String PRODUCER_DOES_NOT_EXIST = "the producer does not exist";
 
-    private final DestinationService destinationService;
+    private final ProducerService producerService;
     private final MessageFactory messageFactory;
 
-    public ProducerController(DestinationService destinationService, MessageFactory messageFactory) {
-        this.destinationService = destinationService;
+    public ProducerController(ProducerService producerService, MessageFactory messageFactory) {
+        this.producerService = producerService;
         this.messageFactory = messageFactory;
     }
 
@@ -37,26 +40,22 @@ public class ProducerController {
      */
     @PostMapping(path = "/producer")
     public IdModel createProducer(@RequestBody DestinationModel model) {
-        UUID consumerId = destinationService.findDestination(model.getDestination())
-                .map(SingleDestinationService::createProducer)
-                .orElseThrow(() -> createError(FAILED_CREATE_PRODUCER, DESTINATION_DOES_NOT_EXIST));
-        return new IdModel(consumerId);
+        try {
+            return new IdModel(producerService.createProducer(model.getDestination()));
+        } catch (DestinationDoesNotExistException e) {
+            throw createError(FAILED_CREATE_PRODUCER, DESTINATION_DOES_NOT_EXIST);
+        }
     }
 
     /**
      * Delete a producer.
      *
-     * @param destinationType the type of destination
-     * @param destinationId   the id of the destination
      * @param producerId      the id of the producer
      */
-    @DeleteMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}")
-    public void deleteProducer(@PathVariable String destinationType, @PathVariable UUID destinationId,
-                               @PathVariable UUID producerId) {
+    @DeleteMapping(path = "/producer/{producerId}")
+    public void deleteProducer(@PathVariable UUID producerId) {
         try {
-            destinationService.findDestination(new Destination(toType(destinationType), destinationId))
-                    .orElseThrow(() -> createError(FAILED_DELETE_PRODUCER, DESTINATION_DOES_NOT_EXIST))
-                    .removeProducer(producerId);
+            producerService.removeProducer(producerId);
         } catch (ProducerDoesNotExistException e) {
             throw createError(FAILED_DELETE_PRODUCER, PRODUCER_DOES_NOT_EXIST);
         }
@@ -65,19 +64,13 @@ public class ProducerController {
     /**
      * Send a message from a producer to a destination.
      *
-     * @param destinationType the type of destination
-     * @param destinationId   the id of the destination
-     * @param producerId      the id of the producer
-     * @param message         the message to send to the destination
+     * @param producerId the id of the producer
+     * @param message    the message to send to the destination
      */
-    @PostMapping(path = "/{destinationType}/{destinationId}/producer/{producerId}/send")
-    public void sendMessage(@PathVariable String destinationType, @PathVariable UUID destinationId,
-                            @PathVariable UUID producerId, @RequestBody MessageModel message) throws MessageFormatException {
+    @PostMapping(path = "/producer/{producerId}/send")
+    public void sendMessage(@PathVariable UUID producerId, @RequestBody MessageModel message) throws MessageFormatException {
         try {
-            Destination destination = new Destination(toType(destinationType), destinationId);
-            destinationService.findDestination(destination)
-                    .orElseThrow(() -> createError(FAILED_SEND_MESSAGE, DESTINATION_DOES_NOT_EXIST))
-                    .addMessage(producerId, messageFactory.create(message));
+            producerService.sendMessage(producerId, messageFactory.create(message));
         } catch (ProducerDoesNotExistException e) {
             throw createError(FAILED_SEND_MESSAGE, PRODUCER_DOES_NOT_EXIST);
         }

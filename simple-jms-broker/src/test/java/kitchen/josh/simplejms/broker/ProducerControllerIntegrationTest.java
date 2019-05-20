@@ -21,7 +21,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Collections.emptyList;
@@ -48,15 +47,14 @@ public class ProducerControllerIntegrationTest {
     private SingleDestinationService singleDestinationService;
 
     @MockBean
-    private DestinationService destinationService;
+    private ProducerService producerService;
 
     @MockBean
     private MessageFactory messageFactory;
 
     @Test
     public void createProducer_returnsOkAndId() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        when(singleDestinationService.createProducer()).thenReturn(PRODUCER_ID);
+        when(producerService.createProducer(any())).thenReturn(PRODUCER_ID);
 
         mockMvc.perform(post("/producer")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -65,9 +63,8 @@ public class ProducerControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}", true));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        verify(singleDestinationService).createProducer();
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verify(producerService).createProducer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
@@ -78,12 +75,12 @@ public class ProducerControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"message\": \"Malformed JSON\"}", true));
 
-        verifyZeroInteractions(destinationService, singleDestinationService, messageFactory);
+        verifyZeroInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
     public void createProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.empty());
+        when(producerService.createProducer(any())).thenThrow(DestinationDoesNotExistException.class);
 
         mockMvc.perform(post("/producer")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -92,118 +89,61 @@ public class ProducerControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to create producer: the destination does not exist\"}", true));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verify(producerService).createProducer(new Destination(DestinationType.QUEUE, DESTINATION_ID));
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
     public void deleteProducer_returnsOk() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-
-        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+        mockMvc.perform(delete("/producer/" + PRODUCER_ID))
                 .andExpect(status().isOk());
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(singleDestinationService).removeProducer(PRODUCER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
-    }
-
-    @Test
-    public void deleteProducer_unknownDestinationType_returnsNotFound() throws Exception {
-        mockMvc.perform(delete("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string(""));
-
-        verifyZeroInteractions(destinationService, singleDestinationService, messageFactory);
-    }
-
-    @Test
-    public void deleteProducer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.empty());
-
-        mockMvc.perform(delete("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"Failed to delete producer: the destination does not exist\"}", true));
-
-        verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verify(producerService).removeProducer(PRODUCER_ID);
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
     public void deleteProducer_producerDoesNotExist_returnsBadRequest() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
-        doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).removeProducer(any());
+        doThrow(ProducerDoesNotExistException.class).when(producerService).removeProducer(PRODUCER_ID);
 
-        mockMvc.perform(delete("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID))
+        mockMvc.perform(delete("/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to delete producer: the producer does not exist\"}", true));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
-        verify(singleDestinationService).removeProducer(PRODUCER_ID);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verify(producerService).removeProducer(PRODUCER_ID);
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
     public void sendMessage_returnsOk() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(messageFactory.create(any())).thenReturn(MESSAGE);
 
-        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
+        mockMvc.perform(post("/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
+        verify(producerService).sendMessage(PRODUCER_ID, MESSAGE);
         verify(messageFactory).create(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
-        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
-    }
-
-    @Test
-    public void sendMessage_unknownDestinationType_returnsNotFound() throws Exception {
-        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string(""));
-
-        verifyZeroInteractions(destinationService, singleDestinationService, messageFactory);
-    }
-
-    @Test
-    public void sendMessage_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.empty());
-
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
-                .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
-                .andExpect(content().json("{\"message\": \"Failed to send message: the destination does not exist\"}", true));
-
-        verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 
     @Test
     public void sendMessage_producerDoesNotExist_returnsBadRequest() throws Exception {
-        when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(messageFactory.create(any())).thenReturn(MESSAGE);
-        doThrow(ProducerDoesNotExistException.class).when(singleDestinationService).addMessage(any(), any());
+        doThrow(ProducerDoesNotExistException.class).when(producerService).sendMessage(any(), any());
 
-        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_ID + "/send")
+        mockMvc.perform(post("/producer/" + PRODUCER_ID + "/send")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to send message: the producer does not exist\"}", true));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
         verify(messageFactory).create(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
-        verify(singleDestinationService).addMessage(PRODUCER_ID, MESSAGE);
-        verifyNoMoreInteractions(destinationService, singleDestinationService, messageFactory);
+        verify(producerService).sendMessage(PRODUCER_ID, MESSAGE);
+        verifyNoMoreInteractions(producerService, singleDestinationService, messageFactory);
     }
 }

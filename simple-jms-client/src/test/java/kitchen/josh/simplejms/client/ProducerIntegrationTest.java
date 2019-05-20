@@ -35,8 +35,8 @@ public class ProducerIntegrationTest {
     private static final UUID PRODUCER_UUID = UUID.randomUUID();
     private static final ProducerId PRODUCER_ID = new ProducerId(DESTINATION, PRODUCER_UUID);
 
-    private static final String SEND_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID + "/send";
-    private static final String CLOSE_URL = HOST + "/queue/" + DESTINATION_ID + "/producer/" + PRODUCER_UUID;
+    private static final String SEND_URL = HOST + "/producer/" + PRODUCER_UUID + "/send";
+    private static final String CLOSE_URL = HOST + "/producer/" + PRODUCER_UUID;
 
     private static final String JSON = "{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []," +
             "\"headers\": {\"JMSMessageID\": \"ID:1234\", \"JMSDestination\": \"queue:" + DESTINATION_ID + "\"}}";
