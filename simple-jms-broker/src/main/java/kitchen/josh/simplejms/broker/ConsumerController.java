@@ -1,12 +1,10 @@
 package kitchen.josh.simplejms.broker;
 
-import kitchen.josh.simplejms.common.Destination;
-import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.ErrorModel;
-import kitchen.josh.simplejms.common.IdModel;
+import kitchen.josh.simplejms.common.*;
 import kitchen.josh.simplejms.common.message.MessageModel;
 import kitchen.josh.simplejms.common.message.MessageModelFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -35,13 +33,12 @@ public class ConsumerController {
     /**
      * Create a new consumer for a destination.
      *
-     * @param destinationType the type of destination to create a consumer for
-     * @param destinationId   the id of the destination to create a consumer for
+     * @param model the destination to create the consumer for
      * @return the id of the created consumer
      */
-    @PostMapping(path = "/{destinationType}/{destinationId}/consumer")
-    public IdModel createConsumer(@PathVariable String destinationType, @PathVariable UUID destinationId) {
-        UUID consumerId = destinationService.findDestination(new Destination(toType(destinationType), destinationId))
+    @PostMapping(path = "/consumer")
+    public IdModel createConsumer(@RequestBody DestinationModel model) {
+        UUID consumerId = destinationService.findDestination(model.getDestination())
                 .map(SingleDestinationService::createConsumer)
                 .orElseThrow(() -> createError(FAILED_CREATE_CONSUMER, DESTINATION_DOES_NOT_EXIST));
         return new IdModel(consumerId);
@@ -98,6 +95,12 @@ public class ConsumerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorModel apiExceptionHandler(ApiException apiException) {
         return new ErrorModel(apiException.getMessage());
+    }
+
+    @ExceptionHandler(HttpMessageConversionException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorModel malformedJsonHandler() {
+        return new ErrorModel("Malformed JSON");
     }
 
     private static DestinationType toType(String type) {

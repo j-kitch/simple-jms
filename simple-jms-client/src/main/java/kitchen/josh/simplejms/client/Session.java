@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationModel;
 import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.IdModel;
 import kitchen.josh.simplejms.common.message.MessageFactory;
@@ -67,7 +68,7 @@ public class Session {
      * @return the created consumer
      */
     public Consumer createConsumer(Destination destination) {
-        IdModel consumerId = restTemplate.postForEntity(createConsumerUrl(destination), null, IdModel.class).getBody();
+        IdModel consumerId = restTemplate.postForEntity(host + "/consumer", new DestinationModel(destination), IdModel.class).getBody();
         return new Consumer(host, restTemplate, new ConsumerId(destination, consumerId.getId()), new MessageFactory(new HeadersFactory(), new PropertiesFactory(), new BodyFactory()));
     }
 

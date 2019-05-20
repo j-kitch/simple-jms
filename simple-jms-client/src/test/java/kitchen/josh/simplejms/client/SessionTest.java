@@ -1,6 +1,7 @@
 package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Destination;
+import kitchen.josh.simplejms.common.DestinationModel;
 import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.IdModel;
 import kitchen.josh.simplejms.common.message.MessageFactory;
@@ -93,7 +94,7 @@ public class SessionTest {
         when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
 
         assertThatExceptionOfType(RestClientException.class).isThrownBy(() -> session.createConsumer(DESTINATION));
-        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
+        verify(restTemplate).postForEntity(HOST + "/consumer", new DestinationModel(DESTINATION), IdModel.class);
     }
 
     @Test
@@ -103,7 +104,7 @@ public class SessionTest {
         Consumer consumer = session.createConsumer(DESTINATION);
 
         assertThat(consumer).isEqualToComparingFieldByFieldRecursively(new Consumer(HOST, restTemplate, CONSUMER_ID, MESSAGE_FACTORY));
-        verify(restTemplate).postForEntity(HOST + "/queue/" + DESTINATION_ID + "/consumer", null, IdModel.class);
+        verify(restTemplate).postForEntity(HOST + "/consumer", new DestinationModel(DESTINATION), IdModel.class);
         verifyNoMoreInteractions(restTemplate);
     }
 

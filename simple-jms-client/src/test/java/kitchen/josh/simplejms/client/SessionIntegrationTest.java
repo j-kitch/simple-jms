@@ -21,8 +21,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class SessionIntegrationTest {
@@ -44,8 +43,10 @@ public class SessionIntegrationTest {
 
     @Test
     public void createConsumer() {
-        mockRestServiceServer.expect(once(), requestTo(HOST + "/queue/" + DESTINATION_ID + "/consumer"))
+        mockRestServiceServer.expect(once(), requestTo(HOST + "/consumer"))
                 .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"destination\": \"queue:" + DESTINATION_ID + "\"}", true))
                 .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON_UTF8));
 
         Session session = new Session(HOST, restTemplate);

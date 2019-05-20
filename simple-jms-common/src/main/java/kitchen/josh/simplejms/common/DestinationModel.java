@@ -3,6 +3,7 @@ package kitchen.josh.simplejms.common;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class DestinationModel {
@@ -29,5 +30,18 @@ public class DestinationModel {
     @JsonGetter("destination")
     public String getDestinationString() {
         return destination.getType().name().toLowerCase() + ":" + destination.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DestinationModel model = (DestinationModel) o;
+        return Objects.equals(destination, model.destination);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(destination);
     }
 }

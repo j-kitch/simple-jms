@@ -58,30 +58,35 @@ public class ConsumerControllerIntegrationTest {
         when(destinationService.findDestination(any())).thenReturn(Optional.of(singleDestinationService));
         when(singleDestinationService.createConsumer()).thenReturn(CONSUMER_ID);
 
-        mockMvc.perform(post("/queue/" + DESTINATION_ID + "/consumer"))
+        mockMvc.perform(post("/consumer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}", true));
 
-        verify(destinationService).findDestination(new Destination(DestinationType.QUEUE, DESTINATION_ID));
+        verify(destinationService).findDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         verify(singleDestinationService).createConsumer();
         verifyNoMoreInteractions(destinationService, singleDestinationService, messageModelFactory);
     }
 
     @Test
-    public void createConsumer_unknownDestinationType_returnsNotFound() throws Exception {
-        mockMvc.perform(post("/ooga-booga/" + DESTINATION_ID + "/consumer"))
-                .andExpect(status().isNotFound())
-                .andExpect(content().string(""));
-
-        verifyZeroInteractions(destinationService, singleDestinationService, messageModelFactory);
+    public void createConsumer_invalidDestinationType_returns() throws Exception {
+        mockMvc.perform(post("/consumer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"abcd\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"Malformed JSON\"}"));
     }
 
     @Test
     public void createConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
         when(destinationService.findDestination(any())).thenReturn(Optional.empty());
 
-        mockMvc.perform(post("/topic/" + DESTINATION_ID + "/consumer"))
+        mockMvc.perform(post("/consumer")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to create consumer: the destination does not exist\"}", true));
