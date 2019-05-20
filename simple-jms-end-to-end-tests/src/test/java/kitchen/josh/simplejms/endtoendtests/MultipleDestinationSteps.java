@@ -78,11 +78,6 @@ public class MultipleDestinationSteps {
             Optional<Message> message3 = destinationSetup.consumer.receiveMessage();
             Optional<Message> message4 = destinationSetup.consumer.receiveMessage();
 
-            assertThat(message1.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
-            assertThat(message2.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
-            assertThat(message3.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
-            assertThat(message4.get().getHeaders()).isEqualToComparingFieldByField(createHeaders(destinationSetup.destination));
-
             assertThat(message1.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
             assertThat(message2.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
             assertThat(message3.get().getProperties()).isEqualToComparingFieldByField(new PropertiesImpl());
@@ -96,11 +91,5 @@ public class MultipleDestinationSteps {
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
             assertThat(destinationSetup.consumer.receiveMessage()).isEmpty();
         });
-    }
-
-    private static Headers createHeaders(Destination destination) {
-        Headers headers = new HeadersImpl();
-        headers.setDestination(destination);
-        return headers;
     }
 }

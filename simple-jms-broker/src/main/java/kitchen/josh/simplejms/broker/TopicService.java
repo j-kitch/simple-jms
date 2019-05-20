@@ -51,6 +51,7 @@ public class TopicService implements SingleDestinationService {
     public void addMessage(UUID producer, Message message) {
         verifyProducerExists(producer);
         message.setDestination(new Destination(DestinationType.TOPIC, id));
+        message.setId("ID:" + UUID.randomUUID());
         consumerQueues.values().forEach(queue -> queue.add(message));
     }
 

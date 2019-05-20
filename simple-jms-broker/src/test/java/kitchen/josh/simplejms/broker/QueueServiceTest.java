@@ -4,6 +4,8 @@ import kitchen.josh.simplejms.common.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -108,6 +110,30 @@ public class QueueServiceTest {
         assertThat(queueService.getMessages())
                 .extracting(Message::getDestination)
                 .containsExactly(new Destination(DestinationType.QUEUE, ID), new Destination(DestinationType.QUEUE, ID));
+    }
+
+    @Test
+    public void addMessage_setsMessageId() {
+        UUID producerId = queueService.createProducer();
+        queueService.createConsumer();
+        queueService.createConsumer();
+
+        queueService.addMessage(producerId, messages[0]);
+        queueService.addMessage(producerId, messages[1]);
+
+        List<Message> messages = new ArrayList<>(queueService.getMessages());
+
+        // IDs should be unique
+        assertThat(messages.get(0).getId()).isNotEqualTo(messages.get(1).getId());
+
+        // IDs should be ID:<UUID> format.
+        assertThat(messages)
+                .extracting(Message::getId)
+                .allSatisfy(id -> {
+                    String[] parts = id.split(":");
+                    assertThat(parts[0]).isEqualTo("ID");
+                    assertThat(UUID.fromString(parts[1])).isNotNull();
+                });
     }
 
     @Test

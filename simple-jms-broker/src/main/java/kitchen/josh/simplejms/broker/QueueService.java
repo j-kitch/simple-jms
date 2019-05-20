@@ -53,6 +53,7 @@ public class QueueService implements SingleDestinationService {
     public void addMessage(UUID producer, Message message) {
         verifyProducerExists(producer);
         message.setDestination(new Destination(DestinationType.QUEUE, id));
+        message.setId("ID:" + UUID.randomUUID());
         messages.add(message);
     }
 

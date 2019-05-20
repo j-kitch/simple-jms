@@ -154,7 +154,6 @@ public class TopicServiceTest {
 
     @Test
     public void addMessage_setsDestinationToThis() {
-
         UUID producerId = topicService.createProducer();
         topicService.createConsumer();
         topicService.createConsumer();
@@ -166,6 +165,37 @@ public class TopicServiceTest {
                 assertThat(queue)
                         .extracting(Message::getDestination)
                         .containsExactly(new Destination(DestinationType.TOPIC, ID), new Destination(DestinationType.TOPIC, ID)));
+    }
+
+    @Test
+    public void addMessage_setsMessageId() {
+        UUID producerId = topicService.createProducer();
+        topicService.createConsumer();
+        topicService.createConsumer();
+
+        topicService.addMessage(producerId, messages[0]);
+        topicService.addMessage(producerId, messages[1]);
+
+        List<Queue<Message>> queues = new ArrayList<>(topicService.getConsumerQueues().values());
+        List<Message> messages1 = new ArrayList<>(queues.get(0));
+        List<Message> messages2 = new ArrayList<>(queues.get(1));
+
+        for (int i = 0; i < 2; i++) {
+            // IDs should be the same for the same message in each consumer's queue.
+            assertThat(messages1.get(i).getId()).isEqualTo(messages2.get(i).getId());
+        }
+
+        // IDs should be unique
+        assertThat(messages1.get(0).getId()).isNotEqualTo(messages1.get(1).getId());
+
+        // IDs should be ID:<UUID> format.
+        assertThat(messages1)
+                .extracting(Message::getId)
+                .allSatisfy(id -> {
+                    String[] parts = id.split(":");
+                    assertThat(parts[0]).isEqualTo("ID");
+                    assertThat(UUID.fromString(parts[1])).isNotNull();
+                });
     }
 
     @Test
