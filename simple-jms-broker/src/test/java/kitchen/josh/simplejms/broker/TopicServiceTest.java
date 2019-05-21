@@ -22,6 +22,12 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class TopicServiceTest {
 
     private static final UUID ID = UUID.randomUUID();
+    private static final UUID CONSUMER_ID = UUID.randomUUID();
+    private static final UUID CONSUMER_ID_1 = UUID.randomUUID();
+    private static final UUID CONSUMER_ID_2 = UUID.randomUUID();
+    private static final UUID PRODUCER_ID = UUID.randomUUID();
+    private static final UUID PRODUCER_ID_1 = UUID.randomUUID();
+    private static final UUID PRODUCER_ID_2 = UUID.randomUUID();
 
     private Message[] messages;
 
@@ -105,12 +111,12 @@ public class TopicServiceTest {
 
     @Test
     public void removeConsumer_removesConsumerAndQueue() {
-        UUID producerId = topicService.createProducer();
-        UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addConsumer(CONSUMER_ID);
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
 
-        topicService.removeConsumer(consumerId);
+        topicService.removeConsumer(CONSUMER_ID);
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
     }
@@ -126,9 +132,9 @@ public class TopicServiceTest {
 
     @Test
     public void removeProducer_removesProducer() {
-        UUID producerId = topicService.createProducer();
+        topicService.addProducer(PRODUCER_ID);
 
-        topicService.removeProducer(producerId);
+        topicService.removeProducer(PRODUCER_ID);
 
         assertThat(topicService.getProducers()).isEmpty();
     }
@@ -153,17 +159,17 @@ public class TopicServiceTest {
 
     @Test
     public void addMessage_noConsumers_doesNothing() {
-        UUID producerId = topicService.createProducer();
-        topicService.addMessage(producerId, messages[0]);
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
 
         assertThat(topicService.getConsumerQueues()).isEmpty();
-        assertThat(topicService.getProducers()).containsOnly(producerId);
+        assertThat(topicService.getProducers()).containsOnly(PRODUCER_ID);
     }
 
     @Test
     public void addMessage_producerDoesNotExist_consumersExist_throwsProducerDoesNotExist() {
-        topicService.createConsumer();
-        topicService.createConsumer();
+        topicService.addConsumer(CONSUMER_ID_1);
+        topicService.addConsumer(CONSUMER_ID_2);
 
         assertThatExceptionOfType(ProducerDoesNotExistException.class)
                 .isThrownBy(() -> topicService.addMessage(UUID.randomUUID(), messages[0]));
@@ -177,28 +183,28 @@ public class TopicServiceTest {
 
     @Test
     public void addMessage_consumersExist_appendsMessageToQueues() {
-        UUID producerId = topicService.createProducer();
-        topicService.createConsumer();
-        topicService.createConsumer();
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addConsumer(CONSUMER_ID_1);
+        topicService.addConsumer(CONSUMER_ID_2);
 
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
 
         assertThat(topicService.getConsumerQueues()).hasSize(2);
         topicService.getConsumerQueues().values().forEach(queue -> {
             assertThat(queue).containsExactly(messages[0], messages[1]);
         });
-        assertThat(topicService.getProducers()).containsOnly(producerId);
+        assertThat(topicService.getProducers()).containsOnly(PRODUCER_ID);
     }
 
     @Test
     public void addMessage_setsDestinationToThis() {
-        UUID producerId = topicService.createProducer();
-        topicService.createConsumer();
-        topicService.createConsumer();
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addConsumer(CONSUMER_ID_1);
+        topicService.addConsumer(CONSUMER_ID_2);
 
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
 
         topicService.getConsumerQueues().values().forEach(queue ->
                 assertThat(queue)
@@ -208,12 +214,12 @@ public class TopicServiceTest {
 
     @Test
     public void addMessage_setsMessageId() {
-        UUID producerId = topicService.createProducer();
-        topicService.createConsumer();
-        topicService.createConsumer();
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addConsumer(CONSUMER_ID_1);
+        topicService.addConsumer(CONSUMER_ID_2);
 
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
 
         List<Queue<Message>> queues = new ArrayList<>(topicService.getConsumerQueues().values());
         List<Message> messages1 = new ArrayList<>(queues.get(0));
@@ -248,40 +254,41 @@ public class TopicServiceTest {
 
     @Test
     public void readMessage_consumerExists_emptyQueue_returnsEmpty() {
-        UUID consumerId = topicService.createConsumer();
-        Optional<Message> message = topicService.readMessage(consumerId);
+        topicService.addConsumer(CONSUMER_ID);
+        Optional<Message> message = topicService.readMessage(CONSUMER_ID);
         assertThat(message).isEmpty();
     }
 
     @Test
     public void readMessage_consumerExistsWithMessage_returnsAndRemovesMessage() {
-        UUID producerId = topicService.createProducer();
-        UUID consumerId = topicService.createConsumer();
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addConsumer(CONSUMER_ID);
 
-        Optional<Message> message = topicService.readMessage(consumerId);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
+
+        Optional<Message> message = topicService.readMessage(CONSUMER_ID);
 
         assertThat(message).contains(messages[0]);
-        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(messages[1]);
-        assertThat(topicService.getProducers()).containsOnly(producerId);
+        assertThat(topicService.getConsumerQueues().get(CONSUMER_ID)).containsExactly(messages[1]);
+        assertThat(topicService.getProducers()).containsOnly(PRODUCER_ID);
     }
 
     @Test
     public void readMessage_multipleConsumers_onlyRemovesThisConsumersMessage() {
-        UUID producerId = topicService.createProducer();
-        UUID consumerId = topicService.createConsumer();
-        UUID otherId = topicService.createConsumer();
+        topicService.addProducer(PRODUCER_ID);
+        topicService.addConsumer(CONSUMER_ID_1);
+        topicService.addConsumer(CONSUMER_ID_2);
 
-        topicService.addMessage(producerId, messages[0]);
-        topicService.addMessage(producerId, messages[1]);
+        topicService.addMessage(PRODUCER_ID, messages[0]);
+        topicService.addMessage(PRODUCER_ID, messages[1]);
 
-        Optional<Message> message = topicService.readMessage(consumerId);
+        Optional<Message> message = topicService.readMessage(CONSUMER_ID_1);
 
         assertThat(message).contains(messages[0]);
-        assertThat(topicService.getConsumerQueues().get(consumerId)).containsExactly(messages[1]);
-        assertThat(topicService.getConsumerQueues().get(otherId)).containsExactly(messages[0], messages[1]);
-        assertThat(topicService.getProducers()).containsOnly(producerId);
+        assertThat(topicService.getConsumerQueues().get(CONSUMER_ID_1)).containsExactly(messages[1]);
+        assertThat(topicService.getConsumerQueues().get(CONSUMER_ID_2)).containsExactly(messages[0], messages[1]);
+        assertThat(topicService.getProducers()).containsOnly(PRODUCER_ID);
     }
 
     private static Message[] createMessages() {
