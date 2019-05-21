@@ -58,7 +58,7 @@ public class TopicService implements SingleDestinationService {
     }
 
     @Override
-    public Optional<Message> readMessage(UUID consumerId) {
+    public Optional<Message> deliverMessage(UUID consumerId) {
         verifyConsumerExists(consumerId);
         return Optional.ofNullable(consumerQueues.get(consumerId).poll());
     }

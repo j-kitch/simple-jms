@@ -76,13 +76,13 @@ public class ConsumerServiceTest {
         UUID consumerId = consumerService.createConsumer(DESTINATION);
         reset(singleDestinationService);
 
-        when(singleDestinationService.readMessage(any())).thenReturn(Optional.empty());
+        when(singleDestinationService.deliverMessage(any())).thenReturn(Optional.empty());
 
         Optional<Message> message = consumerService.readMessage(consumerId);
 
         assertThat(message).isEmpty();
         verify(destinationService, atLeastOnce()).findDestination(DESTINATION);
-        verify(singleDestinationService).readMessage(consumerId);
+        verify(singleDestinationService).deliverMessage(consumerId);
     }
 
     @Test
@@ -91,13 +91,13 @@ public class ConsumerServiceTest {
         UUID consumerId = consumerService.createConsumer(DESTINATION);
         reset(singleDestinationService);
 
-        when(singleDestinationService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
+        when(singleDestinationService.deliverMessage(any())).thenReturn(Optional.of(MESSAGE));
 
         Optional<Message> message = consumerService.readMessage(consumerId);
 
         assertThat(message).contains(MESSAGE);
         verify(destinationService, atLeastOnce()).findDestination(DESTINATION);
-        verify(singleDestinationService).readMessage(consumerId);
+        verify(singleDestinationService).deliverMessage(consumerId);
     }
 
     @Test

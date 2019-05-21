@@ -52,11 +52,14 @@ public interface SingleDestinationService {
     void addMessage(UUID producerId, Message message);
 
     /**
-     * Receive and remove a message from the destination for a consumer.
+     * Deliver the next message for the consumer.
+     * <p>
+     * Once a message has been delivered, it is the responsibility of the caller to handle message redelivery and
+     * message acknowledgement.
      *
-     * @param consumerId the id of the consumer receiving the message
-     * @return the message received from the destination, or <code>Optional.empty()</code> if there isn't a message
+     * @param consumerId the id of the consumer to deliver the message to.
+     * @return the message delivered from the destination, or <code>Optional.empty()</code> if there isn't a message
      * @throws ConsumerDoesNotExistException if the consumer doesn't exist
      */
-    Optional<Message> readMessage(UUID consumerId);
+    Optional<Message> deliverMessage(UUID consumerId);
 }

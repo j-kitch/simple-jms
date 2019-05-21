@@ -30,7 +30,7 @@ public class ConsumerService {
     }
 
     public Optional<Message> readMessage(UUID consumerId) {
-        return findDestinationService(consumerId).readMessage(consumerId);
+        return findDestinationService(consumerId).deliverMessage(consumerId);
     }
 
     public void removeConsumer(UUID consumerId) {

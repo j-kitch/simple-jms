@@ -167,12 +167,12 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void readMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
+    public void deliverMessage_consumerDoesNotExist_throwsConsumerDoesNotExist() {
         queueService.addProducer(PRODUCER_ID);
         queueService.addMessage(PRODUCER_ID, messages[0]);
 
         assertThatExceptionOfType(ConsumerDoesNotExistException.class)
-                .isThrownBy(() -> queueService.readMessage(UUID.randomUUID()));
+                .isThrownBy(() -> queueService.deliverMessage(UUID.randomUUID()));
 
         assertThat(queueService.getConsumers()).isEmpty();
         assertThat(queueService.getMessages()).containsExactly(messages[0]);
@@ -180,10 +180,10 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void readMessage_consumerExistsNoMessages_returnsEmpty() {
+    public void deliverMessage_consumerExistsNoMessages_returnsEmpty() {
         queueService.addConsumer(CONSUMER_ID);
 
-        Optional<Message> read = queueService.readMessage(CONSUMER_ID);
+        Optional<Message> read = queueService.deliverMessage(CONSUMER_ID);
 
         assertThat(read).isEmpty();
         assertThat(queueService.getConsumers()).containsExactly(CONSUMER_ID);
@@ -192,13 +192,13 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void readMessage_consumerExistsWithMessages_popsFirst() {
+    public void deliverMessage_consumerExistsWithMessages_popsFirst() {
         queueService.addProducer(PRODUCER_ID);
         queueService.addConsumer(CONSUMER_ID);
         queueService.addMessage(PRODUCER_ID, messages[0]);
         queueService.addMessage(PRODUCER_ID, messages[1]);
 
-        Optional<Message> read = queueService.readMessage(CONSUMER_ID);
+        Optional<Message> read = queueService.deliverMessage(CONSUMER_ID);
 
         assertThat(read).contains(messages[0]);
         assertThat(queueService.getConsumers()).containsExactly(CONSUMER_ID);
@@ -207,7 +207,7 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void readMessage_multipleConsumers_popFromSameQueue() {
+    public void deliverMessage_multipleConsumers_popFromSameQueue() {
         queueService.addProducer(PRODUCER_ID);
         queueService.addMessage(PRODUCER_ID, messages[0]);
         queueService.addMessage(PRODUCER_ID, messages[1]);
@@ -217,12 +217,12 @@ public class QueueServiceTest {
         queueService.addConsumer(CONSUMER_ID_1);
         queueService.addConsumer(CONSUMER_ID_2);
 
-        Optional<Message> read1 = queueService.readMessage(CONSUMER_ID_1);
-        Optional<Message> read2 = queueService.readMessage(CONSUMER_ID_2);
-        Optional<Message> read3 = queueService.readMessage(CONSUMER_ID_1);
-        Optional<Message> read4 = queueService.readMessage(CONSUMER_ID_2);
-        Optional<Message> read5 = queueService.readMessage(CONSUMER_ID_2);
-        Optional<Message> read6 = queueService.readMessage(CONSUMER_ID_1);
+        Optional<Message> read1 = queueService.deliverMessage(CONSUMER_ID_1);
+        Optional<Message> read2 = queueService.deliverMessage(CONSUMER_ID_2);
+        Optional<Message> read3 = queueService.deliverMessage(CONSUMER_ID_1);
+        Optional<Message> read4 = queueService.deliverMessage(CONSUMER_ID_2);
+        Optional<Message> read5 = queueService.deliverMessage(CONSUMER_ID_2);
+        Optional<Message> read6 = queueService.deliverMessage(CONSUMER_ID_1);
 
         assertThat(read1).contains(messages[0]);
         assertThat(read2).contains(messages[1]);
