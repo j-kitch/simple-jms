@@ -73,22 +73,6 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void createConsumer_shouldCreateNewUUIDAndAddToConsumers() {
-        UUID consumerId = queueService.createConsumer();
-
-        assertThat(consumerId).isNotNull();
-        assertThat(queueService.getConsumers()).containsOnly(consumerId);
-    }
-
-    @Test
-    public void createProducer_shouldCreateNewUUIDAndAddToProducers() {
-        UUID producerId = queueService.createProducer();
-
-        assertThat(producerId).isNotNull();
-        assertThat(queueService.getProducers()).containsOnly(producerId);
-    }
-
-    @Test
     public void removeConsumer_removesConsumer() {
         queueService.addConsumer(CONSUMER_ID);
 

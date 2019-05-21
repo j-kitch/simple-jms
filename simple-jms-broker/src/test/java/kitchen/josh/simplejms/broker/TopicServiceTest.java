@@ -13,8 +13,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -68,45 +66,6 @@ public class TopicServiceTest {
         topicService.addProducer(ID);
 
         assertThatExceptionOfType(IllegalStateException.class).isThrownBy(() -> topicService.addProducer(ID));
-    }
-
-    @Test
-    public void createConsumer_shouldCreateUUIDAndAddEntryWithEmptyQueue() {
-        UUID consumerId = topicService.createConsumer();
-
-        assertThat(consumerId).isNotNull();
-        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(consumerId);
-        Queue<Message> consumerQueue = topicService.getConsumerQueues().get(consumerId);
-        assertThat(consumerQueue).isEmpty();
-    }
-
-    @Test
-    public void createConsumer_createsUniqueUUIDs() {
-        Set<UUID> consumerIds = IntStream.range(0, 10)
-                .mapToObj(i -> topicService.createConsumer())
-                .collect(Collectors.toSet());
-
-        assertThat(consumerIds).hasSize(10);
-        assertThat(topicService.getConsumerQueues()).containsOnlyKeys(new ArrayList<>(consumerIds).toArray(new UUID[]{}));
-        assertThat(topicService.getConsumerQueues().values()).allMatch(Collection::isEmpty);
-    }
-
-    @Test
-    public void createProducer_shouldCreateUUIDAndAddEntry() {
-        UUID producerId = topicService.createProducer();
-
-        assertThat(producerId).isNotNull();
-        assertThat(topicService.getProducers()).containsOnly(producerId);
-    }
-
-    @Test
-    public void createProducer_createsUniqueUUIDs() {
-        Set<UUID> producerIds = IntStream.range(0, 10)
-                .mapToObj(i -> topicService.createProducer())
-                .collect(Collectors.toSet());
-
-        assertThat(producerIds).hasSize(10);
-        assertThat(topicService.getProducers()).containsOnly(new ArrayList<>(producerIds).toArray(new UUID[]{}));
     }
 
     @Test

@@ -40,20 +40,6 @@ public class QueueService implements SingleDestinationService {
     }
 
     @Override
-    public UUID createConsumer() {
-        UUID consumerId = UUID.randomUUID();
-        consumers.add(consumerId);
-        return consumerId;
-    }
-
-    @Override
-    public UUID createProducer() {
-        UUID producerId = UUID.randomUUID();
-        producers.add(producerId);
-        return producerId;
-    }
-
-    @Override
     public void removeConsumer(UUID consumer) {
         verifyConsumerExists(consumer);
         consumers.remove(consumer);
