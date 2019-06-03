@@ -159,4 +159,30 @@ public class ConsumerControllerIntegrationTest {
         verify(consumerManager).findConsumer(CONSUMER_ID);
         verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
+
+    @Test
+    public void recover_callsConsumerRecover() throws Exception {
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.of(singleConsumerService));
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/recover"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verify(singleConsumerService).recover();
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
+    }
+
+    @Test
+    public void recover_consumerDoesNotExist_returnsBadRequest() throws Exception {
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/recover"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"Failed to recover consumer: the consumer does not exist\"}"));
+
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
+    }
 }

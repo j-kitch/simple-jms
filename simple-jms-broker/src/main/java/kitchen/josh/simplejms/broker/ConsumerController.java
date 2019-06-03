@@ -19,6 +19,7 @@ public class ConsumerController {
     private static final String FAILED_CREATE_CONSUMER = "Failed to create consumer";
     private static final String FAILED_DELETE_CONSUMER = "Failed to delete consumer";
     private static final String FAILED_RECEIVE_MESSAGE = "Failed to receive message";
+    private static final String FAILED_RECOVER_CONSUMER = "Failed to recover consumer";
 
     private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
     private static final String CONSUMER_DOES_NOT_EXIST = "the consumer does not exist";
@@ -68,15 +69,18 @@ public class ConsumerController {
      */
     @PostMapping(path = "/consumer/{consumerId}/receive")
     public MessageModel receiveMessage(@PathVariable UUID consumerId) {
-        try {
-            return consumerManager.findConsumer(consumerId)
-                    .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST))
-                    .receive()
-                    .map(messageModelFactory::create)
-                    .orElse(new MessageModel(null, emptyList(), null));
-        } catch (ConsumerDoesNotExistException e) {
-            throw createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST);
-        }
+        return consumerManager.findConsumer(consumerId)
+                .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST))
+                .receive()
+                .map(messageModelFactory::create)
+                .orElse(new MessageModel(null, emptyList(), null));
+    }
+
+    @PostMapping(path = "/consumer/{consumerId}/recover")
+    public void recover(@PathVariable UUID consumerId) {
+        consumerManager.findConsumer(consumerId)
+                .orElseThrow(() -> createError(FAILED_RECOVER_CONSUMER, CONSUMER_DOES_NOT_EXIST))
+                .recover();
     }
 
     /**
