@@ -3,6 +3,7 @@ package kitchen.josh.simplejms.broker;
 import kitchen.josh.simplejms.common.DestinationModel;
 import kitchen.josh.simplejms.common.ErrorModel;
 import kitchen.josh.simplejms.common.IdModel;
+import kitchen.josh.simplejms.common.message.MessageIdModel;
 import kitchen.josh.simplejms.common.message.MessageModel;
 import kitchen.josh.simplejms.common.message.MessageModelFactory;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ public class ConsumerController {
     private static final String FAILED_CREATE_CONSUMER = "Failed to create consumer";
     private static final String FAILED_DELETE_CONSUMER = "Failed to delete consumer";
     private static final String FAILED_RECEIVE_MESSAGE = "Failed to receive message";
+    private static final String FAILED_ACKNOWLEDGE_MESSAGE = "Failed to acknowledge message";
     private static final String FAILED_RECOVER_CONSUMER = "Failed to recover consumer";
 
     private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
@@ -74,6 +76,13 @@ public class ConsumerController {
                 .receive()
                 .map(messageModelFactory::create)
                 .orElse(new MessageModel(null, emptyList(), null));
+    }
+
+    @PostMapping(path = "/consumer/{consumerId}/acknowledge")
+    public void acknowledge(@PathVariable UUID consumerId, @RequestBody MessageIdModel messageIdModel) {
+        consumerManager.findConsumer(consumerId)
+                .orElseThrow(() -> createError(FAILED_ACKNOWLEDGE_MESSAGE, CONSUMER_DOES_NOT_EXIST))
+                .acknowledge(messageIdModel.getId());
     }
 
     @PostMapping(path = "/consumer/{consumerId}/recover")

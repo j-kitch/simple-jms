@@ -40,6 +40,7 @@ public class ConsumerControllerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
     private static final String TEXT = "hello world";
     private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
+    private static final String MESSAGE_ID = "ID:message-id";
 
     @Mock
     private SingleConsumerService singleConsumerService;
@@ -155,6 +156,36 @@ public class ConsumerControllerIntegrationTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to receive message: the consumer does not exist\"}"));
+
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
+    }
+
+    @Test
+    public void acknowledge_callsConsumerAcknowledge() throws Exception {
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.of(singleConsumerService));
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/acknowledge")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"id\": \"" + MESSAGE_ID + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(""));
+
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verify(singleConsumerService).acknowledge(MESSAGE_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
+    }
+
+    @Test
+    public void acknowledge_consumerDoesNotExist_returnsBadRequest() throws Exception {
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.empty());
+
+        mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/acknowledge")
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .content("{\"id\": \"" + MESSAGE_ID + "\"}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json("{\"message\": \"Failed to acknowledge message: the consumer does not exist\"}"));
 
         verify(consumerManager).findConsumer(CONSUMER_ID);
         verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
