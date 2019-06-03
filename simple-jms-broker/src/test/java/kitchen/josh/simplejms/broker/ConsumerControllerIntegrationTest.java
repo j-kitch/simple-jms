@@ -13,6 +13,7 @@ import kitchen.josh.simplejms.common.message.headers.HeadersModel;
 import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,18 +41,21 @@ public class ConsumerControllerIntegrationTest {
     private static final String TEXT = "hello world";
     private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
 
+    @Mock
+    private SingleConsumerService singleConsumerService;
+
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
-    private ConsumerService consumerService;
+    private ConsumerManager consumerManager;
 
     @MockBean
     private MessageModelFactory messageModelFactory;
 
     @Test
     public void createConsumer_returnsOkAndId() throws Exception {
-        when(consumerService.createConsumer(any())).thenReturn(CONSUMER_ID);
+        when(consumerManager.createConsumer(any())).thenReturn(CONSUMER_ID);
 
         mockMvc.perform(post("/consumer")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -60,8 +64,8 @@ public class ConsumerControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}", true));
 
-        verify(consumerService).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
@@ -73,12 +77,12 @@ public class ConsumerControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Malformed JSON\"}"));
 
-        verifyZeroInteractions(consumerService, messageModelFactory);
+        verifyZeroInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
     public void createConsumer_destinationDoesNotExist_returnsBadRequest() throws Exception {
-        when(consumerService.createConsumer(any())).thenThrow(DestinationDoesNotExistException.class);
+        when(consumerManager.createConsumer(any())).thenThrow(DestinationDoesNotExistException.class);
 
         mockMvc.perform(post("/consumer")
                 .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -87,8 +91,8 @@ public class ConsumerControllerIntegrationTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to create consumer: the destination does not exist\"}", true));
 
-        verify(consumerService).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
@@ -96,59 +100,63 @@ public class ConsumerControllerIntegrationTest {
         mockMvc.perform(delete("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isOk());
 
-        verify(consumerService).removeConsumer(CONSUMER_ID);
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).removeConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
     public void deleteConsumer_consumerDoesNotExist_returnsBadRequest() throws Exception {
-        doThrow(ConsumerDoesNotExistException.class).when(consumerService).removeConsumer(any());
+        doThrow(ConsumerDoesNotExistException.class).when(consumerManager).removeConsumer(any());
 
         mockMvc.perform(delete("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to delete consumer: the consumer does not exist\"}", true));
 
-        verify(consumerService).removeConsumer(CONSUMER_ID);
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).removeConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
     public void receiveMessage_noMessage_returnsNull() throws Exception {
-        when(consumerService.readMessage(any())).thenReturn(Optional.empty());
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.of(singleConsumerService));
+        when(singleConsumerService.receive()).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"body\": null, \"properties\": [], headers: null}", true));
 
-        verify(consumerService).readMessage(CONSUMER_ID);
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verify(singleConsumerService).receive();
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
     public void receiveMessage_message_returnsMessage() throws Exception {
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.of(singleConsumerService));
+        when(singleConsumerService.receive()).thenReturn(Optional.of(MESSAGE));
         when(messageModelFactory.create(any())).thenReturn(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));
-        when(consumerService.readMessage(any())).thenReturn(Optional.of(MESSAGE));
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isOk())
                 .andExpect(content().json("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": []}"));
 
-        verify(consumerService).readMessage(CONSUMER_ID);
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verify(singleConsumerService).receive();
         verify(messageModelFactory).create(MESSAGE);
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 
     @Test
     public void receiveMessage_consumerDoesNotExist_returnsBadRequest() throws Exception {
-        when(consumerService.readMessage(any())).thenThrow(ConsumerDoesNotExistException.class);
+        when(consumerManager.findConsumer(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
                 .andExpect(content().json("{\"message\": \"Failed to receive message: the consumer does not exist\"}"));
 
-        verify(consumerService).readMessage(CONSUMER_ID);
-        verifyNoMoreInteractions(consumerService, messageModelFactory);
+        verify(consumerManager).findConsumer(CONSUMER_ID);
+        verifyNoMoreInteractions(consumerManager, singleConsumerService, messageModelFactory);
     }
 }

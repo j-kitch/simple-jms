@@ -23,11 +23,11 @@ public class ConsumerController {
     private static final String DESTINATION_DOES_NOT_EXIST = "the destination does not exist";
     private static final String CONSUMER_DOES_NOT_EXIST = "the consumer does not exist";
 
-    private final ConsumerService consumerService;
+    private final ConsumerManager consumerManager;
     private final MessageModelFactory messageModelFactory;
 
-    public ConsumerController(ConsumerService consumerService, MessageModelFactory messageModelFactory) {
-        this.consumerService = consumerService;
+    public ConsumerController(ConsumerManager consumerManager, MessageModelFactory messageModelFactory) {
+        this.consumerManager = consumerManager;
         this.messageModelFactory = messageModelFactory;
     }
 
@@ -40,7 +40,7 @@ public class ConsumerController {
     @PostMapping(path = "/consumer")
     public IdModel createConsumer(@RequestBody DestinationModel model) {
         try {
-            return new IdModel(consumerService.createConsumer(model.getDestination()));
+            return new IdModel(consumerManager.createConsumer(model.getDestination()));
         } catch (DestinationDoesNotExistException e) {
             throw createError(FAILED_CREATE_CONSUMER, DESTINATION_DOES_NOT_EXIST);
         }
@@ -54,7 +54,7 @@ public class ConsumerController {
     @DeleteMapping(path = "/consumer/{consumerId}")
     public void deleteConsumer(@PathVariable UUID consumerId) {
         try {
-            consumerService.removeConsumer(consumerId);
+            consumerManager.removeConsumer(consumerId);
         } catch (ConsumerDoesNotExistException e) {
             throw createError(FAILED_DELETE_CONSUMER, CONSUMER_DOES_NOT_EXIST);
         }
@@ -69,7 +69,9 @@ public class ConsumerController {
     @PostMapping(path = "/consumer/{consumerId}/receive")
     public MessageModel receiveMessage(@PathVariable UUID consumerId) {
         try {
-            return consumerService.readMessage(consumerId)
+            return consumerManager.findConsumer(consumerId)
+                    .orElseThrow(() -> createError(FAILED_RECEIVE_MESSAGE, CONSUMER_DOES_NOT_EXIST))
+                    .receive()
                     .map(messageModelFactory::create)
                     .orElse(new MessageModel(null, emptyList(), null));
         } catch (ConsumerDoesNotExistException e) {

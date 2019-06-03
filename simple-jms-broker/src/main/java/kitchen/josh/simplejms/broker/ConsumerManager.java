@@ -1,12 +1,14 @@
 package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.Destination;
+import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Component
 public class ConsumerManager {
 
     private final DestinationService destinationService;
