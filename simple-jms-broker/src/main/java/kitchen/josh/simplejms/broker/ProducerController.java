@@ -1,7 +1,6 @@
 package kitchen.josh.simplejms.broker;
 
 import kitchen.josh.simplejms.common.DestinationModel;
-import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.ErrorModel;
 import kitchen.josh.simplejms.common.IdModel;
 import kitchen.josh.simplejms.common.message.MessageFactory;
@@ -9,7 +8,6 @@ import kitchen.josh.simplejms.common.message.MessageModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConversionException;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.jms.MessageFormatException;
 import java.util.UUID;
@@ -50,7 +48,7 @@ public class ProducerController {
     /**
      * Delete a producer.
      *
-     * @param producerId      the id of the producer
+     * @param producerId the id of the producer
      */
     @DeleteMapping(path = "/producer/{producerId}")
     public void deleteProducer(@PathVariable UUID producerId) {
@@ -92,14 +90,6 @@ public class ProducerController {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorModel malformedJsonHandler() {
         return new ErrorModel("Malformed JSON");
-    }
-
-    private static DestinationType toType(String type) {
-        try {
-            return DestinationType.valueOf(type.toUpperCase());
-        } catch (IllegalArgumentException iae) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
     }
 
     private static ApiException createError(String problem, String cause) {
