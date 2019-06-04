@@ -2,6 +2,7 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.message.Message;
 import kitchen.josh.simplejms.common.message.MessageFactory;
+import kitchen.josh.simplejms.common.message.MessageIdModel;
 import kitchen.josh.simplejms.common.message.MessageModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -37,6 +38,11 @@ public class Consumer implements AutoCloseable {
         return Optional.ofNullable(restTemplate.postForEntity(receiveUrl, null, MessageModel.class))
                 .map(ResponseEntity::getBody)
                 .map(this::createMessage);
+    }
+
+    public void acknowledge(Message message) {
+        String acknowledgeUrl = brokerUrl + "/consumer/" + id.getId();
+        restTemplate.postForEntity(acknowledgeUrl, new MessageIdModel(message.getId()), Void.class);
     }
 
     /**

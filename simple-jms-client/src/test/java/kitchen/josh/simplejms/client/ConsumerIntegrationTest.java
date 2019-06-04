@@ -24,8 +24,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.client.ExpectedCount.once;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 public class ConsumerIntegrationTest {
@@ -38,6 +37,7 @@ public class ConsumerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
     private static final String RECEIVE_URL = HOST + "/consumer/" + CONSUMER_ID + "/receive";
+    private static final String ACKNOWLEDGE_URL = HOST + "/consumer/" + CONSUMER_ID;
     private static final String CLOSE_URL = HOST + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
@@ -87,6 +87,23 @@ public class ConsumerIntegrationTest {
         expected.setId("ID:1234");
         expected.setDestination(new Destination(DestinationType.TOPIC, DESTINATION_ID));
         assertThat(received.get()).isEqualToComparingFieldByFieldRecursively(expected);
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    public void acknowledge() {
+        String json = "{\"id\": \"ID:1234\"}";
+        Message message = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody());
+        message.setId("ID:1234");
+
+        mockRestServiceServer.expect(once(), requestTo(ACKNOWLEDGE_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().json(json))
+                .andRespond(withSuccess());
+
+        consumer.acknowledge(message);
+
         mockRestServiceServer.verify();
     }
 

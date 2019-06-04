@@ -2,16 +2,15 @@ package kitchen.josh.simplejms.client;
 
 import kitchen.josh.simplejms.common.Destination;
 import kitchen.josh.simplejms.common.DestinationType;
-import kitchen.josh.simplejms.common.message.Message;
-import kitchen.josh.simplejms.common.message.MessageFactory;
-import kitchen.josh.simplejms.common.message.MessageModel;
-import kitchen.josh.simplejms.common.message.TextMessage;
+import kitchen.josh.simplejms.common.message.*;
 import kitchen.josh.simplejms.common.message.body.TextBody;
 import kitchen.josh.simplejms.common.message.headers.HeadersImpl;
 import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.http.ResponseEntity;
@@ -38,10 +37,14 @@ public class ConsumerTest {
 
     private static final String RECEIVE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID + "/receive";
     private static final String DELETE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID;
+    private static final String ACKNOWLEDGE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
     private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
     private static final MessageModel MESSAGE_MODEL = new MessageModel(null, null, null);
+
+    @Captor
+    private ArgumentCaptor<MessageIdModel> messageIdModelCaptor;
 
     @Mock
     private RestTemplate restTemplate;
@@ -89,6 +92,27 @@ public class ConsumerTest {
         verify(restTemplate).postForEntity(RECEIVE_URL, null, MessageModel.class);
         verify(messageFactory).create(MESSAGE_MODEL);
         verifyNoMoreInteractions(restTemplate, messageFactory);
+    }
+
+    @Test
+    public void acknowledge_restTemplateThrows_throws() {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
+
+        assertThatExceptionOfType(RestClientException.class).isThrownBy(() -> consumer.acknowledge(MESSAGE));
+        verify(restTemplate).postForEntity(eq(ACKNOWLEDGE_URL), messageIdModelCaptor.capture(), eq(Void.class));
+        verifyNoMoreInteractions(restTemplate, messageFactory);
+        assertThat(messageIdModelCaptor.getValue()).isEqualToComparingFieldByField(new MessageIdModel(MESSAGE.getId()));
+    }
+
+    @Test
+    public void acknowledge_callsBroker() {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        consumer.acknowledge(MESSAGE);
+
+        verify(restTemplate).postForEntity(eq(ACKNOWLEDGE_URL), messageIdModelCaptor.capture(), eq(Void.class));
+        verifyNoMoreInteractions(restTemplate, messageFactory);
+        assertThat(messageIdModelCaptor.getValue()).isEqualToComparingFieldByField(new MessageIdModel(MESSAGE.getId()));
     }
 
     @Test
