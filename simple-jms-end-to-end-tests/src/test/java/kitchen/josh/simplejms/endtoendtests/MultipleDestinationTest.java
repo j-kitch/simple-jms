@@ -1,10 +1,6 @@
 package kitchen.josh.simplejms.endtoendtests;
 
-import cucumber.api.java.After;
-import cucumber.api.java.Before;
-import cucumber.api.java.en.Given;
-import cucumber.api.java.en.Then;
-import cucumber.api.java.en.When;
+import kitchen.josh.simplejms.broker.Broker;
 import kitchen.josh.simplejms.client.Consumer;
 import kitchen.josh.simplejms.client.Producer;
 import kitchen.josh.simplejms.client.Session;
@@ -13,15 +9,24 @@ import kitchen.josh.simplejms.common.DestinationType;
 import kitchen.josh.simplejms.common.message.Message;
 import kitchen.josh.simplejms.common.message.body.TextBody;
 import kitchen.josh.simplejms.common.message.properties.PropertiesImpl;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
-public class MultipleDestinationSteps {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = Broker.class, webEnvironment = RANDOM_PORT)
+public class MultipleDestinationTest {
 
     private static class DestinationSetup {
         Destination destination;
@@ -33,13 +38,15 @@ public class MultipleDestinationSteps {
     @LocalServerPort
     private int port;
 
+    private String host;
     private Session session;
     private DestinationSetup destinationSetup1;
     private DestinationSetup destinationSetup2;
 
     @Before
     public void setUp() {
-        session = new Session("http://localhost:" + port, new RestTemplate());
+        host = "http://localhost:" + port;
+        session = new Session(host, new RestTemplate());
     }
 
     @After
@@ -49,8 +56,11 @@ public class MultipleDestinationSteps {
         destinationSetup2 = null;
     }
 
-    @Given("multiple destinations, each with producers and consumers")
-    public void multiple_destinations_each_with_producers_and_consumers() {
+    /**
+     * Messages sent to unique destinations are only received by that destination's consumers.
+     */
+    @Test
+    public void eachDestinationIsUnique() {
         destinationSetup1 = new DestinationSetup();
         destinationSetup1.destination = session.createDestination(DestinationType.QUEUE);
         destinationSetup1.producer = session.createProducer(destinationSetup1.destination);
@@ -62,20 +72,14 @@ public class MultipleDestinationSteps {
         destinationSetup2.producer = session.createProducer(destinationSetup2.destination);
         destinationSetup2.consumer = session.createConsumer(destinationSetup2.destination);
         destinationSetup2.messages = new String[]{"e", "f", "g", "h"};
-    }
 
-    @When("each destination's producers send messages")
-    public void each_destination_s_producers_send_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
             destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[0]));
             destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[1]));
             destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[2]));
             destinationSetup.producer.sendMessage(session.createTextMessage(destinationSetup.messages[3]));
         });
-    }
 
-    @Then("each destination's consumers only receive their destinations messages")
-    public void each_destination_s_consumers_only_receive_their_destinations_messages() {
         Stream.of(destinationSetup1, destinationSetup2).forEach(destinationSetup -> {
             Optional<Message> message1 = destinationSetup.consumer.receiveMessage();
             Optional<Message> message2 = destinationSetup.consumer.receiveMessage();
