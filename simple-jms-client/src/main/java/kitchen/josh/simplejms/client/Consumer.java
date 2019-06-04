@@ -41,8 +41,13 @@ public class Consumer implements AutoCloseable {
     }
 
     public void acknowledge(Message message) {
-        String acknowledgeUrl = brokerUrl + "/consumer/" + id.getId();
+        String acknowledgeUrl = brokerUrl + "/consumer/" + id.getId() + "/acknowledge";
         restTemplate.postForEntity(acknowledgeUrl, new MessageIdModel(message.getId()), Void.class);
+    }
+
+    public void recover() {
+        String recoverUrl = brokerUrl + "/consumer/" + id.getId() + "/recover";
+        restTemplate.postForEntity(recoverUrl, null, Void.class);
     }
 
     /**

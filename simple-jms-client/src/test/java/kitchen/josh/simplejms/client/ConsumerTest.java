@@ -37,7 +37,8 @@ public class ConsumerTest {
 
     private static final String RECEIVE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID + "/receive";
     private static final String DELETE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID;
-    private static final String ACKNOWLEDGE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID;
+    private static final String ACKNOWLEDGE_URL = BROKER_URL + "/consumer/" + CONSUMER_ID + "/acknowledge";
+    private static final String RECOVER_URL = BROKER_URL + "/consumer/" + CONSUMER_ID + "/recover";
 
     private static final String TEXT = "hello world";
     private static final Message MESSAGE = new TextMessage(new HeadersImpl(), new PropertiesImpl(), new TextBody(TEXT));
@@ -113,6 +114,26 @@ public class ConsumerTest {
         verify(restTemplate).postForEntity(eq(ACKNOWLEDGE_URL), messageIdModelCaptor.capture(), eq(Void.class));
         verifyNoMoreInteractions(restTemplate, messageFactory);
         assertThat(messageIdModelCaptor.getValue()).isEqualToComparingFieldByField(new MessageIdModel(MESSAGE.getId()));
+    }
+
+    @Test
+    public void recover_restTemplateThrows_throws() {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenThrow(RestClientException.class);
+
+        assertThatExceptionOfType(RestClientException.class).isThrownBy(() -> consumer.recover());
+
+        verify(restTemplate).postForEntity(RECOVER_URL, null, Void.class);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
+    }
+
+    @Test
+    public void recover() {
+        when(restTemplate.postForEntity(anyString(), any(), any())).thenReturn(ResponseEntity.ok().build());
+
+        consumer.recover();
+
+        verify(restTemplate).postForEntity(RECOVER_URL, null, Void.class);
+        verifyNoMoreInteractions(restTemplate, messageFactory);
     }
 
     @Test

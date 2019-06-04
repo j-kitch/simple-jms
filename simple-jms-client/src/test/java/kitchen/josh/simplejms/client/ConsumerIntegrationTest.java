@@ -37,7 +37,8 @@ public class ConsumerIntegrationTest {
     private static final UUID CONSUMER_ID = UUID.randomUUID();
 
     private static final String RECEIVE_URL = HOST + "/consumer/" + CONSUMER_ID + "/receive";
-    private static final String ACKNOWLEDGE_URL = HOST + "/consumer/" + CONSUMER_ID;
+    private static final String ACKNOWLEDGE_URL = HOST + "/consumer/" + CONSUMER_ID + "/acknowledge";
+    private static final String RECOVER_URL = HOST + "/consumer/" + CONSUMER_ID + "/recover";
     private static final String CLOSE_URL = HOST + "/consumer/" + CONSUMER_ID;
 
     private static final String TEXT = "hello world";
@@ -103,6 +104,18 @@ public class ConsumerIntegrationTest {
                 .andRespond(withSuccess());
 
         consumer.acknowledge(message);
+
+        mockRestServiceServer.verify();
+    }
+
+    @Test
+    public void recover() {
+        mockRestServiceServer.expect(once(), requestTo(RECOVER_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().string(""))
+                .andRespond(withSuccess());
+
+        consumer.recover();
 
         mockRestServiceServer.verify();
     }
