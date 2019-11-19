@@ -59,10 +59,10 @@ public class ConsumerControllerIntegrationTest {
         when(consumerManager.createConsumer(any())).thenReturn(CONSUMER_ID);
 
         mockMvc.perform(post("/consumer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"id\": \"" + CONSUMER_ID + "\"}", true));
 
         verify(consumerManager).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
@@ -72,10 +72,10 @@ public class ConsumerControllerIntegrationTest {
     @Test
     public void createConsumer_invalidDestinationType_returns() throws Exception {
         mockMvc.perform(post("/consumer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"abcd\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Malformed JSON\"}"));
 
         verifyZeroInteractions(consumerManager, singleConsumerService, messageModelFactory);
@@ -86,10 +86,10 @@ public class ConsumerControllerIntegrationTest {
         when(consumerManager.createConsumer(any())).thenThrow(DestinationDoesNotExistException.class);
 
         mockMvc.perform(post("/consumer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to create consumer: the destination does not exist\"}", true));
 
         verify(consumerManager).createConsumer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
@@ -111,7 +111,7 @@ public class ConsumerControllerIntegrationTest {
 
         mockMvc.perform(delete("/consumer/" + CONSUMER_ID))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to delete consumer: the consumer does not exist\"}", true));
 
         verify(consumerManager).removeConsumer(CONSUMER_ID);
@@ -154,7 +154,7 @@ public class ConsumerControllerIntegrationTest {
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/receive"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to receive message: the consumer does not exist\"}"));
 
         verify(consumerManager).findConsumer(CONSUMER_ID);
@@ -166,7 +166,7 @@ public class ConsumerControllerIntegrationTest {
         when(consumerManager.findConsumer(any())).thenReturn(Optional.of(singleConsumerService));
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/acknowledge")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"id\": \"" + MESSAGE_ID + "\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
@@ -181,10 +181,10 @@ public class ConsumerControllerIntegrationTest {
         when(consumerManager.findConsumer(any())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/acknowledge")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"id\": \"" + MESSAGE_ID + "\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to acknowledge message: the consumer does not exist\"}"));
 
         verify(consumerManager).findConsumer(CONSUMER_ID);
@@ -210,7 +210,7 @@ public class ConsumerControllerIntegrationTest {
 
         mockMvc.perform(post("/consumer/" + CONSUMER_ID + "/recover"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to recover consumer: the consumer does not exist\"}"));
 
         verify(consumerManager).findConsumer(CONSUMER_ID);

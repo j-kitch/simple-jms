@@ -60,7 +60,7 @@ public class ConsumerIntegrationTest {
     public void receiveMessage_noMessage_returnsEmpty() {
         mockRestServiceServer.expect(once(), requestTo(RECEIVE_URL))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess("{\"body\": null, \"properties\": []}", MediaType.APPLICATION_JSON));
 
         Optional<Message> message = consumer.receiveMessage();
 
@@ -80,7 +80,7 @@ public class ConsumerIntegrationTest {
 
         mockRestServiceServer.expect(once(), requestTo(RECEIVE_URL))
                 .andExpect(method(HttpMethod.POST))
-                .andRespond(withSuccess(json, MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess(json, MediaType.APPLICATION_JSON));
 
         Optional<Message> received = consumer.receiveMessage();
 
@@ -99,7 +99,7 @@ public class ConsumerIntegrationTest {
 
         mockRestServiceServer.expect(once(), requestTo(ACKNOWLEDGE_URL))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(json))
                 .andRespond(withSuccess());
 

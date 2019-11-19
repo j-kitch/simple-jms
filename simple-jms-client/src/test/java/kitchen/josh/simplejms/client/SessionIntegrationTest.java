@@ -45,9 +45,9 @@ public class SessionIntegrationTest {
     public void createConsumer() {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/consumer"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"destination\": \"queue:" + DESTINATION_ID + "\"}", true))
-                .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON));
 
         Session session = new Session(HOST, restTemplate);
 
@@ -62,9 +62,9 @@ public class SessionIntegrationTest {
     public void createProducer() {
         mockRestServiceServer.expect(once(), requestTo(HOST + "/producer"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"destination\": \"topic:" + DESTINATION_ID + "\"}", true))
-                .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON_UTF8));
+                .andRespond(withSuccess("{\"id\": \"" + ID + "\"}", MediaType.APPLICATION_JSON));
         Session session = new Session(HOST, restTemplate);
 
         Producer producer = session.createProducer(TOPIC);

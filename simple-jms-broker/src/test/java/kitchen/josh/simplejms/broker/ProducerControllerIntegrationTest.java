@@ -57,10 +57,10 @@ public class ProducerControllerIntegrationTest {
         when(producerService.createProducer(any())).thenReturn(PRODUCER_ID);
 
         mockMvc.perform(post("/producer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"topic:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"id\": \"" + PRODUCER_ID + "\"}", true));
 
         verify(producerService).createProducer(new Destination(DestinationType.TOPIC, DESTINATION_ID));
@@ -70,7 +70,7 @@ public class ProducerControllerIntegrationTest {
     @Test
     public void createProducer_unknownDestinationType_returnsBadRequest() throws Exception {
         mockMvc.perform(post("/producer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"abcd\"}"))
                 .andExpect(status().isBadRequest())
                 .andExpect(content().json("{\"message\": \"Malformed JSON\"}", true));
@@ -83,10 +83,10 @@ public class ProducerControllerIntegrationTest {
         when(producerService.createProducer(any())).thenThrow(DestinationDoesNotExistException.class);
 
         mockMvc.perform(post("/producer")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"destination\": \"queue:" + DESTINATION_ID + "\"}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to create producer: the destination does not exist\"}", true));
 
         verify(producerService).createProducer(new Destination(DestinationType.QUEUE, DESTINATION_ID));
@@ -108,7 +108,7 @@ public class ProducerControllerIntegrationTest {
 
         mockMvc.perform(delete("/producer/" + PRODUCER_ID))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to delete producer: the producer does not exist\"}", true));
 
         verify(producerService).removeProducer(PRODUCER_ID);
@@ -120,7 +120,7 @@ public class ProducerControllerIntegrationTest {
         when(messageFactory.create(any())).thenReturn(MESSAGE);
 
         mockMvc.perform(post("/producer/" + PRODUCER_ID + "/send")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string(""));
@@ -136,10 +136,10 @@ public class ProducerControllerIntegrationTest {
         doThrow(ProducerDoesNotExistException.class).when(producerService).sendMessage(any(), any());
 
         mockMvc.perform(post("/producer/" + PRODUCER_ID + "/send")
-                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"body\": {\"type\": \"text\", \"text\": \"" + TEXT + "\"}, \"properties\": [], \"headers\": {}}"))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"message\": \"Failed to send message: the producer does not exist\"}", true));
 
         verify(messageFactory).create(new MessageModel(new HeadersModel(null, null), emptyList(), new TextBodyModel(TEXT)));

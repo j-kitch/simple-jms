@@ -36,7 +36,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/topic"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.TOPIC);
@@ -49,7 +49,7 @@ public class DestinationControllerIntegrationTest {
 
         mockMvc.perform(post("/queue"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json("{\"id\": \"" + DESTINATION_ID + "\"}", true));
 
         verify(destinationService).createDestination(DestinationType.QUEUE);
